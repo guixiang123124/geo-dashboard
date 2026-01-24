@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GEO Attribution Dashboard - AI Performance Tracking",
-  description: "Track how AI platforms mention, cite, and represent your brand",
+  title: "GEO Insights - AI Era Brand Optimization",
+  description: "Track and optimize your brand performance across AI platforms (ChatGPT, Gemini, Claude, Perplexity)",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex h-screen bg-slate-50">
+        <div className="flex h-screen bg-gradient-to-br from-slate-50 via-purple-50/20 to-blue-50/20">
           {/* Sidebar Navigation */}
           <Sidebar />
 
@@ -39,7 +39,7 @@ export default function RootLayout({
             <Header />
 
             {/* Page Content */}
-            <main className="flex-1 overflow-y-auto">
+            <main className="flex-1 overflow-y-auto p-6 md:p-8">
               {children}
             </main>
           </div>
