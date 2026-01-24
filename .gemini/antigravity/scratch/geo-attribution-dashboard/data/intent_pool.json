@@ -1,0 +1,33 @@
+{
+    "industry": "Kids Fashion",
+    "intents": [
+        {
+            "category": "general",
+            "prompts": [
+                "Best kids clothing brands in the US",
+                "Top rated children's fashion websites"
+            ]
+        },
+        {
+            "category": "price",
+            "prompts": [
+                "Affordable kids clothes that are durable",
+                "Where to buy cheap but good quality kids clothes"
+            ]
+        },
+        {
+            "category": "sustainability",
+            "prompts": [
+                "Best organic cotton kids clothing brands",
+                "Sustainable children's fashion brands"
+            ]
+        },
+        {
+            "category": "occasion",
+            "prompts": [
+                "Best outfits for kids back to school",
+                "Formal wear for toddlers"
+            ]
+        }
+    ]
+}
