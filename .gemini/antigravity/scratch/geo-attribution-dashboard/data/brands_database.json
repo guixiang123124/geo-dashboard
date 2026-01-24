@@ -221,6 +221,116 @@
       "keywords": ["trendy", "cool", "teen", "tween", "stylish"],
       "competitors": ["gap-kids", "zara-kids", "childrens-place"],
       "attributes": ["teen-focused", "trendy styles", "brand appeal"]
+    },
+    {
+      "id": "kate-quinn-organics",
+      "name": "Kate Quinn Organics",
+      "domain": "katequinn.com",
+      "positioning": "Premium organic baby clothing with modern designs",
+      "price_tier": "premium",
+      "target_age_range": ["baby", "toddler"],
+      "keywords": ["organic", "premium", "baby", "modern", "sustainable"],
+      "competitors": ["monica-andy", "pact", "hanna-andersson"],
+      "attributes": ["GOTS certified organic", "modern aesthetic", "eco-friendly dyes"]
+    },
+    {
+      "id": "copper-pearl",
+      "name": "Copper Pearl",
+      "domain": "copperpearl.com",
+      "positioning": "Stylish baby accessories and clothing with unique patterns",
+      "price_tier": "mid-range",
+      "target_age_range": ["baby", "toddler"],
+      "keywords": ["stylish", "baby", "patterns", "accessories", "modern"],
+      "competitors": ["little-sleepies", "primary", "carters"],
+      "attributes": ["unique patterns", "multi-use products", "Instagram-worthy"]
+    },
+    {
+      "id": "freshly-picked",
+      "name": "Freshly Picked",
+      "domain": "freshlypicked.com",
+      "positioning": "Soft-sole moccasins and modern kids clothing",
+      "price_tier": "premium",
+      "target_age_range": ["baby", "toddler", "kids"],
+      "keywords": ["moccasins", "soft-sole", "modern", "stylish", "quality"],
+      "competitors": ["primary", "monica-andy", "little-sleepies"],
+      "attributes": ["signature moccasins", "modern design", "quality leather"]
+    },
+    {
+      "id": "colored-organics",
+      "name": "Colored Organics",
+      "domain": "coloredorganics.com",
+      "positioning": "Affordable organic kids clothing in vibrant colors",
+      "price_tier": "mid-range",
+      "target_age_range": ["baby", "toddler", "kids"],
+      "keywords": ["organic", "affordable", "colorful", "sustainable", "basics"],
+      "competitors": ["pact", "primary", "hanna-andersson"],
+      "attributes": ["100% GOTS organic cotton", "vibrant dyes", "affordable pricing"]
+    },
+    {
+      "id": "amazon-essentials-kids",
+      "name": "Amazon Essentials Kids",
+      "domain": "amazon.com",
+      "positioning": "Budget-friendly basics with Amazon Prime convenience",
+      "price_tier": "budget",
+      "target_age_range": ["baby", "toddler", "kids", "teen"],
+      "keywords": ["affordable", "basics", "Amazon", "fast shipping", "value"],
+      "competitors": ["old-navy-kids", "target", "walmart"],
+      "attributes": ["Amazon Prime shipping", "very affordable", "basic essentials"]
+    },
+    {
+      "id": "petit-bateau",
+      "name": "Petit Bateau",
+      "domain": "petit-bateau.us",
+      "positioning": "French luxury kids clothing with iconic stripes",
+      "price_tier": "luxury",
+      "target_age_range": ["baby", "toddler", "kids", "teen"],
+      "keywords": ["French", "luxury", "stripes", "premium", "quality"],
+      "competitors": ["janie-and-jack", "mini-boden", "tea-collection"],
+      "attributes": ["French heritage", "iconic striped designs", "luxury quality"]
+    },
+    {
+      "id": "bonds-kids",
+      "name": "Bonds Kids",
+      "domain": "bonds.com",
+      "positioning": "Australian comfort-focused kids clothing and underwear",
+      "price_tier": "mid-range",
+      "target_age_range": ["baby", "toddler", "kids", "teen"],
+      "keywords": ["comfortable", "Australian", "underwear", "basics", "quality"],
+      "competitors": ["uniqlo-kids", "gap-kids", "primary"],
+      "attributes": ["comfort-first design", "quality basics", "Australian brand"]
+    },
+    {
+      "id": "mini-mioche",
+      "name": "Mini Mioche",
+      "domain": "minimioche.com",
+      "positioning": "Canadian organic and sustainable kids clothing",
+      "price_tier": "premium",
+      "target_age_range": ["baby", "toddler", "kids"],
+      "keywords": ["organic", "sustainable", "Canadian", "ethical", "eco-friendly"],
+      "competitors": ["pact", "monica-andy", "kate-quinn-organics"],
+      "attributes": ["Canadian-made", "sustainable production", "organic fabrics"]
+    },
+    {
+      "id": "milk-and-masuki",
+      "name": "Milk & Masuki",
+      "domain": "milkandmasuki.com.au",
+      "positioning": "Australian organic kids clothing with unique prints",
+      "price_tier": "premium",
+      "target_age_range": ["baby", "toddler", "kids"],
+      "keywords": ["organic", "Australian", "unique prints", "sustainable", "quality"],
+      "competitors": ["kate-quinn-organics", "primary", "mini-boden"],
+      "attributes": ["Australian design", "GOTS certified", "artistic prints"]
+    },
+    {
+      "id": "rylee-and-cru",
+      "name": "Rylee + Cru",
+      "domain": "ryleeandcru.com",
+      "positioning": "Boutique kids clothing with vintage-inspired aesthetic",
+      "price_tier": "premium",
+      "target_age_range": ["baby", "toddler", "kids"],
+      "keywords": ["boutique", "vintage", "aesthetic", "trendy", "instagram"],
+      "competitors": ["mini-boden", "tea-collection", "freshly-picked"],
+      "attributes": ["vintage-inspired", "boutique quality", "Instagram popular"]
     }
   ]
 }
