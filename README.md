@@ -1,6 +1,13 @@
 # GEO Attribution & Measurement Dashboard
 
+> 🇨🇳 [中文文档](./README_CN.md) | 🇺🇸 English
+
 A SaaS platform for measuring **Generative Engine Optimization (GEO)** — tracking how AI chatbots (ChatGPT, Gemini, Claude, Perplexity) mention, cite, and frame brands in their responses.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688.svg)](https://fastapi.tiangolo.com)
 
 ## What is GEO?
 

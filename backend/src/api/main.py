@@ -14,16 +14,16 @@ from ..core.database import init_db, close_db
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
-    print(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
+    print(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     await init_db()
-    print("✅ Database initialized")
+    print("Database initialized")
 
     yield
 
     # Shutdown
-    print("👋 Shutting down...")
+    print("Shutting down...")
     await close_db()
-    print("✅ Database connections closed")
+    print("Database connections closed")
 
 
 # Create FastAPI app
