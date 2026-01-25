@@ -34,7 +34,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://your-api-domain.com/api/:path*"
+      "destination": "https://geo-insights-api.onrender.com/api/:path*"
     }
   ]
 }
