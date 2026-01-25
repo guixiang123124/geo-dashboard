@@ -401,3 +401,50 @@ export function getModelBreakdownById(brandId: string): ModelComparisonData[] {
 export function getFunnelDataById(brandId: string): FunnelData[] {
   return generateFunnelData();
 }
+
+// Scores alias - extract scores from MOCK_BRANDS
+export const SCORES = MOCK_BRANDS.map(brand => brand.score).filter(Boolean);
+
+// Mock evaluation runs data
+export const ALL_EVALUATION_RUNS = [
+  {
+    id: 'eval-1',
+    name: 'Weekly Brand Check',
+    status: 'completed',
+    startedAt: '2024-01-15T10:00:00Z',
+    completedAt: '2024-01-15T10:45:00Z',
+    totalBrands: 30,
+    totalPrompts: 120,
+    progress: 100,
+  },
+  {
+    id: 'eval-2',
+    name: 'Monthly Deep Analysis',
+    status: 'completed',
+    startedAt: '2024-01-10T14:00:00Z',
+    completedAt: '2024-01-10T16:30:00Z',
+    totalBrands: 30,
+    totalPrompts: 120,
+    progress: 100,
+  },
+  {
+    id: 'eval-3',
+    name: 'New Brand Evaluation',
+    status: 'running',
+    startedAt: '2024-01-16T09:00:00Z',
+    completedAt: null,
+    totalBrands: 5,
+    totalPrompts: 120,
+    progress: 65,
+  },
+  {
+    id: 'eval-4',
+    name: 'Competitor Analysis',
+    status: 'pending',
+    startedAt: null,
+    completedAt: null,
+    totalBrands: 10,
+    totalPrompts: 120,
+    progress: 0,
+  },
+];
