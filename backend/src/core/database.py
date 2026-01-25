@@ -14,9 +14,24 @@ from sqlalchemy.orm import DeclarativeBase
 from .config import settings
 
 
+def get_database_url() -> str:
+    """
+    Get the database URL, converting Render's postgres:// to postgresql+asyncpg://
+    """
+    url = settings.DATABASE_URL
+
+    # Render provides postgres:// but SQLAlchemy async needs postgresql+asyncpg://
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+    return url
+
+
 # Create async engine
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    get_database_url(),
     echo=settings.DEBUG,
     future=True,
 )
