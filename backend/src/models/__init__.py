@@ -7,6 +7,7 @@ from .brand import Brand
 from .prompt import Prompt
 from .evaluation import EvaluationRun, EvaluationResult
 from .scorecard import ScoreCard
+from .user import User
 
 __all__ = [
     "Workspace",
@@ -15,4 +16,5 @@ __all__ = [
     "EvaluationRun",
     "EvaluationResult",
     "ScoreCard",
+    "User",
 ]

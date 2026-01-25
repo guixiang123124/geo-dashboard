@@ -37,6 +37,9 @@ class Workspace(Base):
     evaluation_runs: Mapped[List["EvaluationRun"]] = relationship(
         "EvaluationRun", back_populates="workspace", cascade="all, delete-orphan"
     )
+    users: Mapped[List["User"]] = relationship(
+        "User", back_populates="workspace"
+    )
 
     def __repr__(self) -> str:
         return f"<Workspace(id={self.id}, name={self.name}, slug={self.slug})>"

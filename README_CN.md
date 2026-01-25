@@ -1,404 +1,265 @@
-# GEO归因与测量仪表板
+# GEO Insights - AI时代品牌优化平台
 
-> 🇨🇳 中文 | [🇺🇸 English](./README.md)
+> 🇺🇸 [English](./README.md) | 🇨🇳 中文文档
 
-一个用于测量**生成式引擎优化（GEO）**的SaaS平台 — 追踪AI聊天机器人（ChatGPT、Gemini、Claude、Perplexity）如何提及、引用和描述品牌。
+一个现代化的SaaS平台，用于**生成式引擎优化（GEO）**——追踪AI聊天机器人（ChatGPT、Gemini、Claude、Perplexity）如何在回答中提及、引用和描述你的品牌。
 
-[![许可证: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688.svg)](https://fastapi.tiangolo.com)
 
-## 🎯 什么是GEO？
+## 什么是GEO？
 
-GEO（生成式引擎优化）衡量品牌在AI生成回复中的可见度和呈现方式。与传统SEO专注于搜索引擎排名不同，GEO追踪：
+**GEO（生成式引擎优化）** 衡量品牌在AI生成回答中的可见性和呈现方式。与关注搜索引擎排名的传统SEO不同，GEO追踪：
 
-- **AI是否记得你的品牌？**（可见度）
-- **AI为什么信任你的品牌？**（引用与权威性）
-- **AI如何描述你的品牌？**（呈现与定位）
-- **AI在哪些场景推荐你的品牌？**（意图覆盖）
+| 问题 | 维度 |
+|------|------|
+| AI是否记得你的品牌？ | **可见性 Visibility**（35%） |
+| AI是否引用你的来源？ | **引用 Citation**（25%） |
+| AI如何描述你的品牌？ | **呈现 Representation**（25%） |
+| AI在哪些场景推荐你？ | **意图覆盖 Intent Coverage**（15%） |
 
-## 📊 GEO归因漏斗
+## 功能特性
 
-```
-用户意图 → AI提示词
-    ↓
-A. 可见度与召回 (35%权重)
-    ↓
-B. 来源选择/引用 (25%权重)
-    ↓
-C. 品牌定位/呈现 (25%权重)
-    ↓
-D. 意图匹配与覆盖 (15%权重)
-    ↓
-用户感知 → 转化
-```
+### 核心功能
+- **多模型AI评估** - 支持ChatGPT、Gemini、Claude、Perplexity测试
+- **四维GEO评分** - 可见性、引用、呈现、意图覆盖
+- **实时分析仪表盘** - 交互式图表和可视化
+- **品牌管理** - 追踪多个品牌的详细档案
+- **数据导出** - CSV、PDF和PNG导出功能
 
-## 🚀 快速开始
+### 技术特性
+- **JWT认证** - 安全的用户登录和注册
+- **多租户架构** - 组织工作区隔离
+- **REST API** - 完整的FastAPI后端，带OpenAPI文档
+- **现代UI** - 渐变设计配合毛玻璃效果
 
-### 前置要求
-
-- **Python 3.10+**
-- **Node.js 18+**
-- **OpenAI API密钥**（用于ChatGPT集成）
-- **Google API密钥**（可选，用于Gemini集成）
-
-### 安装步骤
-
-1. **克隆仓库**
-```bash
-git clone https://github.com/YOUR_USERNAME/geo-attribution-dashboard.git
-cd geo-attribution-dashboard
-```
-
-2. **后端设置**
-```bash
-cd backend
-
-# 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # Mac/Linux
-# venv\Scripts\activate   # Windows
-
-# 安装依赖
-pip install -r requirements.txt
-
-# 配置环境变量
-cp .env.example .env
-# 编辑.env文件，添加你的API密钥
-
-# 初始化数据库
-alembic upgrade head
-
-# 填充示例数据（30个童装品牌）
-python scripts/seed_database.py
-
-# 启动后端服务器
-uvicorn src.api.main:app --reload
-```
-
-后端将运行在: http://localhost:8000
-
-3. **前端设置**
-```bash
-cd frontend
-
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-```
-
-前端将运行在: http://localhost:3000
-
-## 📁 项目结构
+## 项目结构
 
 ```
-geo-attribution-dashboard/
-├── frontend/                    # Next.js 16 + React 19 仪表板
+geo-dashboard/
+├── frontend/                 # Next.js 16 + React 19 仪表盘
 │   ├── src/
-│   │   ├── app/                # Next.js App Router
-│   │   │   ├── page.tsx        # 首页
-│   │   │   ├── analytics/      # 分析页面
-│   │   │   ├── brands/         # 品牌管理
-│   │   │   └── evaluations/    # 评估运行
-│   │   ├── components/
-│   │   │   ├── charts/         # 5种图表组件
-│   │   │   ├── layout/         # 侧边栏、头部
-│   │   │   └── geo/            # GEO评分卡
-│   │   ├── hooks/              # React Hooks
-│   │   └── lib/
-│   │       ├── api.ts          # API客户端
-│   │       ├── types.ts        # TypeScript类型
-│   │       └── data.ts         # 模拟数据
+│   │   ├── app/             # 页面（首页、分析、品牌、评估）
+│   │   ├── components/      # UI组件（图表、过滤器、布局）
+│   │   ├── hooks/           # React hooks
+│   │   └── lib/             # API客户端、类型、工具
+│   ├── vercel.json          # Vercel部署配置
 │   └── package.json
 │
-├── backend/                     # Python FastAPI + 评分引擎
+├── backend/                  # FastAPI + SQLAlchemy
 │   ├── src/
-│   │   ├── api/
-│   │   │   ├── main.py         # FastAPI应用
-│   │   │   └── routes/         # API路由（品牌、评估、分数）
-│   │   ├── core/
-│   │   │   ├── config.py       # 配置管理
-│   │   │   └── database.py     # 数据库连接
-│   │   ├── models/             # SQLAlchemy模型（6个模型）
-│   │   ├── schemas/            # Pydantic模式
-│   │   └── services/
-│   │       ├── ai_clients/     # OpenAI、Gemini客户端
-│   │       └── evaluation_service.py  # 评估编排
-│   ├── scripts/
-│   │   ├── seed_database.py    # 数据库填充
-│   │   └── test_evaluation.py  # 测试脚本
-│   ├── alembic/                # 数据库迁移
+│   │   ├── api/             # 路由（认证、品牌、评估、评分）
+│   │   ├── core/            # 配置、数据库
+│   │   ├── models/          # SQLAlchemy模型
+│   │   ├── schemas/         # Pydantic schemas
+│   │   └── services/        # 业务逻辑、AI客户端
+│   ├── Dockerfile           # 生产环境Docker构建
+│   ├── railway.json         # Railway部署配置
 │   └── requirements.txt
 │
-├── data/
-│   ├── intent_pool.json        # 100个评估提示词
-│   └── brands_database.json    # 30个童装品牌
+├── data/                     # 示例数据
+│   ├── intent_pool.json     # 100个评估提示
+│   └── brands_database.json # 30个童装品牌
 │
-├── docs/                       # 文档
-│   ├── METRICS.md              # GEO方法论
-│   ├── PLAYBOOK.md             # 优化策略
-│   └── DASHBOARD_GUIDE.md      # 用户指南
-│
-├── README.md                   # 英文README
-├── README_CN.md                # 中文README（本文件）
-├── DEPLOYMENT.md               # 部署指南
-└── SYSTEM_READY.md             # 系统就绪指南
+├── render.yaml              # Render.com蓝图
+└── docker-compose.yml       # 本地开发环境
 ```
 
-## ✨ 核心功能
+## 快速开始
 
-### 后端功能
-- ✅ **FastAPI REST API** - 11个端点，完整OpenAPI文档
-- ✅ **多租户架构** - 基于工作区的隔离
-- ✅ **真实AI集成** - OpenAI ChatGPT + Google Gemini
-- ✅ **GEO评分引擎** - 4维度加权算法（35/25/25/15）
-- ✅ **评估编排** - 批量异步执行与进度跟踪
-- ✅ **数据库** - SQLite（开发）/PostgreSQL（生产）
+### 前置要求
+- Node.js 18+
+- Python 3.11+
+- PostgreSQL 14+（开发环境可用SQLite）
 
-### 前端功能
-- ✅ **4个主要页面** - 首页、分析、品牌、评估
-- ✅ **5种图表类型**:
-  - 时间序列图（历史趋势）
-  - 雷达图（多维对比）
-  -漏斗图（归因流）
-  - 模型对比图（AI平台分解）
-  - 热力图（品牌×模型矩阵）
-- ✅ **专业UI** - 侧边栏导航、响应式设计
-- ✅ **实时API集成** - 与后端实时通信
-- ✅ **加载状态** - 骨架屏、错误处理
+### 本地开发
 
-### 数据与内容
-- ✅ **30个童装品牌** - 包含完整元数据
-- ✅ **100个评估提示词** - 12个意图类别
-- ✅ **6个月历史数据** - 用于趋势分析
-- ✅ **完整类型系统** - TypeScript类型定义
+1. **克隆仓库：**
+   ```bash
+   git clone https://github.com/guixiang123124/geo-dashboard.git
+   cd geo-dashboard
+   ```
 
-## 🎨 可视化组件
+2. **设置后端：**
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   pip install -r requirements.txt
 
-### 1. 时间序列图
-追踪6个月的分数历史，可切换维度显示。
+   # 配置环境变量
+   cp ../.env.example .env
+   # 编辑.env填入你的API密钥
+   ```
 
-### 2. 雷达图
-4维度蜘蛛图，支持多品牌叠加对比。
+3. **设置前端：**
+   ```bash
+   cd frontend
+   npm install
 
-### 3. 漏斗图
-显示从召回到转化的4阶段归因流程。
+   # 配置环境变量
+   cp .env.example .env.local
+   ```
 
-### 4. 模型对比图
-对比ChatGPT、Gemini、Claude、Perplexity的表现。
+4. **启动开发服务器：**
+   ```bash
+   # 方式1：使用启动脚本
+   ./start-servers.sh
 
-### 5. 热力图
-品牌×AI模型性能矩阵。
+   # 方式2：手动启动
+   # 终端1 - 后端
+   cd backend && uvicorn src.api.main:app --reload
 
-## 🔌 API端点
+   # 终端2 - 前端
+   cd frontend && npm run dev
+   ```
+
+5. **访问应用：**
+   - 前端：http://localhost:3000
+   - 后端API：http://localhost:8000
+   - API文档：http://localhost:8000/docs
+
+## API端点
+
+### 认证
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| POST | `/api/v1/auth/register` | 注册新用户 |
+| POST | `/api/v1/auth/login` | 登录获取JWT令牌 |
+| GET | `/api/v1/auth/me` | 获取当前用户信息 |
+| POST | `/api/v1/auth/change-password` | 修改密码 |
 
 ### 品牌管理
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/v1/brands` | 获取品牌列表 |
+| POST | `/api/v1/brands` | 创建新品牌 |
+| GET | `/api/v1/brands/{id}` | 获取品牌详情 |
+| PATCH | `/api/v1/brands/{id}` | 更新品牌 |
+| DELETE | `/api/v1/brands/{id}` | 删除品牌 |
+
+### 评估
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/v1/evaluations` | 获取评估列表 |
+| POST | `/api/v1/evaluations` | 开始新评估 |
+| GET | `/api/v1/evaluations/{id}` | 获取评估详情 |
+| GET | `/api/v1/evaluations/{id}/results` | 获取评估结果 |
+
+### 评分
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/v1/scores/brand/{id}` | 获取品牌评分历史 |
+| GET | `/api/v1/scores/brand/{id}/latest` | 获取品牌最新评分 |
+| GET | `/api/v1/scores/workspace` | 获取工作区所有评分 |
+
+## 部署指南
+
+### 后端（Railway）
+1. 将GitHub仓库连接到Railway
+2. 在Railway控制台设置环境变量
+3. 从`/backend`目录部署
+
 ```bash
-GET  /api/v1/brands/?workspace_id={id}&page=1&page_size=10
-GET  /api/v1/brands/{brand_id}?workspace_id={id}
-POST /api/v1/brands/?workspace_id={id}
-PUT  /api/v1/brands/{brand_id}?workspace_id={id}
-DEL  /api/v1/brands/{brand_id}?workspace_id={id}
+# 必需的环境变量
+DATABASE_URL=postgresql://...
+SECRET_KEY=your-secure-secret
+OPENAI_API_KEY=sk-...
+GOOGLE_API_KEY=...
 ```
 
-### 评分查询
-```bash
-GET /api/v1/scores/brand/{brand_id}/latest?workspace_id={id}
-GET /api/v1/scores/brand/{brand_id}/history?workspace_id={id}
-GET /api/v1/scores/?workspace_id={id}
-```
+### 后端（Render）
+1. 在Render创建新的Web服务
+2. 连接你的GitHub仓库
+3. 使用`render.yaml`蓝图或手动配置
 
-### 评估运行
-```bash
-POST /api/v1/evaluations/run?workspace_id={id}
-GET  /api/v1/evaluations/{run_id}?workspace_id={id}
-GET  /api/v1/evaluations/?workspace_id={id}
-```
-
-### 默认工作区ID
-```
-00a2dcdb-30e4-4a0e-80cd-56de2eaf0577
-```
-
-## 🧪 测试系统
-
-### 测试后端健康检查
-```bash
-curl http://localhost:8000/health
-```
-
-### 测试品牌API
-```bash
-curl "http://localhost:8000/api/v1/brands/?workspace_id=00a2dcdb-30e4-4a0e-80cd-56de2eaf0577&page=1&page_size=5"
-```
-
-### 运行快速评估
-```bash
-cd backend
-python scripts/test_evaluation.py
-```
-
-### 运行多模型评估
-```bash
-cd backend
-python scripts/test_multimodel_evaluation.py
-```
-
-## 📊 数据说明
-
-### 童装品牌数据库（30个品牌）
-
-**高端品牌:**
-- Janie and Jack, Mini Boden, Tea Collection, Hanna Andersson
-
-**中端品牌:**
-- Carter's, OshKosh B'gosh, Children's Place, Gap Kids
-
-**平价品牌:**
-- Old Navy Kids, Target Cat & Jack, H&M Kids
-
-**可持续品牌:**
-- Pact, Primary, Monica + Andy, Kate Quinn Organics
-
-**直接面向消费者:**
-- PatPat, Freshly Picked, Little Sleepies
-
-### 意图类别（100个提示词）
-1. general_discovery（通用发现）- 10个
-2. price_value（价格价值）- 10个
-3. sustainability（可持续性）- 12个
-4. occasion_specific（特定场合）- 10个
-5. age_specific（特定年龄）- 10个
-6. safety_quality（安全质量）- 12个
-7. material_quality（材料质量）- 10个
-8. style_trend（风格趋势）- 10个
-9. use_case_activity（使用场景）- 10个
-10. specialty_needs（特殊需求）- 10个
-11. sizing_fit（尺寸适配）- 8个
-12. brand_comparison（品牌对比）- 8个
-
-## 🚀 部署指南
-
-### 后端部署（Railway / Render）
-
-1. 在 [railway.app](https://railway.app) 或 [render.com](https://render.com) 创建账号
-2. 连接GitHub仓库
+### 前端（Vercel）
+1. 将项目导入Vercel
+2. 设置根目录为`/frontend`
 3. 添加环境变量：
    ```
-   OPENAI_API_KEY=your-key
-   GOOGLE_API_KEY=your-key
-   DATABASE_URL=postgresql://...
+   NEXT_PUBLIC_API_URL=https://your-backend-url.com
    ```
-4. 部署！
 
-### 前端部署（Vercel）
+## GEO评分计算
 
-1. 在 [vercel.com](https://vercel.com) 创建账号
-2. 导入GitHub仓库
-3. 添加环境变量：
-   ```
-   NEXT_PUBLIC_API_URL=https://your-backend.railway.app
-   ```
-4. 部署！
+### 四个维度
 
-详细部署说明请查看 [DEPLOYMENT.md](./DEPLOYMENT.md)
+| 维度 | 权重 | 计算方式 |
+|------|------|----------|
+| **可见性** | 35% | `提及率 × 0.7 + 排名分 × 0.3` |
+| **引用** | 25% | `引用率 × 100` |
+| **呈现** | 25% | `(准确度分 / 3) × 100` |
+| **意图覆盖** | 15% | `覆盖意图数 / 总意图数 × 100` |
 
-## 📚 文档
+### 综合评分
+```
+GEO评分 = (可见性 × 0.35) + (引用 × 0.25) +
+          (呈现 × 0.25) + (意图覆盖 × 0.15)
+```
 
-- **[SYSTEM_READY.md](./SYSTEM_READY.md)** - 完整系统参考指南
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - 部署指南
-- **[METRICS.md](./docs/METRICS.md)** - GEO方法论详解
-- **[PLAYBOOK.md](./docs/PLAYBOOK.md)** - 优化策略手册
-- **[DASHBOARD_GUIDE.md](./docs/DASHBOARD_GUIDE.md)** - 用户操作指南
-
-## 🛠️ 技术栈
-
-### 后端
-- **FastAPI** - 现代Python Web框架
-- **SQLAlchemy** - ORM（支持异步）
-- **Alembic** - 数据库迁移
-- **OpenAI SDK** - ChatGPT集成
-- **Google Generative AI** - Gemini集成
-- **Pydantic** - 数据验证
+## 技术栈
 
 ### 前端
-- **Next.js 16** - React框架（App Router）
-- **React 19** - UI库
-- **TypeScript** - 类型安全
-- **Tailwind CSS 4** - 样式框架
-- **Radix UI** - 无样式组件
-- **Recharts** - 数据可视化
-- **Lucide React** - 图标库
+- **框架：** Next.js 16（App Router）
+- **UI：** React 19 + Tailwind CSS 4 + Radix UI
+- **图表：** Recharts
+- **状态管理：** Zustand
+- **语言：** TypeScript
 
-### 数据库
-- **SQLite** - 开发环境
-- **PostgreSQL** - 生产环境
+### 后端
+- **框架：** FastAPI
+- **数据库：** PostgreSQL + SQLAlchemy 2.0
+- **迁移：** Alembic
+- **认证：** JWT（python-jose + passlib）
+- **AI：** OpenAI SDK、Google Generative AI、Anthropic SDK
+- **验证：** Pydantic 2.0
 
-## 🔒 环境变量
+## 环境变量
 
-### 后端 (.env)
-```bash
-# 应用配置
-APP_NAME=GEO Attribution Dashboard API
-APP_VERSION=1.0.0
-DEBUG=True
-
-# API配置
-API_V1_PREFIX=/api/v1
-CORS_ORIGINS=["http://localhost:3000"]
-
+### 后端（.env）
+```env
 # 数据库
 DATABASE_URL=sqlite+aiosqlite:///./geo_dashboard.db
 
-# AI API密钥
-OPENAI_API_KEY=sk-proj-...
-GOOGLE_API_KEY=AIza...
+# 安全
+SECRET_KEY=your-secret-key
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-# AI模型配置
-OPENAI_MODEL=gpt-4-turbo-preview
-GOOGLE_MODEL=gemini-pro
+# AI API密钥
+OPENAI_API_KEY=sk-...
+GOOGLE_API_KEY=...
+ANTHROPIC_API_KEY=...
 ```
 
-### 前端 (.env.local)
-```bash
+### 前端（.env.local）
+```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-## 🤝 贡献指南
+## 文档
 
-欢迎贡献！请查看我们的贡献指南。
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - 系统架构详情
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - 部署指南
+- **[docs/METRICS.md](./docs/METRICS.md)** - GEO指标定义
+- **[docs/PLAYBOOK.md](./docs/PLAYBOOK.md)** - 优化策略
 
-1. Fork项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启Pull Request
+## 贡献
 
-## 📄 许可证
+1. Fork本仓库
+2. 创建功能分支（`git checkout -b feature/amazing-feature`）
+3. 提交更改（`git commit -m 'Add amazing feature'`）
+4. 推送到分支（`git push origin feature/amazing-feature`）
+5. 创建Pull Request
 
-本项目采用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+## 许可证
 
-## 🙏 致谢
-
-- OpenAI - ChatGPT API
-- Google - Gemini API
-- Anthropic - Claude（计划中）
-- Perplexity - Perplexity AI（计划中）
-
-## 📞 联系方式
-
-如有问题或建议，请：
-1. 查看文档
-2. 开启GitHub Issue
-3. 查看API文档：http://localhost:8000/docs
+MIT许可证 - 详见[LICENSE](./LICENSE)文件。
 
 ---
 
-**状态:** ✅ 生产就绪
-
-系统完全可运行，随时可用或部署！
-
-*Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>*
+**技术栈：** Next.js、FastAPI、PostgreSQL、OpenAI
+**聚焦行业：** 童装行业GEO测量
+**版本：** 2.0.0（GEO Insights）
