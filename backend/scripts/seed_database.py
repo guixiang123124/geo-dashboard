@@ -25,8 +25,9 @@ async def load_json(filepath: str) -> dict:
 
 async def create_demo_workspace(db) -> str:
     """Create a demo workspace."""
+    # Use fixed ID that matches frontend DEFAULT_WORKSPACE_ID
     workspace = Workspace(
-        id=str(uuid4()),
+        id="ws-demo-001",
         name="Demo Workspace",
         slug="demo",
         api_key=f"demo-{uuid4()}",
