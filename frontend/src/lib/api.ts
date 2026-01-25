@@ -21,6 +21,9 @@ import type {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const API_V1 = `${API_BASE_URL}/api/v1`;
 
+// Default workspace ID for demo/development
+export const DEFAULT_WORKSPACE_ID = process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE_ID || 'ws-demo-001';
+
 // ============ Token Management ============
 
 let accessToken: string | null = null;
@@ -261,3 +264,26 @@ export async function checkApiHealth(): Promise<boolean> {
     return false;
   }
 }
+
+// ============ Compatibility Aliases ============
+// These aliases maintain compatibility with existing hooks
+
+export const brandsAPI = {
+  ...brandsApi,
+  async list(workspaceId: string, page = 1, pageSize = 20) {
+    const result = await brandsApi.list(workspaceId, page, pageSize);
+    // Transform to expected format with 'brands' key
+    return { brands: result.items || [], total: result.total || 0 };
+  },
+};
+
+export const scoresAPI = {
+  ...scoresApi,
+  getBrandLatest: scoresApi.getBrandScore,
+};
+
+export const evaluationsAPI = evaluationsApi;
+export const authAPI = authApi;
+
+// Re-export types for convenience
+export type { Brand, ScoreCard, BrandWithScore } from './types';
