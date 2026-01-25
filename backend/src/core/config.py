@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # API
     API_V1_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+    CORS_ORIGINS: list[str] = ["*"]  # Allow all origins for development
 
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///./geo_dashboard.db"
