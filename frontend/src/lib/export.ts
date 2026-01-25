@@ -305,3 +305,32 @@ export function exportToJSON<T>(data: T, filename: string): void {
 
   URL.revokeObjectURL(url);
 }
+
+// ============ Generic Export Functions ============
+
+/**
+ * Generic CSV export function.
+ */
+export function exportToCSV<T extends Record<string, unknown>>(
+  data: T[],
+  filename: string,
+  columns?: { key: keyof T; label: string }[]
+): void {
+  const csv = toCSV(data, columns);
+  downloadCSV(csv, filename);
+}
+
+/**
+ * Format chart data for CSV export.
+ */
+export function formatChartDataForCSV(
+  data: Record<string, unknown>[],
+  chartType: string
+): Record<string, unknown>[] {
+  return data.map((item, index) => ({
+    index: index + 1,
+    ...item,
+    chartType,
+    exportedAt: new Date().toISOString(),
+  }));
+}
