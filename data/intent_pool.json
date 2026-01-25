@@ -1,0 +1,212 @@
+{
+  "industry": "Kids Fashion",
+  "description": "Comprehensive evaluation prompts for kids fashion brand GEO attribution testing",
+  "total_prompts": 100,
+  "version": "2.0",
+  "intents": [
+    {
+      "category": "general_discovery",
+      "weight": 8,
+      "description": "General brand discovery and top-of-funnel queries",
+      "prompts": [
+        "Best kids clothing brands in the US",
+        "Top rated children's fashion websites",
+        "Popular kids fashion brands 2026",
+        "Where do parents buy kids clothes online",
+        "Most trusted children's clothing retailers",
+        "Best places to shop for kids clothes",
+        "Recommended kids clothing stores",
+        "Quality children's clothing brands",
+        "Where to buy stylish kids clothes",
+        "Best online stores for children's apparel"
+      ]
+    },
+    {
+      "category": "price_value",
+      "weight": 7,
+      "description": "Price-conscious and value-seeking queries",
+      "prompts": [
+        "Affordable kids clothes that are durable",
+        "Where to buy cheap but good quality kids clothes",
+        "Budget-friendly children's clothing brands",
+        "Best value for money kids fashion",
+        "Inexpensive kids clothes that last long",
+        "Kids clothing brands under $20",
+        "Discount children's clothing online",
+        "Affordable organic kids clothes",
+        "Best sales on kids fashion",
+        "Value kids clothing subscription boxes"
+      ]
+    },
+    {
+      "category": "sustainability",
+      "weight": 9,
+      "description": "Eco-conscious and sustainable fashion queries",
+      "prompts": [
+        "Best sustainable kids clothing brands",
+        "Organic cotton children's clothes",
+        "Eco-friendly kids fashion brands",
+        "Non-toxic kids clothing",
+        "Ethical children's clothing manufacturers",
+        "Sustainable baby and toddler clothes",
+        "Organic kids clothing made in USA",
+        "Recycled material children's apparel",
+        "Fair trade kids clothing brands",
+        "Zero waste kids fashion",
+        "GOTS certified kids clothes",
+        "Plastic-free children's clothing"
+      ]
+    },
+    {
+      "category": "occasion_specific",
+      "weight": 6,
+      "description": "Event and occasion-based queries",
+      "prompts": [
+        "Best kids clothes for special occasions",
+        "Children's holiday outfits 2026",
+        "Kids birthday party dresses",
+        "Formal wear for kids",
+        "Back to school clothing for kids",
+        "Kids wedding guest outfits",
+        "Summer vacation kids clothes",
+        "Winter holiday kids fashion",
+        "First day of school outfits",
+        "Kids photoshoot clothing"
+      ]
+    },
+    {
+      "category": "age_specific",
+      "weight": 8,
+      "description": "Age-targeted queries from newborn to teen",
+      "prompts": [
+        "Best newborn baby clothes",
+        "Toddler clothing brands 2-4 years",
+        "School age kids fashion 5-10 years",
+        "Tween clothing brands 10-12 years",
+        "Teen fashion for 13-16 year olds",
+        "Baby clothes 0-12 months",
+        "Preschooler clothing brands",
+        "Middle school appropriate clothing",
+        "High school teen fashion",
+        "Gender neutral baby clothes"
+      ]
+    },
+    {
+      "category": "safety_quality",
+      "weight": 10,
+      "description": "Safety, quality, and trust-focused queries",
+      "prompts": [
+        "Safest kids pajamas flame retardant free",
+        "Non-toxic kids clothing brands",
+        "Hypoallergenic children's clothes",
+        "Lead-free kids clothing",
+        "Chemical-free kids pajamas",
+        "Best quality children's clothing",
+        "Durable kids clothes for active play",
+        "Kids clothes for sensitive skin",
+        "BPA-free baby clothes",
+        "Oeko-Tex certified kids clothing",
+        "Tagless kids clothes for sensory issues",
+        "Allergy-friendly children's apparel"
+      ]
+    },
+    {
+      "category": "material_quality",
+      "weight": 9,
+      "description": "Fabric and material-focused queries",
+      "prompts": [
+        "Best organic cotton kids clothes",
+        "Bamboo fabric children's clothing",
+        "Merino wool kids clothes",
+        "Breathable kids clothing for summer",
+        "Soft comfortable kids clothes",
+        "Durable denim for active kids",
+        "Natural fiber children's clothing",
+        "Moisture-wicking kids athletic wear",
+        "Warm winter kids clothes",
+        "Lightweight kids summer clothing"
+      ]
+    },
+    {
+      "category": "style_trend",
+      "weight": 5,
+      "description": "Fashion-forward and trend-focused queries",
+      "prompts": [
+        "Trendy kids fashion 2026",
+        "Instagram worthy kids clothes",
+        "Boutique children's clothing",
+        "Designer kids fashion brands",
+        "Matching family outfits kids",
+        "Vintage inspired kids clothes",
+        "Minimalist kids clothing",
+        "Boho kids fashion",
+        "Preppy children's clothing brands",
+        "Modern kids clothing aesthetics"
+      ]
+    },
+    {
+      "category": "use_case_activity",
+      "weight": 7,
+      "description": "Activity and use-case specific queries",
+      "prompts": [
+        "Kids athletic wear for sports",
+        "Outdoor adventure kids clothing",
+        "Kids dance and gymnastics clothes",
+        "Swimming and beach kids clothes",
+        "Kids school uniforms",
+        "Playground-friendly kids clothes",
+        "Kids clothes for messy play",
+        "Travel-friendly kids clothing",
+        "Kids loungewear and pajamas",
+        "Kids clothes that hide stains"
+      ]
+    },
+    {
+      "category": "specialty_needs",
+      "weight": 6,
+      "description": "Special needs and accessibility queries",
+      "prompts": [
+        "Adaptive clothing for kids with disabilities",
+        "Sensory-friendly kids clothes",
+        "Kids clothes for wheelchair users",
+        "Easy on easy off kids clothing",
+        "Kids clothes with flat seams",
+        "Tagless sensitive kids clothing",
+        "Montessori-friendly kids clothes",
+        "Kids clothes for eczema",
+        "Autism-friendly children's clothing",
+        "Velcro closure kids clothes"
+      ]
+    },
+    {
+      "category": "sizing_fit",
+      "weight": 6,
+      "description": "Sizing and fit-related queries",
+      "prompts": [
+        "Kids clothes with adjustable waistbands",
+        "Extended size kids clothing",
+        "Plus size children's fashion",
+        "Petite kids clothing brands",
+        "Tall kids clothing options",
+        "Kids clothes true to size",
+        "Grow-with-me kids clothing",
+        "Kids clothes sizing chart comparison"
+      ]
+    },
+    {
+      "category": "brand_comparison",
+      "weight": 7,
+      "description": "Comparative and versus queries",
+      "prompts": [
+        "Carter's vs OshKosh B'gosh quality",
+        "Primary vs Pact kids clothes",
+        "Gap Kids vs Old Navy comparison",
+        "Mini Boden vs Hanna Andersson",
+        "Best alternative to Gymboree",
+        "Tea Collection vs Janie and Jack",
+        "Zara Kids vs H&M Kids quality",
+        "Target Cat & Jack vs Carter's"
+      ]
+    }
+  ]
+}

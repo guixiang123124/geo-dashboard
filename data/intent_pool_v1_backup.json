@@ -1,0 +1,125 @@
+{
+    "industry": "Kids Fashion",
+    "description": "Comprehensive intent pool for evaluating kids fashion brand visibility in AI responses",
+    "total_prompts": 56,
+    "intents": [
+        {
+            "category": "general",
+            "weight": 8,
+            "prompts": [
+                "Best kids clothing brands in the US",
+                "Top rated children's fashion websites",
+                "Popular kids fashion brands 2024",
+                "Where do parents buy kids clothes online",
+                "Most trusted children's clothing retailers",
+                "Best places to shop for kids clothes"
+            ]
+        },
+        {
+            "category": "price",
+            "weight": 7,
+            "prompts": [
+                "Affordable kids clothes that are durable",
+                "Where to buy cheap but good quality kids clothes",
+                "Budget-friendly children's clothing brands",
+                "Best value for money kids fashion",
+                "Inexpensive kids clothing that lasts",
+                "Discount children's clothing stores online"
+            ]
+        },
+        {
+            "category": "sustainability",
+            "weight": 9,
+            "prompts": [
+                "Best organic cotton kids clothing brands",
+                "Sustainable children's fashion brands",
+                "Eco-friendly kids clothes made in USA",
+                "Ethical children's clothing companies",
+                "Organic baby and toddler clothing brands",
+                "Environmentally conscious kids fashion retailers"
+            ]
+        },
+        {
+            "category": "occasion",
+            "weight": 6,
+            "prompts": [
+                "Best outfits for kids back to school",
+                "Formal wear for toddlers",
+                "Kids holiday party dresses",
+                "Children's special occasion clothing",
+                "School uniform brands for kids",
+                "Birthday party outfits for children"
+            ]
+        },
+        {
+            "category": "age_specific",
+            "weight": 8,
+            "prompts": [
+                "Best baby clothes brands 0-12 months",
+                "Toddler clothing for active kids",
+                "Kids clothes for ages 4-7",
+                "Tween fashion brands for ages 8-12",
+                "Newborn essentials clothing brands",
+                "Teen fashion brands that fit pre-teens"
+            ]
+        },
+        {
+            "category": "safety",
+            "weight": 10,
+            "prompts": [
+                "Safe sleepwear for toddlers",
+                "Non-toxic kids clothing brands",
+                "CPSC certified children's pajamas",
+                "Flame-resistant kids nightwear",
+                "Chemical-free baby clothing",
+                "Hypoallergenic kids clothes for sensitive skin"
+            ]
+        },
+        {
+            "category": "quality",
+            "weight": 9,
+            "prompts": [
+                "Durable kids clothes that survive multiple kids",
+                "High quality children's basics",
+                "Long-lasting kids clothing brands",
+                "Well-made toddler clothes",
+                "Kids clothes that don't shrink or fade",
+                "Premium quality children's fashion"
+            ]
+        },
+        {
+            "category": "trend",
+            "weight": 5,
+            "prompts": [
+                "Trendy kids fashion 2024",
+                "Stylish children's clothing brands",
+                "Modern kids streetwear brands",
+                "Fashion-forward toddler clothes",
+                "Cool kids clothing lines"
+            ]
+        },
+        {
+            "category": "use_case",
+            "weight": 7,
+            "prompts": [
+                "Best kids athletic wear for sports",
+                "Everyday basics for children",
+                "Kids outdoor adventure clothing",
+                "Comfortable loungewear for kids",
+                "Kids swimwear brands",
+                "Winter clothing for children"
+            ]
+        },
+        {
+            "category": "specialty",
+            "weight": 6,
+            "prompts": [
+                "Adaptive clothing for kids with disabilities",
+                "Gender-neutral kids clothing brands",
+                "Plus size children's fashion",
+                "Kids clothes for sensitive tags",
+                "Montessori-friendly kids clothing"
+            ]
+        }
+    ]
+}
