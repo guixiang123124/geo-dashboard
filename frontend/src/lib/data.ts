@@ -373,3 +373,31 @@ export function formatNumber(num: number): string {
 export function formatPercentage(value: number, decimals = 1): string {
   return `${value.toFixed(decimals)}%`;
 }
+
+// ============ Compatibility Aliases ============
+
+// Alias for backwards compatibility
+export const BRANDS = MOCK_BRANDS;
+
+// Model breakdown data
+export const MODEL_BREAKDOWN = [
+  { model: 'ChatGPT', score: 82, queries: 450, mentions: 380 },
+  { model: 'Gemini', score: 78, queries: 380, mentions: 290 },
+  { model: 'Claude', score: 80, queries: 320, mentions: 260 },
+  { model: 'Perplexity', score: 85, queries: 280, mentions: 245 },
+];
+
+// Get historical scores by brand ID
+export function getHistoricalScoresById(brandId: string): TimeSeriesDataPoint[] {
+  return generateTimeSeriesData([brandId], 30);
+}
+
+// Get model breakdown by brand ID
+export function getModelBreakdownById(brandId: string): ModelComparisonData[] {
+  return generateModelComparisonData();
+}
+
+// Get funnel data by brand ID
+export function getFunnelDataById(brandId: string): FunnelData[] {
+  return generateFunnelData();
+}
