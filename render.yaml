@@ -9,7 +9,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     region: oregon
-    plan: starter
+    plan: free
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
@@ -33,5 +33,5 @@ services:
 databases:
   - name: geo-insights-db
     databaseName: geo_insights
-    plan: starter
+    plan: free
     region: oregon
