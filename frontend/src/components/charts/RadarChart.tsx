@@ -20,28 +20,28 @@ export default function RadarChart({ brands, height = 400 }: RadarChartProps) {
             dimension: 'Visibility',
             ...brands.reduce((acc, brand) => ({
                 ...acc,
-                [brand.name]: brand.score.visibility
+                [brand.name]: brand.score.visibility_score
             }), {})
         },
         {
             dimension: 'Citation',
             ...brands.reduce((acc, brand) => ({
                 ...acc,
-                [brand.name]: brand.score.citation
+                [brand.name]: brand.score.citation_score
             }), {})
         },
         {
             dimension: 'Representation',
             ...brands.reduce((acc, brand) => ({
                 ...acc,
-                [brand.name]: brand.score.representation
+                [brand.name]: brand.score.representation_score
             }), {})
         },
         {
             dimension: 'Intent',
             ...brands.reduce((acc, brand) => ({
                 ...acc,
-                [brand.name]: brand.score.intent
+                [brand.name]: brand.score.intent_score
             }), {})
         },
     ];

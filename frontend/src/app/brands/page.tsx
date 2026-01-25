@@ -16,6 +16,7 @@ export default function BrandsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {BRANDS.map((brand) => {
                         const score = SCORES[brand.id];
+                        if (!score) return null;
                         const scoreColor = score.composite >= 80 ? 'text-green-600' : score.composite >= 50 ? 'text-yellow-600' : 'text-red-600';
 
                         return (
@@ -24,7 +25,7 @@ export default function BrandsPage() {
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="flex items-center gap-3">
                                             <div className="flex items-center justify-center w-12 h-12 bg-indigo-100 text-indigo-700 rounded-lg font-bold text-lg">
-                                                {brand.logo}
+                                                {brand.name.charAt(0)}
                                             </div>
                                             <div>
                                                 <h3 className="font-semibold text-gray-900">{brand.name}</h3>

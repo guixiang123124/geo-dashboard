@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AIModel } from '@/lib/types';
 import { format, subMonths } from 'date-fns';
 
 export interface DateRange {
@@ -14,7 +13,7 @@ export type Dimension = 'visibility' | 'citation' | 'representation' | 'intent';
 export interface FilterState {
     dateRange: DateRange;
     brands: string[];
-    models: AIModel[];
+    models: string[];
     dimensions: Dimension[];
 }
 

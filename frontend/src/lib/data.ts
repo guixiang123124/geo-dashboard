@@ -379,13 +379,25 @@ export function formatPercentage(value: number, decimals = 1): string {
 // Alias for backwards compatibility
 export const BRANDS = MOCK_BRANDS;
 
-// Model breakdown data
-export const MODEL_BREAKDOWN = [
-  { model: 'ChatGPT', score: 82, queries: 450, mentions: 380 },
-  { model: 'Gemini', score: 78, queries: 380, mentions: 290 },
-  { model: 'Claude', score: 80, queries: 320, mentions: 260 },
-  { model: 'Perplexity', score: 85, queries: 280, mentions: 245 },
+// Re-export GEOScore from types
+export type { GEOScore } from './types';
+
+// Model breakdown data - indexed by brand ID
+const defaultModelBreakdown: ModelComparisonData[] = [
+  { model: 'ChatGPT', visibility: 82, citation: 75, representation: 78, intent: 80, composite: 79 },
+  { model: 'Gemini', visibility: 78, citation: 72, representation: 76, intent: 74, composite: 75 },
+  { model: 'Claude', visibility: 80, citation: 78, representation: 82, intent: 76, composite: 79 },
+  { model: 'Perplexity', visibility: 85, citation: 88, representation: 74, intent: 82, composite: 82 },
 ];
+
+export const MODEL_BREAKDOWN: Record<string, ModelComparisonData[]> = {
+  '1': defaultModelBreakdown,
+  '2': defaultModelBreakdown,
+  '3': defaultModelBreakdown,
+  '4': defaultModelBreakdown,
+  '5': defaultModelBreakdown,
+  '6': defaultModelBreakdown,
+};
 
 // Get historical scores by brand ID
 export function getHistoricalScoresById(brandId: string): TimeSeriesDataPoint[] {
@@ -402,49 +414,77 @@ export function getFunnelDataById(brandId: string): FunnelData[] {
   return generateFunnelData();
 }
 
-// Scores alias - extract scores from MOCK_BRANDS
-export const SCORES = MOCK_BRANDS.map(brand => brand.score).filter(Boolean);
+// Scores alias - indexed by brand ID for easy lookup
+export const SCORES: Record<string, { composite: number; visibility: number; citation: number; representation: number; intent: number }> =
+  MOCK_BRANDS.reduce((acc, brand) => {
+    if (brand.score) {
+      acc[brand.id] = {
+        composite: brand.score.composite_score,
+        visibility: brand.score.visibility_score,
+        citation: brand.score.citation_score,
+        representation: brand.score.representation_score,
+        intent: brand.score.intent_score,
+      };
+    }
+    return acc;
+  }, {} as Record<string, { composite: number; visibility: number; citation: number; representation: number; intent: number }>);
 
 // Mock evaluation runs data
 export const ALL_EVALUATION_RUNS = [
   {
     id: 'eval-1',
     name: 'Weekly Brand Check',
+    brandName: "Carter's",
     status: 'completed',
     startedAt: '2024-01-15T10:00:00Z',
     completedAt: '2024-01-15T10:45:00Z',
     totalBrands: 30,
     totalPrompts: 120,
+    completedPrompts: 120,
+    modelsUsed: ['ChatGPT', 'Gemini', 'Claude'],
+    duration: '45m',
     progress: 100,
   },
   {
     id: 'eval-2',
     name: 'Monthly Deep Analysis',
+    brandName: "OshKosh B'Gosh",
     status: 'completed',
     startedAt: '2024-01-10T14:00:00Z',
     completedAt: '2024-01-10T16:30:00Z',
     totalBrands: 30,
     totalPrompts: 120,
+    completedPrompts: 120,
+    modelsUsed: ['ChatGPT', 'Gemini', 'Claude', 'Perplexity'],
+    duration: '2h 30m',
     progress: 100,
   },
   {
     id: 'eval-3',
     name: 'New Brand Evaluation',
+    brandName: 'Gymboree',
     status: 'running',
     startedAt: '2024-01-16T09:00:00Z',
     completedAt: null,
     totalBrands: 5,
     totalPrompts: 120,
+    completedPrompts: 78,
+    modelsUsed: ['ChatGPT', 'Claude'],
+    duration: null,
     progress: 65,
   },
   {
     id: 'eval-4',
     name: 'Competitor Analysis',
+    brandName: 'Primary',
     status: 'pending',
     startedAt: null,
     completedAt: null,
     totalBrands: 10,
     totalPrompts: 120,
+    completedPrompts: 0,
+    modelsUsed: ['ChatGPT', 'Gemini', 'Claude', 'Perplexity'],
+    duration: null,
     progress: 0,
   },
 ];

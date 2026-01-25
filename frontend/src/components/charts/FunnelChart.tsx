@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import type { AttributionFunnel } from '@/lib/types';
+import type { FunnelData } from '@/lib/types';
 
 interface FunnelChartProps {
-    data: AttributionFunnel[];
+    data: FunnelData[];
     height?: number;
     onStageClick?: (stage: string) => void;
 }

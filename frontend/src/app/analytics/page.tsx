@@ -26,38 +26,38 @@ export default function AnalyticsPage() {
     const modelBreakdown = getModelBreakdownById(brand1.id);
     const funnelData = getFunnelDataById(brand1.id);
 
-    // Radar chart data
+    // Radar chart data - using GEOScore compatible structure
     const radarData = [
         {
             name: brand1.name,
             score: {
-                visibility: 85,
-                citation: 60,
-                representation: 75,
-                intent: 90,
-                composite: 78
+                composite_score: 78,
+                visibility_score: 85,
+                citation_score: 60,
+                representation_score: 75,
+                intent_score: 90,
             },
             color: '#3b82f6'
         },
         {
             name: brand2.name,
             score: {
-                visibility: 40,
-                citation: 85,
-                representation: 90,
-                intent: 50,
-                composite: 65
+                composite_score: 65,
+                visibility_score: 40,
+                citation_score: 85,
+                representation_score: 90,
+                intent_score: 50,
             },
             color: '#10b981'
         },
         {
             name: brand3.name,
             score: {
-                visibility: 80,
-                citation: 90,
-                representation: 85,
-                intent: 70,
-                composite: 82
+                composite_score: 82,
+                visibility_score: 80,
+                citation_score: 90,
+                representation_score: 85,
+                intent_score: 70,
             },
             color: '#f59e0b'
         }
@@ -69,7 +69,7 @@ export default function AnalyticsPage() {
         return breakdown.map(item => ({
             brand: brand.name,
             model: item.model,
-            score: item.score
+            score: item.composite
         }));
     });
 
@@ -109,12 +109,13 @@ export default function AnalyticsPage() {
                             <ExportButton
                                 onExportCSV={async () => {
                                     await exportToCSV(
-                                        formatChartDataForCSV(historicalData, 'timeseries'),
+                                        formatChartDataForCSV(historicalData as unknown as Record<string, unknown>[], 'timeseries'),
                                         `historical-performance-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`
                                     );
                                 }}
                                 onExportPNG={async () => {
-                                    await exportToPNG('time-series-chart', `historical-performance-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`);
+                                    const el = document.getElementById('time-series-chart');
+                                    if (el) await exportToPNG(el, `historical-performance-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`);
                                 }}
                                 size="sm"
                             />
@@ -134,7 +135,8 @@ export default function AnalyticsPage() {
                             <CardTitle>Multi-Dimensional Comparison</CardTitle>
                             <ExportButton
                                 onExportPNG={async () => {
-                                    await exportToPNG('radar-chart', 'multi-dimensional-comparison');
+                                    const el = document.getElementById('radar-chart');
+                                    if (el) await exportToPNG(el, 'multi-dimensional-comparison');
                                 }}
                                 size="sm"
                             />
@@ -156,12 +158,13 @@ export default function AnalyticsPage() {
                                 <ExportButton
                                     onExportCSV={async () => {
                                         await exportToCSV(
-                                            formatChartDataForCSV(modelBreakdown, 'model'),
+                                            formatChartDataForCSV(modelBreakdown as unknown as Record<string, unknown>[], 'model'),
                                             `model-performance-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`
                                         );
                                     }}
                                     onExportPNG={async () => {
-                                        await exportToPNG('model-comparison-chart', `model-performance-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`);
+                                        const el = document.getElementById('model-comparison-chart');
+                                        if (el) await exportToPNG(el, `model-performance-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`);
                                     }}
                                     size="sm"
                                 />
@@ -181,12 +184,13 @@ export default function AnalyticsPage() {
                                 <ExportButton
                                     onExportCSV={async () => {
                                         await exportToCSV(
-                                            formatChartDataForCSV(funnelData, 'funnel'),
+                                            formatChartDataForCSV(funnelData as unknown as Record<string, unknown>[], 'funnel'),
                                             `attribution-funnel-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`
                                         );
                                     }}
                                     onExportPNG={async () => {
-                                        await exportToPNG('funnel-chart', `attribution-funnel-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`);
+                                        const el = document.getElementById('funnel-chart');
+                                        if (el) await exportToPNG(el, `attribution-funnel-${brand1.name.toLowerCase().replace(/\s+/g, '-')}`);
                                     }}
                                     size="sm"
                                 />
@@ -210,7 +214,8 @@ export default function AnalyticsPage() {
                                     await exportToCSV(heatmapData, 'brand-model-heatmap');
                                 }}
                                 onExportPNG={async () => {
-                                    await exportToPNG('heatmap-chart', 'brand-model-heatmap');
+                                    const el = document.getElementById('heatmap-chart');
+                                    if (el) await exportToPNG(el, 'brand-model-heatmap');
                                 }}
                                 size="sm"
                             />

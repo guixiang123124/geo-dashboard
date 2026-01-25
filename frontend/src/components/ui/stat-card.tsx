@@ -1,12 +1,13 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card, CardContent } from './card';
-import type { TrendIndicator } from '@/lib/types';
+
+type TrendDirection = 'up' | 'down' | 'stable';
 
 interface StatCardProps {
     label: string;
     value: string | number;
-    trend?: TrendIndicator;
+    trend?: TrendDirection;
     change?: string;
     icon?: React.ReactNode;
     className?: string;

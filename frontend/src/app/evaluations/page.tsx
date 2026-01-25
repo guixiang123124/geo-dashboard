@@ -69,7 +69,7 @@ export default function EvaluationsPage() {
                                             <div>
                                                 <p className="text-gray-600">Started</p>
                                                 <p className="font-semibold text-gray-900 mt-1">
-                                                    {new Date(run.startedAt).toLocaleString()}
+                                                    {run.startedAt ? new Date(run.startedAt).toLocaleString() : '-'}
                                                 </p>
                                             </div>
                                             <div>

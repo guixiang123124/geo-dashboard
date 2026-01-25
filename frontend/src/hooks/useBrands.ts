@@ -24,12 +24,12 @@ export function useBrands() {
         const brandsResponse = await brandsAPI.list(DEFAULT_WORKSPACE_ID, 1, 100);
 
         // Fetch latest scores for all brands
-        const brandsWithScores = await Promise.all(
+        const brandsWithScores: BrandWithScore[] = await Promise.all(
           brandsResponse.brands.map(async (brand) => {
             try {
               const score = await scoresAPI.getBrandLatest(brand.id, DEFAULT_WORKSPACE_ID);
-              return { ...brand, score };
-            } catch (err) {
+              return { ...brand, score: score ?? undefined };
+            } catch {
               // Brand might not have scores yet
               return brand;
             }
@@ -66,7 +66,7 @@ export function useBrand(brandId: string) {
 
         try {
           const score = await scoresAPI.getBrandLatest(brandId, DEFAULT_WORKSPACE_ID);
-          setBrand({ ...brandData, score });
+          setBrand({ ...brandData, score: score ?? undefined });
         } catch {
           setBrand(brandData);
         }

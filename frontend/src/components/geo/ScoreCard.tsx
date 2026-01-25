@@ -2,13 +2,30 @@ import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { GEOScore } from '@/lib/data';
+import type { GEOScore } from '@/lib/types';
 import { Eye, Link as LinkIcon, MessageSquare, Target, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+
+interface ScoreData {
+    brandId: string;
+    brandName?: string;
+    scores: {
+        composite: number;
+        visibility: number;
+        citation: number;
+        representation: number;
+        intent: number;
+    };
+    totalMentions: number;
+    avgRank?: number;
+    citationRate: number;
+    intentCoverage?: number;
+    lastUpdated?: string;
+}
 
 interface ScoreCardProps {
     brandName: string;
     category: string;
-    score: GEOScore;
+    score: ScoreData;
 }
 
 const ScoreCard: React.FC<ScoreCardProps> = ({ brandName, category, score }) => {

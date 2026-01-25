@@ -1,16 +1,15 @@
 'use client';
 
 import React from 'react';
-import { AIModel } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 
 interface ModelSelectorProps {
-    models: AIModel[];
-    selected: AIModel[];
-    onChange: (selected: AIModel[]) => void;
+    models: string[];
+    selected: string[];
+    onChange: (selected: string[]) => void;
 }
 
-const MODEL_COLORS: Record<AIModel, string> = {
+const MODEL_COLORS: Record<string, string> = {
     ChatGPT: 'bg-green-100 text-green-700 border-green-200',
     Gemini: 'bg-blue-100 text-blue-700 border-blue-200',
     Claude: 'bg-purple-100 text-purple-700 border-purple-200',
@@ -18,7 +17,7 @@ const MODEL_COLORS: Record<AIModel, string> = {
 };
 
 export function ModelSelector({ models, selected, onChange }: ModelSelectorProps) {
-    const handleToggle = (model: AIModel) => {
+    const handleToggle = (model: string) => {
         if (selected.includes(model)) {
             onChange(selected.filter(m => m !== model));
         } else {

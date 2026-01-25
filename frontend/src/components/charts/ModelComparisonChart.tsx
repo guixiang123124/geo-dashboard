@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import type { ModelScore } from '@/lib/types';
+import type { ModelComparisonData } from '@/lib/types';
 
 interface ModelComparisonChartProps {
-    data: ModelScore[];
+    data: ModelComparisonData[];
     height?: number;
     onModelClick?: (model: string) => void;
 }
@@ -74,14 +74,13 @@ export default function ModelComparisonChart({ data, height = 400, onModelClick 
                 />
                 <Tooltip content={customTooltip} cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }} />
                 <Bar
-                    dataKey="score"
+                    dataKey="composite"
                     onClick={handleBarClick}
                     cursor={onModelClick ? 'pointer' : 'default'}
                     radius={[8, 8, 0, 0]}
                     label={{
                         position: 'top',
                         style: { fontSize: '12px', fontWeight: 600 },
-                        formatter: (value: number) => Math.round(value)
                     }}
                 >
                     {data.map((entry, index) => (

@@ -241,3 +241,16 @@ export const INTENT_CATEGORIES = [
   'Care Instructions',
   'Occasion Specific',
 ] as const;
+
+// ============ Derived Types ============
+
+export type AIModel = (typeof AI_MODELS)[number];
+
+export type AttributionFunnel = FunnelData;
+
+export type ModelScore = ModelComparisonData;
+
+export interface TrendIndicator {
+  direction: 'up' | 'down' | 'stable';
+  change: number;
+}

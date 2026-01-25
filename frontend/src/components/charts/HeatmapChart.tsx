@@ -1,19 +1,18 @@
 'use client';
 
 import React from 'react';
-import type { AIModel } from '@/lib/types';
 
 interface HeatmapData {
     brand: string;
-    model: AIModel;
+    model: string;
     score: number;
 }
 
 interface HeatmapChartProps {
     data: HeatmapData[];
     brands: string[];
-    models: AIModel[];
-    onCellClick?: (brand: string, model: AIModel) => void;
+    models: string[];
+    onCellClick?: (brand: string, model: string) => void;
 }
 
 export default function HeatmapChart({ data, brands, models, onCellClick }: HeatmapChartProps) {
@@ -33,12 +32,12 @@ export default function HeatmapChart({ data, brands, models, onCellClick }: Heat
     };
 
     // Find score for specific brand-model combination
-    const getScore = (brand: string, model: AIModel): number => {
+    const getScore = (brand: string, model: string): number => {
         const item = data.find(d => d.brand === brand && d.model === model);
         return item?.score || 0;
     };
 
-    const handleCellClick = (brand: string, model: AIModel) => {
+    const handleCellClick = (brand: string, model: string) => {
         if (onCellClick) {
             onCellClick(brand, model);
         }
