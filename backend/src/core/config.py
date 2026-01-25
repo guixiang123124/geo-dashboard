@@ -3,7 +3,8 @@ Application configuration using Pydantic Settings.
 Loads from environment variables and .env files.
 """
 
-from typing import Optional
+from typing import Optional, Union
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,7 +18,17 @@ class Settings(BaseSettings):
 
     # API
     API_V1_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: list[str] = ["*"]  # Allow all origins for development
+    CORS_ORIGINS: Union[str, list[str]] = "*"  # Can be "*", a single URL, or comma-separated URLs
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v):
+        """Parse CORS_ORIGINS from string or list."""
+        if isinstance(v, str):
+            if v == "*":
+                return ["*"]
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///./geo_dashboard.db"
