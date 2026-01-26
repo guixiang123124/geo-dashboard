@@ -108,9 +108,107 @@ conn.close()
 
 ---
 
+## 💰 Evaluation成本计算
+
+### API定价（2024年价格）
+
+**OpenAI GPT-4 Turbo:**
+- Input: $0.01 per 1K tokens
+- Output: $0.03 per 1K tokens
+
+**Google Gemini Pro:**
+- Input: $0.00025 per 1K tokens
+- Output: $0.0005 per 1K tokens
+- **免费额度**: 15 RPM (每分钟15次), 1500 RPD (每天1500次)
+
+### 完整Evaluation成本估算
+
+**参数:**
+- 30个品牌
+- 20个prompts（覆盖不同intent categories）
+- 2个模型（ChatGPT + Gemini）
+- 总API调用: 30 × 20 × 2 = **1,200次**
+
+**每次调用token估算:**
+- Input tokens: ~800 (prompt + brand context)
+- Output tokens: ~400 (AI response)
+
+**成本分解:**
+
+| 模型 | 调用次数 | 成本 |
+|------|---------|------|
+| OpenAI GPT-4 | 600次 | **$12.00** |
+| Gemini Pro | 600次 | **$0.24** |
+| **总计** | 1,200次 | **$12.24** |
+
+**实际成本估算:**
+
+如果使用Gemini的免费额度（每天1500次调用限制），并通过rate limiting控制请求速度：
+- Gemini部分: **$0（免费）**
+- OpenAI部分: **$12.00**
+- **预计总成本: $12.00 - $12.24**
+
+**成本优化建议:**
+
+1. **使用Gemini免费额度**
+   ```python
+   # 设置rate limiting
+   AI_REQUEST_TIMEOUT=30
+   MAX_RETRIES=3
+   RETRY_DELAY=2
+   ```
+
+2. **先运行小规模测试**
+   - 3个品牌 × 10 prompts × 2 models = 60次调用
+   - 成本: ~$0.60 - $0.75
+   - 用于验证系统正常工作
+
+3. **分批运行**
+   - 每天运行10个品牌（在免费额度内）
+   - 3天完成全部30个品牌
+   - 总成本: ~$12.00
+
+---
+
 ## 🚀 运行完整Evaluation
 
-### 方法1: 通过API运行Evaluation
+### ⚠️ 运行前确认
+
+在运行evaluation前，请确认：
+
+✅ API密钥已设置（backend/.env）
+✅ 了解成本估算（约$12-$12.24）
+✅ 确认Gemini免费额度（1500 RPD）
+✅ 网络连接稳定
+✅ 预计运行时间：15-20分钟
+
+### 方法1: 使用Python脚本（推荐）
+
+```bash
+# 进入backend目录
+cd geo-attribution-dashboard/backend
+
+# 运行完整evaluation
+python scripts/evaluate_all_brands.py
+
+# 脚本会显示:
+# - 30个品牌列表
+# - 选择的prompts分布
+# - 成本估算
+# - 请求确认: "Start evaluation? (yes/no):"
+
+# 输入 yes 开始
+```
+
+### 方法2: 使用测试脚本（快速验证）
+
+```bash
+# 只评估3个品牌（成本约$0.60）
+cd geo-attribution-dashboard/backend
+python scripts/test_multimodel_evaluation.py
+```
+
+### 方法3: 通过API运行Evaluation
 
 ```bash
 # 触发一次完整的evaluation run
@@ -409,6 +507,20 @@ git push origin master
 5. ✅ **Commit前先pull** 最新代码
 6. ✅ **只add具体文件**，不要用 `git add -A`
 7. ✅ **定期检查** `.gitignore` 是否正确
+
+---
+
+## 📚 相关文档
+
+- **Git工作流详细指南**: 查看 [GIT_WORKFLOW_BEST_PRACTICES.md](./GIT_WORKFLOW_BEST_PRACTICES.md)
+  - 标准commit流程
+  - 多环境工作场景
+  - 冲突解决
+  - Commit message规范
+  - 常见问题排查
+
+- **项目计划**: [PROJECT_PLAN.md](./PROJECT_PLAN.md)
+- **功能实现总结**: [FEATURE_IMPLEMENTATION_SUMMARY.md](./FEATURE_IMPLEMENTATION_SUMMARY.md)
 
 ---
 
