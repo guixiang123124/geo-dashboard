@@ -1,5 +1,43 @@
-import { format, subDays, subMonths } from 'date-fns';
-import type { TimeSeriesDataPoint, ModelScore, EvaluationDetail, EvaluationRun, AIModel } from './types';
+import { format, subDays } from 'date-fns';
+import type { TimeSeriesDataPoint } from './types';
+
+// ============ Local Mock Types ============
+// These are mock-only shapes, not tied to the backend API types.
+
+interface MockModelScore {
+    model: string;
+    score: number;
+    mentionCount: number;
+    citationRate: number;
+    avgRank: number;
+}
+
+interface MockEvaluationDetail {
+    id: string;
+    prompt: string;
+    model: string;
+    response: string;
+    mentioned: boolean;
+    rank: number | null;
+    cited: boolean;
+    citationUrl?: string;
+    accuracy: number;
+    timestamp: string;
+}
+
+interface MockEvaluationRun {
+    id: string;
+    brandId: string;
+    brandName: string;
+    status: 'pending' | 'running' | 'completed' | 'failed';
+    progress: number;
+    modelsUsed: string[];
+    startedAt: string;
+    completedAt?: string;
+    duration?: string;
+    totalPrompts: number;
+    completedPrompts: number;
+}
 
 // Generate time series data for a brand over the past 6 months
 export function generateHistoricalScores(
@@ -31,8 +69,8 @@ export function generateHistoricalScores(
 }
 
 // Generate model breakdown scores for a brand
-export function generateModelBreakdown(brandId: string, baseScore: number): ModelScore[] {
-    const models: AIModel[] = ['ChatGPT', 'Gemini', 'Claude', 'Perplexity'];
+export function generateModelBreakdown(brandId: string, baseScore: number): MockModelScore[] {
+    const models = ['ChatGPT', 'Gemini', 'Claude', 'Perplexity'];
 
     return models.map(model => {
         const variation = (Math.random() * 30) - 15; // +/- 15 points
@@ -53,8 +91,8 @@ export function generateEvaluationDetails(
     brandId: string,
     brandName: string,
     count: number = 10
-): EvaluationDetail[] {
-    const models: AIModel[] = ['ChatGPT', 'Gemini', 'Claude', 'Perplexity'];
+): MockEvaluationDetail[] {
+    const models = ['ChatGPT', 'Gemini', 'Claude', 'Perplexity'];
     const prompts = [
         'Best sustainable kids clothing brands',
         'Where to buy organic baby clothes',
@@ -96,9 +134,9 @@ export function generateEvaluationDetails(
 }
 
 // Generate evaluation runs
-export function generateEvaluationRuns(brandId: string, brandName: string, count: number = 5): EvaluationRun[] {
+export function generateEvaluationRuns(brandId: string, brandName: string, count: number = 5): MockEvaluationRun[] {
     const statuses: Array<'pending' | 'running' | 'completed' | 'failed'> = ['completed', 'completed', 'completed', 'running', 'pending'];
-    const models: AIModel[] = ['ChatGPT', 'Gemini', 'Claude', 'Perplexity'];
+    const models = ['ChatGPT', 'Gemini', 'Claude', 'Perplexity'];
 
     return Array.from({ length: count }, (_, i) => {
         const status = statuses[i % statuses.length];
