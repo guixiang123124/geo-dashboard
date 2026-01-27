@@ -37,7 +37,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
 
     return (
         <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Date Range</label>
+            <label className="text-sm font-medium text-slate-700">Date Range</label>
             <div className="flex flex-wrap gap-2">
                 {PRESETS.map((preset) => (
                     <Button
@@ -52,7 +52,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
                     </Button>
                 ))}
             </div>
-            <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 mt-2 text-sm text-slate-600">
                 <span>Selected: {format(new Date(value.start), 'MMM d, yyyy')}</span>
                 <span>-</span>
                 <span>{format(new Date(value.end), 'MMM d, yyyy')}</span>

@@ -24,24 +24,24 @@ export default function ModelComparisonChart({ data, height = 400, onModelClick 
         const item = payload[0].payload;
 
         return (
-            <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-[180px]">
-                <p className="font-semibold text-sm text-gray-900 mb-2">{item.model}</p>
+            <div className="bg-white border border-slate-200 rounded-lg shadow-lg p-3 min-w-[180px]">
+                <p className="font-semibold text-sm text-slate-900 mb-2">{item.model}</p>
                 <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                        <span className="text-gray-600">Score:</span>
-                        <span className="font-semibold text-gray-900">{item.score}</span>
+                        <span className="text-slate-600">Score:</span>
+                        <span className="font-semibold text-slate-900">{item.score}</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span className="text-gray-600">Mentions:</span>
-                        <span className="font-semibold text-gray-900">{item.mentionCount}</span>
+                        <span className="text-slate-600">Mentions:</span>
+                        <span className="font-semibold text-slate-900">{item.mentionCount}</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span className="text-gray-600">Citation Rate:</span>
-                        <span className="font-semibold text-gray-900">{item.citationRate}%</span>
+                        <span className="text-slate-600">Citation Rate:</span>
+                        <span className="font-semibold text-slate-900">{item.citationRate}%</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span className="text-gray-600">Avg Rank:</span>
-                        <span className="font-semibold text-gray-900">#{item.avgRank}</span>
+                        <span className="text-slate-600">Avg Rank:</span>
+                        <span className="font-semibold text-slate-900">#{item.avgRank}</span>
                     </div>
                 </div>
             </div>

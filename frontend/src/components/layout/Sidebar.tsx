@@ -36,7 +36,7 @@ export function Sidebar() {
             <div className="lg:hidden fixed top-4 left-4 z-50">
                 <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="p-2 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all"
+                    className="p-2 rounded-lg bg-slate-900 text-white shadow-lg hover:bg-slate-800 transition-colors"
                 >
                     {mobileMenuOpen ? (
                         <X className="w-6 h-6" />
@@ -49,30 +49,30 @@ export function Sidebar() {
             {/* Sidebar */}
             <div
                 className={cn(
-                    'fixed inset-y-0 left-0 z-40 bg-gradient-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700 transform transition-all duration-300 ease-in-out',
+                    'fixed inset-y-0 left-0 z-40 bg-slate-900 text-white border-r border-slate-800 transform transition-all duration-300 ease-in-out',
                     mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
                     collapsed ? 'lg:w-20' : 'lg:w-64',
                     'w-64'
                 )}
             >
                 {/* Logo/Brand */}
-                <div className="flex items-center justify-between p-4 border-b border-slate-700">
+                <div className="flex items-center justify-between p-4 border-b border-slate-800">
                     {!collapsed && (
-                        <div className="flex items-center gap-2">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                                <Sparkles className="w-6 h-6" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center">
+                                <Sparkles className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-lg font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                                <h1 className="text-base font-bold text-white tracking-tight">
                                     GEO Insights
                                 </h1>
-                                <p className="text-xs text-slate-400">AI Era Optimization</p>
+                                <p className="text-xs text-slate-400">AI Brand Analytics</p>
                             </div>
                         </div>
                     )}
                     <button
                         onClick={() => setCollapsed(!collapsed)}
-                        className="hidden lg:flex p-1.5 rounded-lg hover:bg-slate-700 transition-colors"
+                        className="hidden lg:flex p-1.5 rounded-lg hover:bg-slate-800 transition-colors text-slate-400 hover:text-white"
                     >
                         {collapsed ? (
                             <ChevronRight className="w-5 h-5" />
@@ -94,10 +94,10 @@ export function Sidebar() {
                                 href={item.href}
                                 onClick={() => setMobileMenuOpen(false)}
                                 className={cn(
-                                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
                                     isActive
-                                        ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/30'
-                                        : 'text-slate-300 hover:bg-slate-700/50 hover:text-white',
+                                        ? 'bg-violet-600 text-white'
+                                        : 'text-slate-300 hover:bg-slate-800 hover:text-white',
                                     collapsed && 'lg:justify-center'
                                 )}
                             >
@@ -111,10 +111,10 @@ export function Sidebar() {
                 {/* Stats Card */}
                 {!collapsed && (
                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-xl p-4 backdrop-blur-sm">
+                        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-lg shadow-green-400/50" />
-                                <span className="text-xs text-slate-400 font-medium">System Status</span>
+                                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                <span className="text-xs text-slate-300 font-medium">System Status</span>
                             </div>
                             <p className="text-sm font-semibold text-white">All Systems Operational</p>
                             <p className="text-xs text-slate-400 mt-1">Last updated: just now</p>

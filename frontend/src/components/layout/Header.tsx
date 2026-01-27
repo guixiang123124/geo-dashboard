@@ -30,22 +30,22 @@ export function Header() {
     const showBreadcrumbs = pathname !== '/';
 
     return (
-        <header className="h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-8 sticky top-0 z-30">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-30">
             {/* Breadcrumbs */}
             <div className="flex items-center gap-2">
                 {showBreadcrumbs ? (
                     <nav className="flex items-center gap-2 text-sm">
                         {breadcrumbs.map((crumb, index) => (
                             <div key={crumb.href} className="flex items-center gap-2">
-                                {index > 0 && <ChevronRight className="w-4 h-4 text-slate-400" />}
+                                {index > 0 && <ChevronRight className="w-4 h-4 text-slate-300" />}
                                 {index === breadcrumbs.length - 1 ? (
-                                    <span className="font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                                    <span className="font-semibold text-slate-900">
                                         {crumb.name}
                                     </span>
                                 ) : (
                                     <Link
                                         href={crumb.href}
-                                        className="text-slate-600 hover:text-slate-900 transition-colors font-medium"
+                                        className="text-slate-500 hover:text-slate-800 transition-colors font-medium"
                                     >
                                         {crumb.name}
                                     </Link>
@@ -55,10 +55,10 @@ export function Header() {
                     </nav>
                 ) : (
                     <div>
-                        <h2 className="text-lg font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                            Welcome back!
+                        <h2 className="text-lg font-bold text-slate-900">
+                            Welcome back
                         </h2>
-                        <p className="text-sm text-slate-600">Track your brand performance in the AI era</p>
+                        <p className="text-sm text-slate-500">Track your brand performance in the AI era</p>
                     </div>
                 )}
             </div>
@@ -66,9 +66,9 @@ export function Header() {
             {/* Actions */}
             <div className="flex items-center gap-3">
                 {/* Notifications */}
-                <button className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all duration-200">
+                <button className="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                     <Bell className="w-5 h-5" />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse shadow-lg shadow-purple-500/50"></span>
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-violet-600 rounded-full"></span>
                 </button>
 
                 {/* User Menu */}
@@ -77,7 +77,7 @@ export function Header() {
                         <p className="text-sm font-semibold text-slate-900">Demo User</p>
                         <p className="text-xs text-slate-500">Workspace Owner</p>
                     </div>
-                    <button className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-full hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-200">
+                    <button className="flex items-center justify-center w-10 h-10 bg-violet-600 text-white rounded-full hover:bg-violet-700 transition-colors">
                         <User className="w-5 h-5" />
                     </button>
                 </div>

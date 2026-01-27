@@ -24,10 +24,10 @@ export default function FunnelChart({ data, height = 400, onStageClick }: Funnel
         const item = payload[0].payload;
 
         return (
-            <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-                <p className="font-semibold text-sm text-gray-900">{item.stage}</p>
-                <p className="text-xs text-gray-600">{item.label}</p>
-                <p className="text-lg font-bold text-gray-900 mt-1">{item.value}%</p>
+            <div className="bg-white border border-slate-200 rounded-lg shadow-lg p-3">
+                <p className="font-semibold text-sm text-slate-900">{item.stage}</p>
+                <p className="text-xs text-slate-600">{item.label}</p>
+                <p className="text-lg font-bold text-slate-900 mt-1">{item.value}%</p>
             </div>
         );
     };
@@ -79,8 +79,8 @@ export default function FunnelChart({ data, height = 400, onStageClick }: Funnel
                     const dropOffPercent = ((dropOff / prevStage.value) * 100).toFixed(1);
 
                     return (
-                        <div key={stage.stage} className="flex items-center gap-2 text-xs text-gray-600">
-                            <div className="flex-shrink-0 w-2 h-2 bg-gray-400 rounded-full" />
+                        <div key={stage.stage} className="flex items-center gap-2 text-xs text-slate-600">
+                            <div className="flex-shrink-0 w-2 h-2 bg-slate-400 rounded-full" />
                             <span>
                                 <span className="font-semibold text-red-600">{dropOffPercent}%</span> drop-off
                                 from {prevStage.stage} to {stage.stage}

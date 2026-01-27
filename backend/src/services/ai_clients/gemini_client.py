@@ -76,22 +76,27 @@ class GeminiClient(BaseAIClient):
             # Extract text from response
             response_text = response.text if hasattr(response, "text") else ""
 
+            # Extract raw response safely (API changed across SDK versions)
+            raw = {}
+            try:
+                if hasattr(response, "prompt_feedback"):
+                    feedback = response.prompt_feedback
+                    raw["prompt_feedback"] = str(feedback) if feedback else None
+            except Exception:
+                raw["prompt_feedback"] = None
+            try:
+                if hasattr(response, "candidates") and response.candidates:
+                    raw["candidates"] = [str(c) for c in response.candidates]
+                else:
+                    raw["candidates"] = []
+            except Exception:
+                raw["candidates"] = []
+
             return AIResponse(
                 text=response_text,
                 model=self.model_name,
                 response_time_ms=response_time_ms,
-                raw_response={
-                    "prompt_feedback": (
-                        response.prompt_feedback._raw_part
-                        if hasattr(response, "prompt_feedback")
-                        else None
-                    ),
-                    "candidates": (
-                        [c._raw_part for c in response.candidates]
-                        if hasattr(response, "candidates")
-                        else []
-                    ),
-                },
+                raw_response=raw,
             )
 
         except Exception as e:

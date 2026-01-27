@@ -39,7 +39,6 @@ export function useBrands() {
         setBrands(brandsWithScores);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch brands');
-        console.error('Error fetching brands:', err);
       } finally {
         setLoading(false);
       }
@@ -72,7 +71,6 @@ export function useBrand(brandId: string) {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch brand');
-        console.error('Error fetching brand:', err);
       } finally {
         setLoading(false);
       }

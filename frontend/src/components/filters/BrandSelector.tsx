@@ -36,7 +36,7 @@ export function BrandSelector({ brands, selected, onChange }: BrandSelectorProps
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">Brands</label>
+                <label className="text-sm font-medium text-slate-700">Brands</label>
                 <div className="flex gap-2">
                     <Button
                         variant="ghost"
@@ -64,7 +64,7 @@ export function BrandSelector({ brands, selected, onChange }: BrandSelectorProps
                             key={brand.id}
                             variant={isSelected ? 'default' : 'outline'}
                             className={`cursor-pointer transition-all ${
-                                isSelected ? 'bg-indigo-600 text-white' : 'hover:bg-gray-100'
+                                isSelected ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100'
                             }`}
                             onClick={() => handleToggle(brand.id)}
                         >
@@ -74,7 +74,7 @@ export function BrandSelector({ brands, selected, onChange }: BrandSelectorProps
                     );
                 })}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-500">
                 {selected.length} of {brands.length} selected
             </p>
         </div>

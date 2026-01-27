@@ -50,8 +50,8 @@ export default function RadarChart({ brands, height = 400 }: RadarChartProps) {
         if (!active || !payload || !payload[0]) return null;
 
         return (
-            <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-                <p className="font-semibold text-sm text-gray-900 mb-2">
+            <div className="bg-white border border-slate-200 rounded-lg shadow-lg p-3">
+                <p className="font-semibold text-sm text-slate-900 mb-2">
                     {payload[0].payload.dimension}
                 </p>
                 {payload.map((entry: any, index: number) => (
@@ -60,8 +60,8 @@ export default function RadarChart({ brands, height = 400 }: RadarChartProps) {
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: entry.color }}
                         />
-                        <span className="text-gray-600">{entry.name}:</span>
-                        <span className="font-semibold text-gray-900">{Math.round(entry.value)}</span>
+                        <span className="text-slate-600">{entry.name}:</span>
+                        <span className="font-semibold text-slate-900">{Math.round(entry.value)}</span>
                     </div>
                 ))}
             </div>

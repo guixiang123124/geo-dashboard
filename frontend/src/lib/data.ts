@@ -30,6 +30,7 @@ export const MOCK_BRANDS: BrandWithScore[] = [
     score: {
       id: 's1',
       brand_id: '1',
+      evaluation_run_id: 'mock-run-1',
       composite_score: 82,
       visibility_score: 85,
       citation_score: 78,
@@ -59,6 +60,7 @@ export const MOCK_BRANDS: BrandWithScore[] = [
     score: {
       id: 's2',
       brand_id: '2',
+      evaluation_run_id: 'mock-run-1',
       composite_score: 76,
       visibility_score: 79,
       citation_score: 72,
@@ -88,6 +90,7 @@ export const MOCK_BRANDS: BrandWithScore[] = [
     score: {
       id: 's3',
       brand_id: '3',
+      evaluation_run_id: 'mock-run-1',
       composite_score: 68,
       visibility_score: 70,
       citation_score: 62,
@@ -117,6 +120,7 @@ export const MOCK_BRANDS: BrandWithScore[] = [
     score: {
       id: 's4',
       brand_id: '4',
+      evaluation_run_id: 'mock-run-1',
       composite_score: 74,
       visibility_score: 72,
       citation_score: 76,
@@ -146,6 +150,7 @@ export const MOCK_BRANDS: BrandWithScore[] = [
     score: {
       id: 's5',
       brand_id: '5',
+      evaluation_run_id: 'mock-run-1',
       composite_score: 71,
       visibility_score: 68,
       citation_score: 74,
@@ -175,6 +180,7 @@ export const MOCK_BRANDS: BrandWithScore[] = [
     score: {
       id: 's6',
       brand_id: '6',
+      evaluation_run_id: 'mock-run-1',
       composite_score: 65,
       visibility_score: 62,
       citation_score: 68,

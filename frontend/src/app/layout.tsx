@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex h-screen bg-gradient-to-br from-slate-50 via-purple-50/20 to-blue-50/20">
+        <div className="flex h-screen bg-slate-50">
           {/* Sidebar Navigation */}
           <Sidebar />
 
@@ -39,7 +39,7 @@ export default function RootLayout({
             <Header />
 
             {/* Page Content */}
-            <main className="flex-1 overflow-y-auto p-6 md:p-8">
+            <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50">
               {children}
             </main>
           </div>

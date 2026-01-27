@@ -2,6 +2,7 @@
 Evaluation service for orchestrating AI model evaluations.
 """
 
+import asyncio
 import re
 from datetime import datetime
 from typing import List, Optional
@@ -31,6 +32,22 @@ class EvaluationService:
         self.db = db
         self.scorers = {}  # Cache scorers
 
+    async def _safe_commit(self):
+        """Commit with rollback recovery for SQLite resilience."""
+        for attempt in range(3):
+            try:
+                await self.db.commit()
+                return
+            except Exception:
+                try:
+                    await self.db.rollback()
+                except Exception:
+                    pass
+                if attempt < 2:
+                    await asyncio.sleep(0.5 * (attempt + 1))
+                else:
+                    raise
+
     async def run_evaluation(
         self,
         run_id: str,
@@ -57,7 +74,7 @@ class EvaluationService:
             # Update status to running
             run.status = "running"
             run.started_at = datetime.utcnow()
-            await self.db.commit()
+            await self._safe_commit()
 
             # Get brands
             brands_result = await self.db.execute(
@@ -74,17 +91,38 @@ class EvaluationService:
                 prompts_result = await self.db.execute(select(Prompt))
             prompts = prompts_result.scalars().all()
 
+            # Pre-extract all ORM attributes into plain dicts to avoid
+            # MissingGreenlet errors when accessing attributes after
+            # run_in_executor calls break the greenlet context.
+            brand_data = [
+                {
+                    "id": b.id,
+                    "name": b.name,
+                    "domain": b.domain,
+                    "positioning": b.positioning,
+                }
+                for b in brands
+            ]
+            prompt_data = [
+                {
+                    "id": p.id,
+                    "text": p.text,
+                    "intent_category": p.intent_category,
+                }
+                for p in prompts
+            ]
+
             # Update run metadata
-            run.prompt_count = len(prompts)
-            await self.db.commit()
+            run.prompt_count = len(prompt_data)
+            await self._safe_commit()
 
             # Calculate total tasks
-            total_tasks = len(brands) * len(prompts) * len(models)
+            total_tasks = len(brand_data) * len(prompt_data) * len(models)
             completed_tasks = 0
 
-            # Process each combination
-            for brand in brands:
-                for prompt in prompts:
+            # Process each combination using plain dicts (no ORM lazy loads)
+            for brand in brand_data:
+                for prompt in prompt_data:
                     for model_name in models:
                         # Run evaluation for this combination
                         await self._evaluate_single(
@@ -97,65 +135,86 @@ class EvaluationService:
                         # Update progress
                         completed_tasks += 1
                         run.progress = int((completed_tasks / total_tasks) * 100)
-                        await self.db.commit()
+
+                    # Commit after each prompt (batch of models) to reduce DB pressure
+                    await self._safe_commit()
 
                 # Calculate scores for this brand
-                await self._calculate_brand_score(run_id, brand.id)
+                await self._calculate_brand_score(run_id, brand["id"])
+                await self._safe_commit()
+
+                # Log progress
+                print(f"  [{completed_tasks}/{total_tasks}] {brand['name']} - score calculated")
 
             # Mark as completed
             run.status = "completed"
             run.completed_at = datetime.utcnow()
             run.progress = 100
-            await self.db.commit()
+            await self._safe_commit()
 
         except Exception as e:
-            # Mark as failed
-            run.status = "failed"
-            run.error_message = str(e)
-            await self.db.commit()
+            # Mark as failed with rollback recovery
+            try:
+                await self.db.rollback()
+            except Exception:
+                pass
+            try:
+                run_result = await self.db.execute(
+                    select(EvaluationRun).where(EvaluationRun.id == run_id)
+                )
+                run = run_result.scalar_one()
+                run.status = "failed"
+                run.error_message = str(e)[:500]
+                await self._safe_commit()
+            except Exception:
+                pass
             raise
 
     async def _evaluate_single(
         self,
         run_id: str,
-        brand: Brand,
-        prompt: Prompt,
+        brand: dict,
+        prompt: dict,
         model_name: str,
     ):
         """
         Evaluate a single brand-prompt-model combination.
+
+        Args:
+            brand: Dict with keys: id, name, domain, positioning
+            prompt: Dict with keys: id, text, intent_category
         """
         # Get AI client
         client = await self._get_ai_client(model_name)
 
         # Make API call
         response = await client.chat(
-            prompt=prompt.text,
+            prompt=prompt["text"],
             system_prompt="You are a helpful assistant. Provide accurate, factual information.",
         )
 
         # Analyze response for brand mentions
         is_mentioned, mention_rank, mention_context = self._analyze_mention(
-            response.text, brand.name
+            response.text, brand["name"]
         )
 
         # Check for citations
-        is_cited, citation_urls = self._analyze_citations(response.text, brand.domain)
+        is_cited, citation_urls = self._analyze_citations(response.text, brand["domain"])
 
         # Analyze representation
         representation_score, description, sentiment = self._analyze_representation(
-            response.text, brand.name, brand.positioning
+            response.text, brand["name"], brand["positioning"]
         )
 
         # Save result
         result = EvaluationResult(
             id=str(uuid4()),
             evaluation_run_id=run_id,
-            brand_id=brand.id,
-            prompt_id=prompt.id,
+            brand_id=brand["id"],
+            prompt_id=prompt["id"],
             model_name=model_name,
-            prompt_text=prompt.text,
-            intent_category=prompt.intent_category,
+            prompt_text=prompt["text"],
+            intent_category=prompt["intent_category"],
             response_text=response.text,
             response_time_ms=response.response_time_ms,
             is_mentioned=is_mentioned,
@@ -169,7 +228,6 @@ class EvaluationService:
         )
 
         self.db.add(result)
-        await self.db.flush()
 
     async def _calculate_brand_score(self, run_id: str, brand_id: str):
         """
@@ -255,7 +313,6 @@ class EvaluationService:
         )
 
         self.db.add(score_card)
-        await self.db.flush()
 
     async def _get_ai_client(self, model_name: str):
         """Get AI client for the specified model."""

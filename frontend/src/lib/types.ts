@@ -50,6 +50,7 @@ export interface Brand {
 
 export interface BrandCreate {
   name: string;
+  slug: string;
   domain?: string;
   logo_url?: string;
   category: string;
@@ -82,14 +83,20 @@ export interface GEOScore {
   intent_score: number;
 }
 
+export interface ModelScoreEntry {
+  score: number;
+  mentions: number;
+}
+
 export interface ScoreCard extends GEOScore {
   id: string;
   brand_id: string;
+  evaluation_run_id: string;
   total_mentions: number;
-  avg_rank: number;
+  avg_rank: number | null;
   citation_rate: number;
   intent_coverage: number;
-  model_scores?: Record<string, GEOScore>;
+  model_scores?: Record<string, ModelScoreEntry>;
   evaluation_count: number;
   last_evaluation_date?: string;
   created_at: string;
@@ -120,22 +127,28 @@ export interface EvaluationRun {
 
 export interface EvaluationResult {
   id: string;
-  run_id: string;
+  evaluation_run_id: string;
   brand_id: string;
+  prompt_id: string;
   model_name: string;
   prompt_text: string;
   intent_category: string;
+  response_text: string;
   is_mentioned: boolean;
   mention_rank?: number;
   mention_context?: string;
   is_cited: boolean;
   citation_urls?: string[];
   representation_score: number;
-  description?: string;
+  description_text?: string;
   sentiment?: string;
-  intent_fit_score: number;
+  intent_fit_score?: number;
   response_time_ms?: number;
-  created_at: string;
+  evaluated_at: string;
+}
+
+export interface EvaluationRunDetail extends EvaluationRun {
+  results: EvaluationResult[];
 }
 
 export interface EvaluationCreate {

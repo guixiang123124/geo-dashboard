@@ -13,6 +13,7 @@ import type {
   BrandWithScore,
   ScoreCard,
   EvaluationRun,
+  EvaluationRunDetail,
   EvaluationResult,
   EvaluationCreate,
   PaginatedResponse,
@@ -150,15 +151,30 @@ export const authApi = {
 
 // ============ Brands API ============
 
+// Backend returns this shape (uses 'brands' key, not 'items')
+interface BackendBrandListResponse {
+  brands: BrandWithScore[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 export const brandsApi = {
   async list(
     workspaceId: string,
     page = 1,
     pageSize = 20
   ): Promise<PaginatedResponse<BrandWithScore>> {
-    return fetchApi<PaginatedResponse<BrandWithScore>>(
+    const raw = await fetchApi<BackendBrandListResponse>(
       `/brands?workspace_id=${workspaceId}&page=${page}&page_size=${pageSize}`
     );
+    return {
+      items: raw.brands ?? [],
+      total: raw.total ?? 0,
+      page: raw.page ?? 1,
+      page_size: raw.page_size ?? pageSize,
+      total_pages: Math.ceil((raw.total ?? 0) / (raw.page_size ?? pageSize)),
+    };
   },
 
   async get(brandId: string, workspaceId: string): Promise<BrandWithScore> {
@@ -220,18 +236,16 @@ export const evaluationsApi = {
   async list(
     workspaceId: string,
     status?: string,
-    page = 1,
-    pageSize = 20
-  ): Promise<PaginatedResponse<EvaluationRun>> {
-    let url = `/evaluations?workspace_id=${workspaceId}&page=${page}&page_size=${pageSize}`;
+  ): Promise<EvaluationRun[]> {
+    let url = `/evaluations?workspace_id=${workspaceId}`;
     if (status) {
       url += `&status=${status}`;
     }
-    return fetchApi<PaginatedResponse<EvaluationRun>>(url);
+    return fetchApi<EvaluationRun[]>(url);
   },
 
-  async get(runId: string, workspaceId: string): Promise<EvaluationRun> {
-    return fetchApi<EvaluationRun>(`/evaluations/${runId}?workspace_id=${workspaceId}`);
+  async get(runId: string, workspaceId: string): Promise<EvaluationRunDetail> {
+    return fetchApi<EvaluationRunDetail>(`/evaluations/${runId}?workspace_id=${workspaceId}`);
   },
 
   async create(workspaceId: string, data: EvaluationCreate): Promise<EvaluationRun> {
@@ -272,8 +286,7 @@ export const brandsAPI = {
   ...brandsApi,
   async list(workspaceId: string, page = 1, pageSize = 20) {
     const result = await brandsApi.list(workspaceId, page, pageSize);
-    // Transform to expected format with 'brands' key
-    return { brands: result.items || [], total: result.total || 0 };
+    return { brands: result.items, total: result.total };
   },
 };
 

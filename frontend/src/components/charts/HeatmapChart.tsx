@@ -28,7 +28,7 @@ export default function HeatmapChart({ data, brands, models, onCellClick }: Heat
     };
 
     const getTextColor = (score: number) => {
-        return score >= 50 ? 'text-white' : 'text-gray-900';
+        return score >= 50 ? 'text-white' : 'text-slate-900';
     };
 
     // Find score for specific brand-model combination
@@ -49,13 +49,13 @@ export default function HeatmapChart({ data, brands, models, onCellClick }: Heat
                 <table className="min-w-full border-collapse">
                     <thead>
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 bg-gray-50 border-b border-r border-gray-200">
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 bg-slate-50 border-b border-r border-slate-200">
                                 Brand / Model
                             </th>
                             {models.map(model => (
                                 <th
                                     key={model}
-                                    className="px-4 py-3 text-center text-xs font-semibold text-gray-700 bg-gray-50 border-b border-gray-200"
+                                    className="px-4 py-3 text-center text-xs font-semibold text-slate-700 bg-slate-50 border-b border-slate-200"
                                 >
                                     {model}
                                 </th>
@@ -65,7 +65,7 @@ export default function HeatmapChart({ data, brands, models, onCellClick }: Heat
                     <tbody>
                         {brands.map((brand, brandIndex) => (
                             <tr key={brand}>
-                                <td className="px-4 py-3 text-sm font-medium text-gray-900 bg-gray-50 border-r border-b border-gray-200 whitespace-nowrap">
+                                <td className="px-4 py-3 text-sm font-medium text-slate-900 bg-slate-50 border-r border-b border-slate-200 whitespace-nowrap">
                                     {brand}
                                 </td>
                                 {models.map((model, modelIndex) => {
@@ -74,7 +74,7 @@ export default function HeatmapChart({ data, brands, models, onCellClick }: Heat
                                         <td
                                             key={`${brand}-${model}`}
                                             className={`
-                                                px-4 py-3 text-center text-sm font-semibold border-b border-gray-200
+                                                px-4 py-3 text-center text-sm font-semibold border-b border-slate-200
                                                 ${getColor(score)} ${getTextColor(score)}
                                                 ${onCellClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}
                                             `}
@@ -93,30 +93,30 @@ export default function HeatmapChart({ data, brands, models, onCellClick }: Heat
 
             {/* Legend */}
             <div className="mt-4 flex items-center justify-center gap-4 flex-wrap">
-                <span className="text-xs font-semibold text-gray-600">Score Range:</span>
+                <span className="text-xs font-semibold text-slate-600">Score Range:</span>
                 <div className="flex items-center gap-1">
                     <div className="w-6 h-4 bg-red-500 rounded" />
-                    <span className="text-xs text-gray-600">0-40</span>
+                    <span className="text-xs text-slate-600">0-40</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <div className="w-6 h-4 bg-orange-500 rounded" />
-                    <span className="text-xs text-gray-600">40-50</span>
+                    <span className="text-xs text-slate-600">40-50</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <div className="w-6 h-4 bg-yellow-500 rounded" />
-                    <span className="text-xs text-gray-600">50-60</span>
+                    <span className="text-xs text-slate-600">50-60</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <div className="w-6 h-4 bg-yellow-400 rounded" />
-                    <span className="text-xs text-gray-600">60-70</span>
+                    <span className="text-xs text-slate-600">60-70</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <div className="w-6 h-4 bg-green-400 rounded" />
-                    <span className="text-xs text-gray-600">70-80</span>
+                    <span className="text-xs text-slate-600">70-80</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <div className="w-6 h-4 bg-green-500 rounded" />
-                    <span className="text-xs text-gray-600">80-100</span>
+                    <span className="text-xs text-slate-600">80-100</span>
                 </div>
             </div>
         </div>

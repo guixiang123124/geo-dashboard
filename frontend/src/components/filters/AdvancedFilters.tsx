@@ -103,7 +103,7 @@ export default function AdvancedFilters({ onFilterChange, onReset }: AdvancedFil
     (filters.sortBy !== 'score-desc' ? 1 : 0);
 
   return (
-    <Card className="border-slate-200/60 shadow-sm">
+    <Card className="border-slate-200">
       <CardContent className="p-4">
         {/* Filter Header */}
         <div className="flex items-center justify-between mb-4">
@@ -111,7 +111,7 @@ export default function AdvancedFilters({ onFilterChange, onReset }: AdvancedFil
             <Filter className="w-5 h-5 text-slate-600" />
             <h3 className="font-semibold text-slate-900">Filters</h3>
             {activeFiltersCount > 0 && (
-              <Badge className="bg-purple-100 text-purple-700 border-purple-200">
+              <Badge className="bg-violet-100 text-violet-700 border-violet-200">
                 {activeFiltersCount} active
               </Badge>
             )}
@@ -152,7 +152,7 @@ export default function AdvancedFilters({ onFilterChange, onReset }: AdvancedFil
             placeholder="Search brands..."
             value={filters.search}
             onChange={(e) => updateFilter('search', e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
           />
         </div>
 
@@ -173,7 +173,7 @@ export default function AdvancedFilters({ onFilterChange, onReset }: AdvancedFil
                       px-3 py-1.5 rounded-lg text-sm font-medium transition-all
                       ${
                         filters.category.includes(category)
-                          ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/30'
+                          ? 'bg-violet-600 text-white'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }
                     `}
@@ -200,7 +200,7 @@ export default function AdvancedFilters({ onFilterChange, onReset }: AdvancedFil
                       ${
                         filters.scoreRange[0] === range.value[0] &&
                         filters.scoreRange[1] === range.value[1]
-                          ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
+                          ? 'bg-violet-600 text-white'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }
                     `}
@@ -226,7 +226,7 @@ export default function AdvancedFilters({ onFilterChange, onReset }: AdvancedFil
                       px-3 py-2 rounded-lg text-sm font-medium transition-all
                       ${
                         filters.dateRange === range.value
-                          ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
+                          ? 'bg-violet-600 text-white'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }
                     `}
@@ -245,7 +245,7 @@ export default function AdvancedFilters({ onFilterChange, onReset }: AdvancedFil
               <select
                 value={filters.sortBy}
                 onChange={(e) => updateFilter('sortBy', e.target.value)}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               >
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>

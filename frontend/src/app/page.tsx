@@ -4,9 +4,20 @@ import Link from 'next/link';
 import { useBrands } from '@/hooks/useBrands';
 import ScoreCard from '@/components/geo/ScoreCard';
 import { Button } from '@/components/ui/button';
-import { StatCard } from '@/components/ui/stat-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, TrendingUp, Target, AlertCircle, Loader2 } from 'lucide-react';
+import {
+  BarChart3,
+  TrendingUp,
+  Target,
+  AlertCircle,
+  Loader2,
+  Eye,
+  Link2,
+  MessageSquare,
+  Users,
+  Activity,
+  Info,
+} from 'lucide-react';
 
 export default function Home() {
   const { brands, loading, error } = useBrands();
@@ -14,19 +25,11 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center space-y-6">
-          <div className="relative">
-            <div className="w-16 h-16 mx-auto">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full animate-ping opacity-20"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full animate-pulse"></div>
-              <Loader2 className="w-16 h-16 animate-spin text-white relative z-10" />
-            </div>
-          </div>
+        <div className="text-center space-y-4">
+          <Loader2 className="w-10 h-10 animate-spin text-violet-600 mx-auto" />
           <div>
-            <p className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Loading GEO Insights
-            </p>
-            <p className="text-sm text-slate-600 mt-2">Fetching brand performance data...</p>
+            <p className="text-lg font-semibold text-slate-900">Loading GEO Insights</p>
+            <p className="text-sm text-slate-500 mt-1">Fetching brand performance data...</p>
           </div>
         </div>
       </div>
@@ -44,10 +47,10 @@ export default function Home() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 mb-4">{error}</p>
-            <p className="text-sm text-gray-600">
+            <p className="text-slate-700 mb-4">{error}</p>
+            <p className="text-sm text-slate-500">
               Make sure the backend API is running at{' '}
-              <code className="bg-gray-100 px-2 py-1 rounded">http://localhost:8000</code>
+              <code className="bg-slate-100 px-2 py-1 rounded text-slate-700">http://localhost:8000</code>
             </p>
             <Button onClick={() => window.location.reload()} className="mt-4">
               Retry
@@ -61,124 +64,214 @@ export default function Home() {
   // Calculate stats from real data
   const brandsWithScores = brands.filter((b) => b.score);
   const totalBrands = brands.length;
+  const scoredCount = brandsWithScores.length;
+  const visibleBrands = brandsWithScores.filter((b) => (b.score?.composite_score ?? 0) > 0);
+
   const avgComposite =
-    brandsWithScores.length > 0
+    scoredCount > 0
       ? Math.round(
-          brandsWithScores.reduce((sum, b) => sum + (b.score?.composite_score || 0), 0) /
-            brandsWithScores.length
+          brandsWithScores.reduce((sum, b) => sum + (b.score?.composite_score ?? 0), 0) /
+            scoredCount
         )
       : 0;
 
-  // Find best dimension
-  const dimensionAverages = {
-    Visibility: brandsWithScores.reduce((sum, b) => sum + (b.score?.visibility_score || 0), 0) / brandsWithScores.length,
-    Citation: brandsWithScores.reduce((sum, b) => sum + (b.score?.citation_score || 0), 0) / brandsWithScores.length,
-    Representation: brandsWithScores.reduce((sum, b) => sum + (b.score?.representation_score || 0), 0) / brandsWithScores.length,
-    Intent: brandsWithScores.reduce((sum, b) => sum + (b.score?.intent_score || 0), 0) / brandsWithScores.length,
-  };
-  const bestDimension = Object.entries(dimensionAverages).reduce((a, b) =>
-    a[1] > b[1] ? a : b
-  )[0];
-
-  // Top and bottom performers
-  const sortedByScore = [...brandsWithScores].sort(
-    (a, b) => (b.score?.composite_score || 0) - (a.score?.composite_score || 0)
+  // Total mentions and mention rate
+  const totalMentions = brandsWithScores.reduce(
+    (sum, b) => sum + (b.score?.total_mentions ?? 0),
+    0
   );
-  const top3 = sortedByScore.slice(0, 3);
-  const bottom3 = sortedByScore.slice(-3).reverse();
+  const totalEvaluations = brandsWithScores.reduce(
+    (sum, b) => sum + (b.score?.evaluation_count ?? 0),
+    0
+  );
+  // Mention rate: brands mentioned at least once / total evaluated brands
+  const mentionRate =
+    scoredCount > 0 ? Math.round((visibleBrands.length / scoredCount) * 100) : 0;
+
+  // Average citation rate
+  const avgCitationRate =
+    scoredCount > 0
+      ? Math.round(
+          (brandsWithScores.reduce((sum, b) => sum + (b.score?.citation_rate ?? 0), 0) /
+            scoredCount) *
+            100
+        )
+      : 0;
+
+  // Dimension averages
+  const dimAvg = (key: 'visibility_score' | 'citation_score' | 'representation_score' | 'intent_score') =>
+    scoredCount > 0
+      ? Math.round(
+          brandsWithScores.reduce((sum, b) => sum + (b.score?.[key] ?? 0), 0) / scoredCount
+        )
+      : 0;
+
+  const dimensionData = [
+    { label: 'Visibility', avg: dimAvg('visibility_score'), weight: '35%', icon: Eye, color: 'blue' },
+    { label: 'Citation', avg: dimAvg('citation_score'), weight: '25%', icon: Link2, color: 'green' },
+    { label: 'Framing', avg: dimAvg('representation_score'), weight: '25%', icon: MessageSquare, color: 'amber' },
+    { label: 'Intent', avg: dimAvg('intent_score'), weight: '15%', icon: Target, color: 'purple' },
+  ];
+
+  // Top performers (non-zero only) and brands needing attention
+  const sortedByScore = [...brandsWithScores].sort(
+    (a, b) => (b.score?.composite_score ?? 0) - (a.score?.composite_score ?? 0)
+  );
+  const top5 = sortedByScore.filter((b) => (b.score?.composite_score ?? 0) > 0).slice(0, 5);
+  const notVisible = brandsWithScores.filter((b) => (b.score?.composite_score ?? 0) === 0);
+  const lowPerformers = sortedByScore
+    .filter((b) => {
+      const s = b.score?.composite_score ?? 0;
+      return s > 0 && s < 15;
+    })
+    .slice(-5)
+    .reverse();
+
+  const maxComposite = top5[0]?.score?.composite_score ?? 1;
 
   return (
     <div className="space-y-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 p-8 md:p-12 text-white shadow-2xl shadow-purple-500/20">
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="relative overflow-hidden rounded-2xl bg-slate-900 p-8 md:p-12 text-white">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
           <div className="relative">
-            <h1 className="text-4xl md:text-5xl font-bold mb-3">
-              Welcome to GEO Insights
+            <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
+              GEO Performance Dashboard
             </h1>
-            <p className="text-xl text-purple-100 mb-6 max-w-2xl">
-              Track and optimize your brand performance in the AI era across major platforms
+            <p className="text-lg text-slate-300 mb-6 max-w-2xl">
+              Generative Engine Optimization — measuring how AI platforms represent your brands
             </p>
             <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">ChatGPT</span>
+              <div className="flex items-center gap-2 bg-white/15 px-4 py-2 rounded-lg">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium text-white">Gemini 2.0 Flash</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">Gemini</span>
+              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
+                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-400">ChatGPT (planned)</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">Claude</span>
+              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
+                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-400">Claude (planned)</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">Perplexity</span>
+              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
+                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
+                <span className="text-sm font-medium text-slate-400">Perplexity (planned)</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow-sm shadow-purple-500/5 border border-slate-200/60 p-6 hover:shadow-md hover:shadow-purple-500/10 transition-all duration-200">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Total Brands</p>
-                <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mt-2">
-                  {totalBrands}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl shadow-lg shadow-purple-500/30">
-                <Target className="w-6 h-6 text-white" />
-              </div>
+        {/* Key Metrics */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="w-4 h-4 text-purple-500" />
+              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Brands</span>
             </div>
-            <p className="text-xs text-slate-500 mt-4">Actively monitored</p>
+            <p className="text-2xl font-bold text-slate-900">{totalBrands}</p>
+            <p className="text-xs text-slate-500 mt-1">{scoredCount} evaluated</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm shadow-blue-500/5 border border-slate-200/60 p-6 hover:shadow-md hover:shadow-blue-500/10 transition-all duration-200">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Average GEO Score</p>
-                <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mt-2">
-                  {avgComposite}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl shadow-lg shadow-blue-500/30">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="w-4 h-4 text-blue-500" />
+              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Avg Score</span>
             </div>
-            <p className="text-xs text-slate-500 mt-4">Across all platforms</p>
+            <p className="text-2xl font-bold text-slate-900">{avgComposite}<span className="text-sm font-normal text-slate-500">/100</span></p>
+            <p className="text-xs text-slate-500 mt-1">composite GEO</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm shadow-green-500/5 border border-slate-200/60 p-6 hover:shadow-md hover:shadow-green-500/10 transition-all duration-200">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Best Dimension</p>
-                <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mt-2">
-                  {bestDimension}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl shadow-lg shadow-green-500/30">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <Eye className="w-4 h-4 text-green-500" />
+              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Visible</span>
             </div>
-            <p className="text-xs text-slate-500 mt-4">Top performing metric</p>
+            <p className="text-2xl font-bold text-slate-900">{visibleBrands.length}<span className="text-sm font-normal text-slate-500">/{scoredCount}</span></p>
+            <p className="text-xs text-slate-500 mt-1">{mentionRate}% mentioned by AI</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="w-4 h-4 text-indigo-500" />
+              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Mentions</span>
+            </div>
+            <p className="text-2xl font-bold text-slate-900">{totalMentions}</p>
+            <p className="text-xs text-slate-500 mt-1">across all prompts</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <Link2 className="w-4 h-4 text-emerald-500" />
+              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Citation</span>
+            </div>
+            <p className="text-2xl font-bold text-slate-900">{avgCitationRate}%</p>
+            <p className="text-xs text-slate-500 mt-1">avg citation rate</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <BarChart3 className="w-4 h-4 text-amber-500" />
+              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Top Score</span>
+            </div>
+            <p className="text-2xl font-bold text-slate-900">{maxComposite}</p>
+            <p className="text-xs text-slate-500 mt-1">{top5[0]?.name ?? 'N/A'}</p>
           </div>
         </div>
+
+        {/* Dimension Breakdown */}
+        <Card className="border-slate-200">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">GEO Score Dimensions</CardTitle>
+            <p className="text-sm text-slate-500">
+              The composite GEO score (0-100) is calculated from four dimensions
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {dimensionData.map((dim) => {
+                const Icon = dim.icon;
+                const colorMap: Record<string, { bg: string; icon: string; bar: string; text: string }> = {
+                  blue: { bg: 'bg-blue-50', icon: 'text-blue-600', bar: 'bg-blue-500', text: 'text-blue-700' },
+                  green: { bg: 'bg-green-50', icon: 'text-green-600', bar: 'bg-green-500', text: 'text-green-700' },
+                  amber: { bg: 'bg-amber-50', icon: 'text-amber-600', bar: 'bg-amber-500', text: 'text-amber-700' },
+                  purple: { bg: 'bg-purple-50', icon: 'text-purple-600', bar: 'bg-purple-500', text: 'text-purple-700' },
+                };
+                const c = colorMap[dim.color];
+                return (
+                  <div key={dim.label} className={`p-4 rounded-lg ${c.bg} border border-slate-100`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon className={`w-4 h-4 ${c.icon}`} />
+                      <span className="text-sm font-medium text-slate-700">{dim.label}</span>
+                      <span className="text-xs text-slate-500 ml-auto">{dim.weight}</span>
+                    </div>
+                    <div className={`text-2xl font-bold ${c.text}`}>{dim.avg}</div>
+                    <div className="w-full bg-white/60 rounded-full h-1.5 mt-2">
+                      <div
+                        className={`${c.bar} h-1.5 rounded-full transition-all`}
+                        style={{ width: `${Math.min(100, dim.avg * 2)}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">avg across {scoredCount} brands</p>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Brand ScoreCards */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-slate-900">Brand Performance</h2>
-              <p className="text-sm text-slate-600 mt-1">Real-time GEO scores across all dimensions</p>
+              <p className="text-sm text-slate-600 mt-1">
+                {visibleBrands.length} brands visible to AI out of {scoredCount} evaluated
+              </p>
             </div>
             <Link href="/analytics">
-              <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all">
+              <Button className="bg-violet-600 hover:bg-violet-700 text-white transition-colors">
                 <BarChart3 className="w-4 h-4 mr-2" />
                 View Analytics
               </Button>
@@ -213,76 +306,150 @@ export default function Home() {
 
         {/* Quick Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-sm shadow-green-500/5 border border-slate-200/60 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-green-100">
-              <h3 className="text-lg font-bold text-slate-900">🏆 Top Performers</h3>
-              <p className="text-sm text-slate-600 mt-1">Brands leading in AI visibility</p>
+              <h3 className="text-lg font-bold text-slate-900">Top Performers</h3>
+              <p className="text-sm text-slate-600 mt-1">Highest GEO composite scores</p>
             </div>
             <div className="p-6 space-y-3">
-              {top3.map((brand, index) => (
-                <div key={brand.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 text-white text-sm font-bold shadow-lg shadow-green-500/30">
-                      {index + 1}
+              {top5.map((brand, index) => {
+                const score = brand.score?.composite_score ?? 0;
+                const barPct = maxComposite > 0 ? (score / maxComposite) * 100 : 0;
+                return (
+                  <Link key={brand.id} href={`/brands/${brand.id}`}>
+                    <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                      <span className="text-sm font-bold text-slate-500 w-6 text-right">#{index + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-semibold text-slate-900 truncate">{brand.name}</span>
+                          <span className="text-lg font-bold text-green-600 ml-2">{score}</span>
+                        </div>
+                        <div className="w-full bg-green-100 rounded-full h-1.5">
+                          <div
+                            className="bg-gradient-to-r from-green-500 to-emerald-500 h-1.5 rounded-full"
+                            style={{ width: `${barPct}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <span className="font-semibold text-slate-900">{brand.name}</span>
-                  </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                    {brand.score?.composite_score}
-                  </span>
-                </div>
-              ))}
+                  </Link>
+                );
+              })}
+              {top5.length === 0 && (
+                <p className="text-sm text-slate-500 py-4 text-center">No brands with scores yet</p>
+              )}
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm shadow-orange-500/5 border border-slate-200/60 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-gradient-to-r from-orange-50 to-red-50 px-6 py-4 border-b border-orange-100">
-              <h3 className="text-lg font-bold text-slate-900">⚠️ Needs Attention</h3>
-              <p className="text-sm text-slate-600 mt-1">Brands requiring optimization</p>
-            </div>
-            <div className="p-6 space-y-3">
-              {bottom3.map((brand, index) => (
-                <div key={brand.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-white text-sm font-bold shadow-lg shadow-orange-500/30">
-                      {index + 1}
-                    </div>
-                    <span className="font-semibold text-slate-900">{brand.name}</span>
-                  </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                    {brand.score?.composite_score}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* System Status */}
-        <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-6 border border-slate-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">🚀 System Status</h3>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50"></div>
-                <span className="text-sm font-medium text-green-600">All Systems Operational</span>
-              </div>
-              <p className="text-sm text-slate-600 mt-2">
-                {brandsWithScores.length} brands actively monitored | API connected
+              <h3 className="text-lg font-bold text-slate-900">Needs Attention</h3>
+              <p className="text-sm text-slate-600 mt-1">
+                {notVisible.length} brand{notVisible.length !== 1 ? 's' : ''} not mentioned by AI
               </p>
             </div>
-            <div className="flex gap-2">
-              <div className="px-3 py-1.5 bg-white rounded-lg shadow-sm">
-                <div className="text-xs text-slate-500">Uptime</div>
-                <div className="text-sm font-bold text-slate-900">99.9%</div>
-              </div>
-              <div className="px-3 py-1.5 bg-white rounded-lg shadow-sm">
-                <div className="text-xs text-slate-500">Evaluations</div>
-                <div className="text-sm font-bold text-slate-900">1.2K+</div>
-              </div>
+            <div className="p-6 space-y-3">
+              {lowPerformers.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Low scoring brands</p>
+                  {lowPerformers.map((brand) => (
+                    <Link key={brand.id} href={`/brands/${brand.id}`}>
+                      <div className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                        <span className="text-sm font-medium text-slate-900">{brand.name}</span>
+                        <span className="text-sm font-bold text-amber-600">{brand.score?.composite_score}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+              {notVisible.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Not visible (score 0)</p>
+                  <div className="flex flex-wrap gap-2">
+                    {notVisible.slice(0, 8).map((brand) => (
+                      <Link key={brand.id} href={`/brands/${brand.id}`}>
+                        <span className="inline-block px-3 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 cursor-pointer transition-colors">
+                          {brand.name}
+                        </span>
+                      </Link>
+                    ))}
+                    {notVisible.length > 8 && (
+                      <span className="inline-block px-3 py-1 text-xs text-slate-500 font-medium">
+                        +{notVisible.length - 8} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+              {lowPerformers.length === 0 && notVisible.length === 0 && (
+                <p className="text-sm text-slate-500 py-4 text-center">All brands performing well</p>
+              )}
             </div>
           </div>
         </div>
+
+        {/* GEO Methodology */}
+        <Card className="border-slate-200">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Info className="w-5 h-5 text-slate-600" />
+              <CardTitle className="text-lg">How GEO Scoring Works</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  GEO (Generative Engine Optimization) measures how AI models represent your brand
+                  when users ask relevant questions. Each brand is evaluated across 20+ prompts
+                  covering product discovery, comparisons, purchase intent, and more.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Eye className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span className="text-slate-700"><strong>Visibility (35%)</strong> — Is the brand mentioned in AI responses?</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Link2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <span className="text-slate-700"><strong>Citation (25%)</strong> — Does AI link to or cite the brand?</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <MessageSquare className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                    <span className="text-slate-700"><strong>Framing (25%)</strong> — How positively is the brand described?</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Target className="w-4 h-4 text-purple-500 flex-shrink-0" />
+                    <span className="text-slate-700"><strong>Intent (15%)</strong> — Does AI recommend the brand for the right queries?</span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-slate-700">Score interpretation</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span className="text-sm text-slate-600"><strong>25+</strong> — Strong AI presence, frequently mentioned and recommended</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span className="text-sm text-slate-600"><strong>10-24</strong> — Moderate presence, mentioned in some contexts</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                    <span className="text-sm text-slate-600"><strong>1-9</strong> — Low visibility, rarely mentioned by AI</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-slate-300"></div>
+                    <span className="text-sm text-slate-600"><strong>0</strong> — Not mentioned in any AI responses</span>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Scores are based on evaluation against Gemini 2.0 Flash. Multi-model support coming soon.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

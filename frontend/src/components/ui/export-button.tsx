@@ -28,8 +28,8 @@ export function ExportButton({ onExportCSV, onExportPNG, disabled, size = 'defau
             } else if (type === 'png' && onExportPNG) {
                 await onExportPNG();
             }
-        } catch (error) {
-            console.error('Export failed:', error);
+        } catch {
+            // Export error handled silently
         } finally {
             setIsExporting(false);
         }

@@ -39,7 +39,7 @@ export function DimensionSelector({ selected, onChange }: DimensionSelectorProps
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">Dimensions</label>
+                <label className="text-sm font-medium text-slate-700">Dimensions</label>
                 <div className="flex gap-2">
                     <Button
                         variant="ghost"

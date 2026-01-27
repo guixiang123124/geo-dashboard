@@ -27,7 +27,7 @@ export function ModelSelector({ models, selected, onChange }: ModelSelectorProps
 
     return (
         <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">AI Models</label>
+            <label className="text-sm font-medium text-slate-700">AI Models</label>
             <div className="flex flex-wrap gap-2">
                 {models.map((model) => {
                     const isSelected = selected.includes(model);
@@ -45,7 +45,7 @@ export function ModelSelector({ models, selected, onChange }: ModelSelectorProps
                     );
                 })}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-500">
                 {selected.length} of {models.length} selected
             </p>
         </div>

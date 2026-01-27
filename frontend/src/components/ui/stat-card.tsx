@@ -19,13 +19,13 @@ export function StatCard({ label, value, trend, change, icon, className }: StatC
 
         if (trend === 'up') return <TrendingUp className="w-4 h-4 text-green-600" />;
         if (trend === 'down') return <TrendingDown className="w-4 h-4 text-red-600" />;
-        return <Minus className="w-4 h-4 text-gray-600" />;
+        return <Minus className="w-4 h-4 text-slate-600" />;
     };
 
     const getTrendColor = () => {
         if (trend === 'up') return 'text-green-600';
         if (trend === 'down') return 'text-red-600';
-        return 'text-gray-600';
+        return 'text-slate-600';
     };
 
     return (
@@ -33,8 +33,8 @@ export function StatCard({ label, value, trend, change, icon, className }: StatC
             <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <p className="text-sm text-gray-600 font-medium mb-1">{label}</p>
-                        <p className="text-3xl font-bold text-gray-900">{value}</p>
+                        <p className="text-sm text-slate-600 font-medium mb-1">{label}</p>
+                        <p className="text-3xl font-bold text-slate-900">{value}</p>
                         {(trend || change) && (
                             <div className="flex items-center gap-1 mt-2">
                                 {getTrendIcon()}
@@ -47,7 +47,7 @@ export function StatCard({ label, value, trend, change, icon, className }: StatC
                         )}
                     </div>
                     {icon && (
-                        <div className="flex-shrink-0 text-gray-400">
+                        <div className="flex-shrink-0 text-slate-500">
                             {icon}
                         </div>
                     )}

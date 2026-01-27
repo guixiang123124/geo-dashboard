@@ -40,8 +40,8 @@ export function useFilters(initialFilters?: Partial<FilterState>) {
             try {
                 const parsed = JSON.parse(savedFilters);
                 setFilters({ ...DEFAULT_FILTERS, ...parsed, ...initialFilters });
-            } catch (error) {
-                console.error('Failed to parse saved filters:', error);
+            } catch {
+                // Ignore invalid saved filters
             }
         }
     }, []);

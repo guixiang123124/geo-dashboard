@@ -7,17 +7,31 @@ import { Badge } from '@/components/ui/badge';
 import {
   ArrowLeft,
   ExternalLink,
-  TrendingUp,
-  TrendingDown,
   Eye,
   Link as LinkIcon,
   MessageSquare,
   Target,
-  Download,
-  Share2
+  Activity,
+  FileSearch,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useBrands } from '@/hooks/useBrands';
+
+function getScoreLevel(value: number): 'high' | 'medium' | 'low' | 'none' {
+  if (value >= 25) return 'high';
+  if (value >= 10) return 'medium';
+  if (value > 0) return 'low';
+  return 'none';
+}
+
+const levelLabels: Record<string, { label: string; color: string }> = {
+  high: { label: 'Strong', color: 'text-green-700' },
+  medium: { label: 'Moderate', color: 'text-blue-700' },
+  low: { label: 'Low', color: 'text-amber-700' },
+  none: { label: 'Not Visible', color: 'text-slate-500' },
+};
+
+const normalizeBar = (val: number) => Math.min(100, Math.max(0, val * 2));
 
 export default function BrandDetailPage() {
   const params = useParams();
@@ -28,7 +42,7 @@ export default function BrandDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-12 h-12 mx-auto mb-4 border-4 border-violet-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-slate-600">Loading brand details...</p>
         </div>
       </div>
@@ -59,16 +73,17 @@ export default function BrandDetailPage() {
   }
 
   const score = brand.score;
-  const getScoreColor = (value: number) => {
-    if (value >= 80) return 'from-green-600 to-emerald-600';
-    if (value >= 50) return 'from-yellow-600 to-orange-600';
-    return 'from-red-600 to-pink-600';
-  };
+  const level = score ? getScoreLevel(score.composite_score) : 'none';
+  const levelInfo = levelLabels[level];
 
-  const getTrendIcon = (value: number) => {
-    if (value >= 70) return <TrendingUp className="w-5 h-5 text-green-600" />;
-    return <TrendingDown className="w-5 h-5 text-red-600" />;
-  };
+  const dimensions = score
+    ? [
+        { label: 'Visibility', desc: 'Mentioned in AI responses', weight: '35%', value: score.visibility_score, icon: Eye, color: 'blue' },
+        { label: 'Citation', desc: 'Linked or cited by AI', weight: '25%', value: score.citation_score, icon: LinkIcon, color: 'green' },
+        { label: 'Framing', desc: 'Positive representation quality', weight: '25%', value: score.representation_score, icon: MessageSquare, color: 'amber' },
+        { label: 'Intent', desc: 'Recommended for right queries', weight: '15%', value: score.intent_score, icon: Target, color: 'purple' },
+      ]
+    : [];
 
   return (
     <div className="space-y-8">
@@ -102,36 +117,42 @@ export default function BrandDetailPage() {
                 )}
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline">
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
+            <Link href="/evaluations">
+              <Button className="bg-violet-600 hover:bg-violet-700 text-white">
+                <FileSearch className="w-4 h-4 mr-2" />
+                View Evaluations
               </Button>
-              <Button className="bg-gradient-to-r from-purple-600 to-blue-600">
-                <Download className="w-4 h-4 mr-2" />
-                Export Report
-              </Button>
-            </div>
+            </Link>
           </div>
         </div>
 
         {/* Composite Score Highlight */}
         {score && (
-          <Card className="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 border-purple-200">
+          <Card className="border-slate-200">
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600 mb-1">Overall GEO Score</p>
                   <div className="flex items-center gap-4">
-                    <div className={`text-6xl font-extrabold bg-gradient-to-r ${getScoreColor(score.composite_score)} bg-clip-text text-transparent`}>
+                    <div className={`text-6xl font-extrabold ${levelInfo.color}`}>
                       {score.composite_score}
                     </div>
-                    {getTrendIcon(score.composite_score)}
+                    <div>
+                      <Badge className={`${
+                        level === 'high' ? 'bg-green-100 text-green-700 border-green-200' :
+                        level === 'medium' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                        level === 'low' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                        'bg-slate-100 text-slate-500 border-slate-200'
+                      }`}>
+                        {levelInfo.label}
+                      </Badge>
+                      <p className="text-xs text-slate-600 mt-1">out of 100</p>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-slate-600 mb-2">Performance Metrics</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <p className="text-sm text-slate-600 mb-2">Key Metrics</p>
+                  <div className="grid grid-cols-3 gap-3">
                     <div className="px-4 py-2 bg-white rounded-lg">
                       <p className="text-xs text-slate-500">Mentions</p>
                       <p className="text-lg font-bold text-slate-900">{score.total_mentions}</p>
@@ -139,6 +160,10 @@ export default function BrandDetailPage() {
                     <div className="px-4 py-2 bg-white rounded-lg">
                       <p className="text-xs text-slate-500">Citation Rate</p>
                       <p className="text-lg font-bold text-slate-900">{(score.citation_rate * 100).toFixed(0)}%</p>
+                    </div>
+                    <div className="px-4 py-2 bg-white rounded-lg">
+                      <p className="text-xs text-slate-500">Intent Coverage</p>
+                      <p className="text-lg font-bold text-slate-900">{(score.intent_coverage * 100).toFixed(0)}%</p>
                     </div>
                   </div>
                 </div>
@@ -150,102 +175,86 @@ export default function BrandDetailPage() {
         {/* Dimension Scores */}
         {score && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Visibility */}
-            <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-blue-600 rounded-lg">
-                    <Eye className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Visibility</CardTitle>
-                    <CardDescription className="text-xs">Brand presence</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-blue-700 mb-4">{score.visibility_score}</div>
-                <div className="w-full bg-blue-100 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${score.visibility_score}%` }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Citation */}
-            <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-green-600 rounded-lg">
-                    <LinkIcon className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Citation</CardTitle>
-                    <CardDescription className="text-xs">Source references</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-green-700 mb-4">{score.citation_score}</div>
-                <div className="w-full bg-green-100 rounded-full h-2">
-                  <div
-                    className="bg-green-600 h-2 rounded-full"
-                    style={{ width: `${score.citation_score}%` }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Representation */}
-            <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-white">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-amber-600 rounded-lg">
-                    <MessageSquare className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Framing</CardTitle>
-                    <CardDescription className="text-xs">Message quality</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-amber-700 mb-4">{score.representation_score}</div>
-                <div className="w-full bg-amber-100 rounded-full h-2">
-                  <div
-                    className="bg-amber-600 h-2 rounded-full"
-                    style={{ width: `${score.representation_score}%` }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Intent */}
-            <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-purple-600 rounded-lg">
-                    <Target className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Intent</CardTitle>
-                    <CardDescription className="text-xs">Query alignment</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-purple-700 mb-4">{score.intent_score}</div>
-                <div className="w-full bg-purple-100 rounded-full h-2">
-                  <div
-                    className="bg-purple-600 h-2 rounded-full"
-                    style={{ width: `${score.intent_score}%` }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            {dimensions.map((dim) => {
+              const Icon = dim.icon;
+              const colorMap: Record<string, { border: string; bg: string; icon: string; text: string; bar: string; barBg: string }> = {
+                blue: { border: 'border-slate-200', bg: 'bg-white', icon: 'bg-blue-600', text: 'text-blue-700', bar: 'bg-blue-600', barBg: 'bg-blue-100' },
+                green: { border: 'border-slate-200', bg: 'bg-white', icon: 'bg-green-600', text: 'text-green-700', bar: 'bg-green-600', barBg: 'bg-green-100' },
+                amber: { border: 'border-slate-200', bg: 'bg-white', icon: 'bg-amber-600', text: 'text-amber-700', bar: 'bg-amber-600', barBg: 'bg-amber-100' },
+                purple: { border: 'border-slate-200', bg: 'bg-white', icon: 'bg-purple-600', text: 'text-purple-700', bar: 'bg-purple-600', barBg: 'bg-purple-100' },
+              };
+              const c = colorMap[dim.color];
+              return (
+                <Card key={dim.label} className={`${c.border} ${c.bg}`}>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <div className={`p-2 ${c.icon} rounded-lg`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{dim.label}</CardTitle>
+                        <CardDescription className="text-xs">{dim.desc}</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-baseline gap-2 mb-3">
+                      <span className={`text-4xl font-bold ${c.text}`}>{dim.value}</span>
+                      <span className="text-sm text-slate-500">weight: {dim.weight}</span>
+                    </div>
+                    <div className={`w-full ${c.barBg} rounded-full h-2`}>
+                      <div
+                        className={`${c.bar} h-2 rounded-full transition-all`}
+                        style={{ width: `${normalizeBar(dim.value)}%` }}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
+        )}
+
+        {/* Model Breakdown */}
+        {score?.model_scores && Object.keys(score.model_scores).length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Performance by AI Model</CardTitle>
+              <CardDescription>How this brand performs across different AI platforms</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {Object.entries(score.model_scores).map(([model, entry]) => {
+                  const modelLevel = getScoreLevel(entry.score);
+                  return (
+                    <div key={model} className="flex items-center gap-4">
+                      <span className="font-medium text-slate-900 w-36 truncate">{model}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-semibold ${levelLabels[modelLevel].color}`}>
+                              {entry.score}
+                            </span>
+                            <span className="text-xs text-slate-500">({levelLabels[modelLevel].label})</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-sm text-slate-500">
+                            <Activity className="w-3 h-3" />
+                            {entry.mentions} mention{entry.mentions !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-2.5">
+                          <div
+                            className="bg-violet-500 h-2.5 rounded-full"
+                            style={{ width: `${normalizeBar(entry.score)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Additional Information */}
@@ -255,10 +264,6 @@ export default function BrandDetailPage() {
               <CardTitle>Brand Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex justify-between py-2 border-b">
-                <span className="text-slate-600">Brand ID</span>
-                <span className="font-mono text-sm text-slate-900">{brand.id}</span>
-              </div>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-slate-600">Category</span>
                 <Badge>{brand.category}</Badge>
@@ -277,16 +282,40 @@ export default function BrandDetailPage() {
                   </a>
                 </div>
               )}
-              {score && (
-                <div className="flex justify-between py-2">
-                  <span className="text-slate-600">Last Evaluation</span>
-                  <span className="text-slate-900">
-                    {score.last_evaluation_date
-                      ? new Date(score.last_evaluation_date).toLocaleDateString()
-                      : 'N/A'
-                    }
-                  </span>
+              {brand.positioning && (
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-slate-600">Positioning</span>
+                  <span className="text-slate-900 text-right max-w-xs">{brand.positioning}</span>
                 </div>
+              )}
+              {brand.price_tier && (
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-slate-600">Price Tier</span>
+                  <Badge variant="outline">{brand.price_tier}</Badge>
+                </div>
+              )}
+              {brand.target_age_range && (
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-slate-600">Target Age</span>
+                  <span className="text-slate-900">{brand.target_age_range}</span>
+                </div>
+              )}
+              {score && (
+                <>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="text-slate-600">Evaluations Run</span>
+                    <span className="text-slate-900">{score.evaluation_count}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Last Evaluation</span>
+                    <span className="text-slate-900">
+                      {score.last_evaluation_date
+                        ? new Date(score.last_evaluation_date).toLocaleDateString()
+                        : 'N/A'
+                      }
+                    </span>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -297,28 +326,71 @@ export default function BrandDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {score && score.composite_score >= 80 && (
+                {score && score.composite_score >= 25 && (
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="font-semibold text-green-900">Excellent Performance</p>
+                    <p className="font-semibold text-green-900">Strong GEO Presence</p>
                     <p className="text-sm text-green-700 mt-1">
-                      This brand is performing exceptionally well across all GEO dimensions.
+                      This brand is frequently mentioned and well-represented in AI responses.
+                      It appears in {score.total_mentions} AI outputs with a {(score.citation_rate * 100).toFixed(0)}% citation rate.
                     </p>
                   </div>
                 )}
-                {score && score.composite_score >= 50 && score.composite_score < 80 && (
-                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="font-semibold text-yellow-900">Good Performance</p>
-                    <p className="text-sm text-yellow-700 mt-1">
-                      There are opportunities to improve visibility and citation rates.
+                {score && score.composite_score >= 10 && score.composite_score < 25 && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="font-semibold text-blue-900">Moderate Presence</p>
+                    <p className="text-sm text-blue-700 mt-1">
+                      This brand appears in some AI responses ({score.total_mentions} mentions).
+                      Focus on improving visibility and citation rates to strengthen GEO performance.
                     </p>
                   </div>
                 )}
-                {score && score.composite_score < 50 && (
+                {score && score.composite_score > 0 && score.composite_score < 10 && (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="font-semibold text-amber-900">Low Visibility</p>
+                    <p className="text-sm text-amber-700 mt-1">
+                      AI mentions this brand rarely. Consider optimizing content, building authority,
+                      and ensuring accurate brand information is widely available online.
+                    </p>
+                  </div>
+                )}
+                {score && score.composite_score === 0 && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="font-semibold text-red-900">Needs Attention</p>
+                    <p className="font-semibold text-red-900">Not Yet Visible</p>
                     <p className="text-sm text-red-700 mt-1">
-                      Consider optimizing content and improving brand presence in AI responses.
+                      This brand was not mentioned in any AI responses. This is common for smaller
+                      or newer brands. Strategies: improve SEO, create authoritative content,
+                      get featured in industry publications that AI models reference.
                     </p>
+                  </div>
+                )}
+                {!score && (
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                    <p className="font-semibold text-slate-900">No Evaluation Data</p>
+                    <p className="text-sm text-slate-700 mt-1">
+                      Run an evaluation to see this brand&apos;s GEO performance.
+                    </p>
+                  </div>
+                )}
+
+                {/* Dimension-specific insights */}
+                {score && score.composite_score > 0 && (
+                  <div className="pt-2 space-y-2">
+                    <p className="text-sm font-medium text-slate-700">Dimension highlights</p>
+                    {score.visibility_score > 0 && score.citation_score === 0 && (
+                      <p className="text-sm text-slate-600">
+                        - Brand is mentioned but never cited with links. Adding structured data and authoritative sources may help.
+                      </p>
+                    )}
+                    {score.intent_score > score.visibility_score && (
+                      <p className="text-sm text-slate-600">
+                        - Strong intent alignment relative to visibility suggests AI understands the brand well when it mentions it.
+                      </p>
+                    )}
+                    {score.representation_score > score.visibility_score && (
+                      <p className="text-sm text-slate-600">
+                        - When mentioned, the brand is described positively. Focus on increasing mention frequency.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
