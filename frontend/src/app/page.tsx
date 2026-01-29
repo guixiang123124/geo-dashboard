@@ -17,6 +17,10 @@ import {
   Users,
   Activity,
   Info,
+  PlayCircle,
+  Plus,
+  Clock,
+  FileText,
 } from 'lucide-react';
 
 export default function Home() {
@@ -129,6 +133,27 @@ export default function Home() {
 
   const maxComposite = top5[0]?.score?.composite_score ?? 1;
 
+  // Last evaluation timestamp
+  const lastEvaluationDate = brandsWithScores.reduce<string | null>((latest, b) => {
+    const d = b.score?.last_evaluation_date ?? b.score?.updated_at;
+    if (!d) return latest;
+    if (!latest) return d;
+    return d > latest ? d : latest;
+  }, null);
+
+  const formatLastEvaluated = (dateStr: string | null): string => {
+    if (!dateStr) return 'No evaluations yet';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffHours < 1) return 'Less than an hour ago';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
   return (
     <div className="space-y-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -142,7 +167,35 @@ export default function Home() {
             <p className="text-lg text-slate-300 mb-6 max-w-2xl">
               Generative Engine Optimization — measuring how AI platforms represent your brands
             </p>
-            <div className="flex flex-wrap gap-3">
+
+            {/* Quick Actions */}
+            <div className="flex flex-wrap gap-3 mb-6">
+              <Link href="/evaluations/new">
+                <button className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium text-sm transition-colors">
+                  <PlayCircle className="w-4 h-4" />
+                  Run Evaluation
+                </button>
+              </Link>
+              <Link href="/brands">
+                <button className="flex items-center gap-2 px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white rounded-lg font-medium text-sm transition-colors">
+                  <Plus className="w-4 h-4" />
+                  Add Brand
+                </button>
+              </Link>
+              <Link href="/analytics">
+                <button className="flex items-center gap-2 px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white rounded-lg font-medium text-sm transition-colors">
+                  <FileText className="w-4 h-4" />
+                  View Reports
+                </button>
+              </Link>
+            </div>
+
+            {/* Last Evaluated + AI Model Status */}
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
+                <Clock className="w-4 h-4 text-slate-300" />
+                <span className="text-sm text-slate-300">Last evaluated: <span className="text-white font-medium">{formatLastEvaluated(lastEvaluationDate)}</span></span>
+              </div>
               <div className="flex items-center gap-2 bg-white/15 px-4 py-2 rounded-lg">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-white">Gemini 2.0 Flash</span>

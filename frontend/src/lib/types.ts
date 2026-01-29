@@ -158,6 +158,37 @@ export interface EvaluationCreate {
   prompt_ids?: string[];
 }
 
+// ============ Prompt Types ============
+
+export interface Prompt {
+  id: string;
+  text: string;
+  intent_category: string;
+  weight: number;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromptCreate {
+  text: string;
+  intent_category: string;
+  weight?: number;
+  description?: string;
+}
+
+export interface PromptUpdate {
+  text?: string;
+  intent_category?: string;
+  weight?: number;
+  description?: string;
+}
+
+export interface PromptCategory {
+  category: string;
+  count: number;
+}
+
 // ============ Analytics Types ============
 
 export interface TimeSeriesDataPoint {
@@ -181,6 +212,22 @@ export interface ModelComparisonData {
   representation: number;
   intent: number;
   composite: number;
+}
+
+export interface BrandComparisonData {
+  brand_id: string;
+  brand_name: string;
+  category: string;
+  composite_score: number;
+  visibility_score: number;
+  citation_score: number;
+  representation_score: number;
+  intent_score: number;
+  total_mentions: number;
+  citation_rate: number;
+  intent_coverage: number;
+  model_scores: Record<string, { score: number; mentions: number }>;
+  last_evaluation_date: string | null;
 }
 
 export interface FunnelData {

@@ -1,19 +1,41 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { ChevronRight, Bell, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useRef, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { ChevronRight, User, LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 
 const routeNames: Record<string, string> = {
     '/': 'Dashboard',
     '/analytics': 'Analytics',
+    '/trends': 'Trends',
+    '/compare': 'Compare',
     '/brands': 'Brands',
     '/evaluations': 'Evaluations',
+    '/prompts': 'Prompts',
+    '/reports': 'Reports',
+    '/settings': 'Settings',
 };
 
 export function Header() {
     const pathname = usePathname();
+    const router = useRouter();
+    const { user, logout } = useAuth();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setMenuOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     // Generate breadcrumbs
     const pathSegments = pathname.split('/').filter(Boolean);
@@ -28,6 +50,20 @@ export function Header() {
 
     // Don't show breadcrumbs on homepage
     const showBreadcrumbs = pathname !== '/';
+
+    const displayName = user?.full_name || user?.email?.split('@')[0] || 'User';
+    const initials = displayName
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+
+    const handleLogout = async () => {
+        setMenuOpen(false);
+        await logout();
+        router.replace('/auth/login');
+    };
 
     return (
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-30">
@@ -56,7 +92,7 @@ export function Header() {
                 ) : (
                     <div>
                         <h2 className="text-lg font-bold text-slate-900">
-                            Welcome back
+                            Welcome back{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
                         </h2>
                         <p className="text-sm text-slate-500">Track your brand performance in the AI era</p>
                     </div>
@@ -66,20 +102,51 @@ export function Header() {
             {/* Actions */}
             <div className="flex items-center gap-3">
                 {/* Notifications */}
-                <button className="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-violet-600 rounded-full"></span>
-                </button>
+                <NotificationPanel />
 
                 {/* User Menu */}
-                <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
-                    <div className="text-right hidden md:block">
-                        <p className="text-sm font-semibold text-slate-900">Demo User</p>
-                        <p className="text-xs text-slate-500">Workspace Owner</p>
-                    </div>
-                    <button className="flex items-center justify-center w-10 h-10 bg-violet-600 text-white rounded-full hover:bg-violet-700 transition-colors">
-                        <User className="w-5 h-5" />
+                <div className="relative" ref={menuRef}>
+                    <button
+                        onClick={() => setMenuOpen(prev => !prev)}
+                        className="flex items-center gap-3 pl-3 border-l border-slate-200 hover:opacity-80 transition-opacity"
+                    >
+                        <div className="text-right hidden md:block">
+                            <p className="text-sm font-semibold text-slate-900">{displayName}</p>
+                            <p className="text-xs text-slate-500">{user?.email || 'Loading...'}</p>
+                        </div>
+                        <div className="flex items-center justify-center w-10 h-10 bg-violet-600 text-white rounded-full">
+                            {initials ? (
+                                <span className="text-sm font-bold">{initials}</span>
+                            ) : (
+                                <User className="w-5 h-5" />
+                            )}
+                        </div>
                     </button>
+
+                    {/* Dropdown menu */}
+                    {menuOpen && (
+                        <div className="absolute right-0 top-14 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+                            <div className="px-4 py-3 border-b border-slate-100">
+                                <p className="text-sm font-semibold text-slate-900">{displayName}</p>
+                                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                            </div>
+                            <Link
+                                href="/settings"
+                                onClick={() => setMenuOpen(false)}
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                            >
+                                <Settings className="w-4 h-4" />
+                                Settings
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Sign out
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </header>

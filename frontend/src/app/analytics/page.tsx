@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { RadarChart, HeatmapChart } from '@/components/charts';
+import { RadarChart, HeatmapChart, FunnelChart, ModelComparisonChart } from '@/components/charts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useBrands } from '@/hooks/useBrands';
 import { RefreshCw, AlertCircle, BarChart3, TrendingUp, Award, Eye, Link2, FileText, Target, Users, Activity } from 'lucide-react';
@@ -129,6 +129,41 @@ export default function AnalyticsPage() {
             }
         }
     }
+
+    // Funnel data for FunnelChart component
+    const funnelData = [
+        { stage: 'Recall', value: scoredBrands > 0 ? 100 : 0, percentage: 100, label: `${scoredBrands} brands evaluated` },
+        { stage: 'Visibility', value: scoredBrands > 0 ? Math.round((visibleBrands / scoredBrands) * 100) : 0, percentage: scoredBrands > 0 ? Math.round((visibleBrands / scoredBrands) * 100) : 0, label: `${visibleBrands} brands mentioned by AI` },
+        { stage: 'Citation', value: scoredBrands > 0 ? Math.round((allScored.filter(b => (b.score?.citation_score ?? 0) > 0).length / scoredBrands) * 100) : 0, percentage: 0, label: 'Cited with links' },
+        { stage: 'Conversion', value: scoredBrands > 0 ? Math.round((allScored.filter(b => (b.score?.composite_score ?? 0) >= 25).length / scoredBrands) * 100) : 0, percentage: 0, label: 'Strong GEO presence' },
+    ];
+
+    // Model comparison data (aggregate model_scores across all brands)
+    const modelAggregates: Record<string, { totalScore: number; totalMentions: number; count: number }> = {};
+    for (const brand of allScored) {
+        if (brand.score?.model_scores) {
+            for (const [model, entry] of Object.entries(brand.score.model_scores)) {
+                if (!modelAggregates[model]) {
+                    modelAggregates[model] = { totalScore: 0, totalMentions: 0, count: 0 };
+                }
+                modelAggregates[model].totalScore += entry.score ?? 0;
+                modelAggregates[model].totalMentions += entry.mentions ?? 0;
+                modelAggregates[model].count += 1;
+            }
+        }
+    }
+    const modelComparisonData = Object.entries(modelAggregates).map(([model, agg]) => ({
+        model,
+        composite: agg.count > 0 ? Math.round(agg.totalScore / agg.count) : 0,
+        visibility: 0,
+        citation: 0,
+        representation: 0,
+        intent: 0,
+        score: agg.count > 0 ? Math.round(agg.totalScore / agg.count) : 0,
+        mentionCount: agg.totalMentions,
+        citationRate: 0,
+        avgRank: 0,
+    }));
 
     // Score distribution (using calibrated thresholds)
     const distribution = {
@@ -372,6 +407,36 @@ export default function AnalyticsPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* GEO Funnel Chart */}
+                {funnelData.length > 0 && scoredBrands > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Attribution Funnel</CardTitle>
+                            <p className="text-sm text-slate-500">
+                                Drop-off rates from recall to conversion
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <FunnelChart data={funnelData} height={250} />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Model Comparison Chart */}
+                {modelComparisonData.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>AI Model Performance</CardTitle>
+                            <p className="text-sm text-slate-500">
+                                Average GEO score across all brands by AI model
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <ModelComparisonChart data={modelComparisonData} height={300} />
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Radar Chart */}
                 {radarBrands.length > 0 && (

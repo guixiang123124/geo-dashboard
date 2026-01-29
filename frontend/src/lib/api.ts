@@ -17,6 +17,12 @@ import type {
   EvaluationResult,
   EvaluationCreate,
   PaginatedResponse,
+  Prompt,
+  PromptCreate,
+  PromptUpdate,
+  PromptCategory,
+  TimeSeriesDataPoint,
+  BrandComparisonData,
 } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -228,6 +234,25 @@ export const scoresApi = {
   async getWorkspaceScores(workspaceId: string): Promise<ScoreCard[]> {
     return fetchApi<ScoreCard[]>(`/scores/workspace?workspace_id=${workspaceId}`);
   },
+
+  async getTrends(
+    workspaceId: string,
+    brandId?: string,
+  ): Promise<TimeSeriesDataPoint[]> {
+    let url = `/scores/trends?workspace_id=${workspaceId}`;
+    if (brandId) url += `&brand_id=${brandId}`;
+    return fetchApi<TimeSeriesDataPoint[]>(url);
+  },
+
+  async getComparison(
+    workspaceId: string,
+    brandIds: string[],
+  ): Promise<BrandComparisonData[]> {
+    const ids = brandIds.join(',');
+    return fetchApi<BrandComparisonData[]>(
+      `/scores/comparison?workspace_id=${workspaceId}&brand_ids=${ids}`
+    );
+  },
 };
 
 // ============ Evaluations API ============
@@ -265,6 +290,77 @@ export const evaluationsApi = {
     if (brandId) url += `&brand_id=${brandId}`;
     if (modelName) url += `&model_name=${modelName}`;
     return fetchApi<EvaluationResult[]>(url);
+  },
+};
+
+// ============ Prompts API ============
+
+interface BackendPromptListResponse {
+  prompts: Prompt[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export const promptsApi = {
+  async list(
+    page = 1,
+    pageSize = 50,
+    category?: string,
+    search?: string,
+  ): Promise<{ prompts: Prompt[]; total: number }> {
+    let url = `/prompts?page=${page}&page_size=${pageSize}`;
+    if (category) url += `&category=${encodeURIComponent(category)}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    const raw = await fetchApi<BackendPromptListResponse>(url);
+    return { prompts: raw.prompts ?? [], total: raw.total ?? 0 };
+  },
+
+  async get(promptId: string): Promise<Prompt> {
+    return fetchApi<Prompt>(`/prompts/${promptId}`);
+  },
+
+  async create(data: PromptCreate): Promise<Prompt> {
+    return fetchApi<Prompt>('/prompts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async update(promptId: string, data: PromptUpdate): Promise<Prompt> {
+    return fetchApi<Prompt>(`/prompts/${promptId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async delete(promptId: string): Promise<void> {
+    await fetchApi(`/prompts/${promptId}`, { method: 'DELETE' });
+  },
+
+  async categories(): Promise<PromptCategory[]> {
+    return fetchApi<PromptCategory[]>('/prompts/categories');
+  },
+};
+
+// ============ AI Models API ============
+
+export interface AIModelInfo {
+  id: string;
+  name: string;
+  model: string;
+  available: boolean;
+  description: string;
+  icon: string;
+}
+
+export const modelsApi = {
+  async list(): Promise<AIModelInfo[]> {
+    return fetchApi<AIModelInfo[]>('/models');
+  },
+
+  async listAvailable(): Promise<AIModelInfo[]> {
+    return fetchApi<AIModelInfo[]>('/models/available');
   },
 };
 

@@ -12,7 +12,11 @@ import {
   Menu,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageSquareText,
+  LineChart,
+  GitCompareArrows,
+  FileText,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -20,8 +24,12 @@ import { cn } from '@/lib/utils';
 const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+    { name: 'Trends', href: '/trends', icon: LineChart },
+    { name: 'Compare', href: '/compare', icon: GitCompareArrows },
     { name: 'Brands', href: '/brands', icon: Package },
     { name: 'Evaluations', href: '/evaluations', icon: TrendingUp },
+    { name: 'Prompts', href: '/prompts', icon: MessageSquareText },
+    { name: 'Reports', href: '/reports', icon: FileText },
     { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

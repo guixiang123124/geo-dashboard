@@ -103,13 +103,21 @@ export default function EvaluationsPage() {
                         <h1 className="text-3xl font-bold text-slate-900">Evaluations</h1>
                         <p className="text-slate-600 mt-2">Track evaluation runs and AI model performance</p>
                     </div>
-                    <button
-                        onClick={refetch}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-md hover:bg-slate-50"
-                    >
-                        <RefreshCw className="w-4 h-4" />
-                        Refresh
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={refetch}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-md hover:bg-slate-50"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                            Refresh
+                        </button>
+                        <Link href="/evaluations/new">
+                            <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-violet-600 rounded-md hover:bg-violet-700">
+                                <PlayCircle className="w-4 h-4" />
+                                Run Evaluation
+                            </button>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Summary Stats */}
