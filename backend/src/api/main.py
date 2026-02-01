@@ -34,13 +34,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Configure CORS - allow all origins for development
+# Configure CORS
+# In production, set CORS_ORIGINS env var to specific domains
+# e.g., CORS_ORIGINS="https://geo.yourdomain.com,https://app.yourdomain.com"
+cors_origins = settings.CORS_ORIGINS if settings.CORS_ORIGINS != ["*"] else ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,  # Cannot use credentials with wildcard origins
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=cors_origins,
+    allow_credentials=True if cors_origins != ["*"] else False,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
 
