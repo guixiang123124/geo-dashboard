@@ -109,10 +109,10 @@ export default function InsightsPage() {
       setLoading(true);
       setError(null);
 
-      const categoryParam = selectedCategory ? `?category=${encodeURIComponent(selectedCategory)}` : '';
+      const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';
 
       const [trendingRes, llmRes, categoriesRes, summaryRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/v1/insights/trending${categoryParam}&limit=10`),
+        fetch(`${API_BASE_URL}/api/v1/insights/trending?limit=10${categoryParam}`),
         fetch(`${API_BASE_URL}/api/v1/insights/llm-comparison`),
         fetch(`${API_BASE_URL}/api/v1/insights/categories`),
         fetch(`${API_BASE_URL}/api/v1/insights/summary`),
