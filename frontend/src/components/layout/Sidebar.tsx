@@ -17,12 +17,14 @@ import {
   LineChart,
   GitCompareArrows,
   FileText,
+  Lightbulb,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'Insights Explorer', href: '/insights', icon: Lightbulb },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Trends', href: '/trends', icon: LineChart },
     { name: 'Compare', href: '/compare', icon: GitCompareArrows },

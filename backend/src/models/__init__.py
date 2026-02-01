@@ -8,6 +8,7 @@ from .prompt import Prompt
 from .evaluation import EvaluationRun, EvaluationResult
 from .scorecard import ScoreCard
 from .user import User
+from .public_insight import PublicInsight, BrandMention
 
 __all__ = [
     "Workspace",
@@ -17,4 +18,6 @@ __all__ = [
     "EvaluationResult",
     "ScoreCard",
     "User",
+    "PublicInsight",
+    "BrandMention",
 ]

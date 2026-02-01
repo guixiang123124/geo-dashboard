@@ -1,0 +1,3002 @@
+[
+  {
+    "id": "review_000000",
+    "brand": "Adidas",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-27T11:04:55.597277",
+    "title": "Great Adidas product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000001",
+    "brand": "Nike",
+    "category": "Fashion",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-08-16T22:04:55.597277",
+    "title": "Poor Nike product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000002",
+    "brand": "Beyond Meat",
+    "category": "Food & Beverage",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-11-26T18:04:55.597277",
+    "title": "Average Beyond Meat product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000003",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2026-01-29T12:04:55.597277",
+    "title": "Poor Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000004",
+    "brand": "Fidelity",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-29T11:04:55.597277",
+    "title": "Great Fidelity product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000005",
+    "brand": "Amazon",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-13T15:04:55.597277",
+    "title": "Great Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000006",
+    "brand": "Chipotle",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-06T00:04:55.597277",
+    "title": "Great Chipotle product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000007",
+    "brand": "Ford",
+    "category": "Automotive",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-14T17:04:55.597277",
+    "title": "Great Ford product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000008",
+    "brand": "Meta",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-15T20:04:55.597277",
+    "title": "Great Meta product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000009",
+    "brand": "Zara",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-01T23:04:55.597277",
+    "title": "Great Zara product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000010",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-11T11:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000011",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-31T09:04:55.597277",
+    "title": "Great Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000012",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-23T07:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000013",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-23T13:04:55.597277",
+    "title": "Great Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000014",
+    "brand": "Novo Nordisk",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-24T15:04:55.597277",
+    "title": "Great Novo Nordisk product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000015",
+    "brand": "Zara",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-13T13:04:55.597277",
+    "title": "Great Zara product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000016",
+    "brand": "Toyota",
+    "category": "Automotive",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2026-01-21T15:04:55.597277",
+    "title": "Average Toyota product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000017",
+    "brand": "Moderna",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-09T19:04:55.597277",
+    "title": "Great Moderna product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000018",
+    "brand": "McDonald's",
+    "category": "Food & Beverage",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-07T00:04:55.597277",
+    "title": "Great McDonald's product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000019",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2026-01-11T01:04:55.597277",
+    "title": "Average Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000020",
+    "brand": "Lucid",
+    "category": "Automotive",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-11-21T09:04:55.597277",
+    "title": "Poor Lucid product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000021",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-27T05:04:55.597277",
+    "title": "Great Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000022",
+    "brand": "Teladoc",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-29T17:04:55.597277",
+    "title": "Great Teladoc product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000023",
+    "brand": "Gucci",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-11T22:04:55.597277",
+    "title": "Great Gucci product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000024",
+    "brand": "NVIDIA",
+    "category": "Technology",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-09-08T08:04:55.597277",
+    "title": "Poor NVIDIA product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000025",
+    "brand": "Moderna",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-09T11:04:55.597277",
+    "title": "Great Moderna product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000026",
+    "brand": "CVS Health",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-08T17:04:55.597277",
+    "title": "Great CVS Health product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000027",
+    "brand": "Visa",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-14T18:04:55.597277",
+    "title": "Great Visa product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000028",
+    "brand": "Lucid",
+    "category": "Automotive",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-09-02T00:04:55.597277",
+    "title": "Poor Lucid product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000029",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-11T15:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000030",
+    "brand": "Merck",
+    "category": "Healthcare",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-08-09T07:04:55.597277",
+    "title": "Poor Merck product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000031",
+    "brand": "Starbucks",
+    "category": "Food & Beverage",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-21T17:04:55.597277",
+    "title": "Great Starbucks product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000032",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-10-16T02:04:55.597277",
+    "title": "Poor Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000033",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-08-09T01:04:55.597277",
+    "title": "Poor Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000034",
+    "brand": "Toyota",
+    "category": "Automotive",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-25T22:04:55.597277",
+    "title": "Great Toyota product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000035",
+    "brand": "Anthropic",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-08-31T00:04:55.597277",
+    "title": "Average Anthropic product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000036",
+    "brand": "TikTok",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-06T04:04:55.597277",
+    "title": "Great TikTok product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000037",
+    "brand": "Best Buy",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-11T00:04:55.597277",
+    "title": "Great Best Buy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000038",
+    "brand": "McDonald's",
+    "category": "Food & Beverage",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-09-16T14:04:55.597277",
+    "title": "Poor McDonald's product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000039",
+    "brand": "Beyond Meat",
+    "category": "Food & Beverage",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-10-10T16:04:55.597277",
+    "title": "Poor Beyond Meat product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000040",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-16T19:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000041",
+    "brand": "Coinbase",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-20T00:04:55.597277",
+    "title": "Great Coinbase product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000042",
+    "brand": "Adidas",
+    "category": "Fashion",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-10-21T11:04:55.597277",
+    "title": "Poor Adidas product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000043",
+    "brand": "Lululemon",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-02T18:04:55.597277",
+    "title": "Great Lululemon product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000044",
+    "brand": "Moderna",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-26T22:04:55.597277",
+    "title": "Great Moderna product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000045",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-10-12T08:04:55.597277",
+    "title": "Average Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000046",
+    "brand": "TikTok",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-21T17:04:55.597277",
+    "title": "Great TikTok product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000047",
+    "brand": "Best Buy",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-05T07:04:55.597277",
+    "title": "Great Best Buy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000048",
+    "brand": "Tesla",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-08-06T17:04:55.597277",
+    "title": "Average Tesla product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000049",
+    "brand": "Etsy",
+    "category": "E-commerce",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-09-30T18:04:55.597277",
+    "title": "Poor Etsy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000050",
+    "brand": "Stripe",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-02T03:04:55.597277",
+    "title": "Great Stripe product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000051",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-08-27T17:04:55.597277",
+    "title": "Average Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000052",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-03T00:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000053",
+    "brand": "Robinhood",
+    "category": "Finance",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-08-22T02:04:55.597277",
+    "title": "Poor Robinhood product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000054",
+    "brand": "Coinbase",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-18T00:04:55.597277",
+    "title": "Great Coinbase product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000055",
+    "brand": "Stripe",
+    "category": "Finance",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-11-23T02:04:55.597277",
+    "title": "Average Stripe product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000056",
+    "brand": "Mastercard",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-07T03:04:55.597277",
+    "title": "Great Mastercard product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000057",
+    "brand": "Disney",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-06T05:04:55.597277",
+    "title": "Great Disney product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000058",
+    "brand": "Ford",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-03T19:04:55.597277",
+    "title": "Great Ford product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000059",
+    "brand": "NVIDIA",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-16T13:04:55.597277",
+    "title": "Great NVIDIA product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000060",
+    "brand": "NVIDIA",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-03T21:04:55.597277",
+    "title": "Great NVIDIA product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000061",
+    "brand": "Nike",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-18T02:04:55.597277",
+    "title": "Great Nike product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000062",
+    "brand": "UnitedHealth",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-05T11:04:55.597277",
+    "title": "Great UnitedHealth product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000063",
+    "brand": "PepsiCo",
+    "category": "Food & Beverage",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-24T13:04:55.597277",
+    "title": "Great PepsiCo product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000064",
+    "brand": "Ford",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-27T12:04:55.597277",
+    "title": "Great Ford product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000065",
+    "brand": "Microsoft",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-12-21T00:04:55.597277",
+    "title": "Average Microsoft product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000066",
+    "brand": "Wayfair",
+    "category": "E-commerce",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-10-21T23:04:55.597277",
+    "title": "Average Wayfair product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000067",
+    "brand": "Samsung",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-12T08:04:55.597277",
+    "title": "Great Samsung product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000068",
+    "brand": "Zara",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-01T22:04:55.597277",
+    "title": "Great Zara product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000069",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-11T11:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000070",
+    "brand": "Fidelity",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-04T18:04:55.597277",
+    "title": "Great Fidelity product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000071",
+    "brand": "Mastercard",
+    "category": "Finance",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-11-20T21:04:55.597277",
+    "title": "Poor Mastercard product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000072",
+    "brand": "Spotify",
+    "category": "Entertainment",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-09-10T02:04:55.597277",
+    "title": "Poor Spotify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000073",
+    "brand": "Square",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-22T14:04:55.597277",
+    "title": "Great Square product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000074",
+    "brand": "Paramount+",
+    "category": "Entertainment",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-11-20T15:04:55.597277",
+    "title": "Poor Paramount+ product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000075",
+    "brand": "Apple TV+",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-25T18:04:55.597277",
+    "title": "Great Apple TV+ product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000076",
+    "brand": "Walmart",
+    "category": "E-commerce",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-10-11T13:04:55.597277",
+    "title": "Average Walmart product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000077",
+    "brand": "Target",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-29T11:04:55.597277",
+    "title": "Great Target product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000078",
+    "brand": "OpenAI",
+    "category": "Technology",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-10-01T12:04:55.597277",
+    "title": "Poor OpenAI product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000079",
+    "brand": "Ford",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-07T05:04:55.597277",
+    "title": "Great Ford product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000080",
+    "brand": "Louis Vuitton",
+    "category": "Fashion",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-08-09T12:04:55.597277",
+    "title": "Poor Louis Vuitton product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000081",
+    "brand": "eBay",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-13T18:04:55.597277",
+    "title": "Great eBay product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000082",
+    "brand": "Robinhood",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-29T18:04:55.597277",
+    "title": "Great Robinhood product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000083",
+    "brand": "Chewy",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-27T05:04:55.597277",
+    "title": "Great Chewy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000084",
+    "brand": "Target",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-08T06:04:55.597277",
+    "title": "Great Target product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000085",
+    "brand": "Johnson & Johnson",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-25T16:04:55.597277",
+    "title": "Great Johnson & Johnson product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000086",
+    "brand": "McDonald's",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-06T22:04:55.597277",
+    "title": "Great McDonald's product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000087",
+    "brand": "Johnson & Johnson",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-24T06:04:55.597277",
+    "title": "Great Johnson & Johnson product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000088",
+    "brand": "Eli Lilly",
+    "category": "Healthcare",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2026-01-04T05:04:55.597277",
+    "title": "Poor Eli Lilly product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000089",
+    "brand": "OpenAI",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-12T20:04:55.597277",
+    "title": "Great OpenAI product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000090",
+    "brand": "eBay",
+    "category": "E-commerce",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-12-04T20:04:55.597277",
+    "title": "Average eBay product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000091",
+    "brand": "Paramount+",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-15T22:04:55.597277",
+    "title": "Great Paramount+ product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000092",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-26T22:04:55.597277",
+    "title": "Great Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000093",
+    "brand": "Alibaba",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-18T07:04:55.597277",
+    "title": "Great Alibaba product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000094",
+    "brand": "Microsoft",
+    "category": "Technology",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-08-09T18:04:55.597277",
+    "title": "Poor Microsoft product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000095",
+    "brand": "Stripe",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-22T20:04:55.597277",
+    "title": "Great Stripe product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000096",
+    "brand": "BYD",
+    "category": "Automotive",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-08-15T09:04:55.597277",
+    "title": "Poor BYD product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000097",
+    "brand": "Wayfair",
+    "category": "E-commerce",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-08-19T20:04:55.597277",
+    "title": "Average Wayfair product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000098",
+    "brand": "Ford",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-29T23:04:55.597277",
+    "title": "Great Ford product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000099",
+    "brand": "Target",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-02T10:04:55.597277",
+    "title": "Great Target product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000100",
+    "brand": "Starbucks",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-12T17:04:55.597277",
+    "title": "Great Starbucks product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000101",
+    "brand": "Robinhood",
+    "category": "Finance",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-09-25T20:04:55.597277",
+    "title": "Poor Robinhood product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000102",
+    "brand": "Alibaba",
+    "category": "E-commerce",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-10-19T03:04:55.597277",
+    "title": "Poor Alibaba product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000103",
+    "brand": "Paramount+",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-20T22:04:55.597277",
+    "title": "Great Paramount+ product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000104",
+    "brand": "Honda",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-22T11:04:55.597277",
+    "title": "Great Honda product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000105",
+    "brand": "PayPal",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-16T18:04:55.597277",
+    "title": "Great PayPal product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000106",
+    "brand": "Patagonia",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-01T17:04:55.597277",
+    "title": "Great Patagonia product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000107",
+    "brand": "Square",
+    "category": "Finance",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-10-18T17:04:55.597277",
+    "title": "Poor Square product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000108",
+    "brand": "Chewy",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-14T16:04:55.597277",
+    "title": "Great Chewy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000109",
+    "brand": "Chipotle",
+    "category": "Food & Beverage",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-17T16:04:55.597277",
+    "title": "Great Chipotle product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000110",
+    "brand": "Trader Joe's",
+    "category": "Food & Beverage",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-12-13T22:04:55.597277",
+    "title": "Poor Trader Joe's product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000111",
+    "brand": "Etsy",
+    "category": "E-commerce",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2026-01-28T09:04:55.597277",
+    "title": "Poor Etsy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000112",
+    "brand": "Tesla",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-08T23:04:55.597277",
+    "title": "Great Tesla product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000113",
+    "brand": "Disney",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-19T04:04:55.597277",
+    "title": "Great Disney product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000114",
+    "brand": "Mastercard",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-20T16:04:55.597277",
+    "title": "Great Mastercard product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000115",
+    "brand": "Merck",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-17T10:04:55.597277",
+    "title": "Great Merck product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000116",
+    "brand": "Visa",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-07T23:04:55.597277",
+    "title": "Great Visa product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000117",
+    "brand": "Merck",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-03T22:04:55.597277",
+    "title": "Great Merck product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000118",
+    "brand": "Etsy",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-07T10:04:55.597277",
+    "title": "Great Etsy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000119",
+    "brand": "Mastercard",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-05T12:04:55.597277",
+    "title": "Great Mastercard product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000120",
+    "brand": "CVS Health",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-04T07:04:55.597277",
+    "title": "Great CVS Health product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000121",
+    "brand": "Tesla",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-15T01:04:55.597277",
+    "title": "Great Tesla product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000122",
+    "brand": "Lululemon",
+    "category": "Fashion",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2026-01-16T10:04:55.597277",
+    "title": "Average Lululemon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000123",
+    "brand": "Samsung",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-07T23:04:55.597277",
+    "title": "Great Samsung product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000124",
+    "brand": "Moderna",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-07T16:04:55.597277",
+    "title": "Great Moderna product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000125",
+    "brand": "Square",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-02-02T00:04:55.597277",
+    "title": "Great Square product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000126",
+    "brand": "Coca-Cola",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-21T01:04:55.597277",
+    "title": "Great Coca-Cola product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000127",
+    "brand": "Paramount+",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-07T09:04:55.597277",
+    "title": "Great Paramount+ product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000128",
+    "brand": "Mercedes-Benz",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-16T06:04:55.597277",
+    "title": "Great Mercedes-Benz product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000129",
+    "brand": "Disney",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-29T07:04:55.597277",
+    "title": "Great Disney product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000130",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-02-01T10:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000131",
+    "brand": "Toyota",
+    "category": "Automotive",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-03T23:04:55.597277",
+    "title": "Great Toyota product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000132",
+    "brand": "Johnson & Johnson",
+    "category": "Healthcare",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-11-10T23:04:55.597277",
+    "title": "Poor Johnson & Johnson product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000133",
+    "brand": "PayPal",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-22T08:04:55.597277",
+    "title": "Great PayPal product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000134",
+    "brand": "Etsy",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-10T13:04:55.597277",
+    "title": "Great Etsy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000135",
+    "brand": "Stripe",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-06T11:04:55.597277",
+    "title": "Great Stripe product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000136",
+    "brand": "Chipotle",
+    "category": "Food & Beverage",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-11-25T14:04:55.597277",
+    "title": "Poor Chipotle product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000137",
+    "brand": "BYD",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-18T18:04:55.597277",
+    "title": "Great BYD product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000138",
+    "brand": "Twitch",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-03T19:04:55.597277",
+    "title": "Great Twitch product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000139",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-10-13T17:04:55.597277",
+    "title": "Poor Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000140",
+    "brand": "Fidelity",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-15T21:04:55.597277",
+    "title": "Great Fidelity product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000141",
+    "brand": "Microsoft",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-08T19:04:55.597277",
+    "title": "Great Microsoft product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000142",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-24T02:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000143",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-25T05:04:55.597277",
+    "title": "Great Amazon product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000144",
+    "brand": "Twitch",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-06T04:04:55.597277",
+    "title": "Great Twitch product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000145",
+    "brand": "Johnson & Johnson",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-10T21:04:55.597277",
+    "title": "Great Johnson & Johnson product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000146",
+    "brand": "Chipotle",
+    "category": "Food & Beverage",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2026-01-21T21:04:55.597277",
+    "title": "Poor Chipotle product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000147",
+    "brand": "Trader Joe's",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-27T03:04:55.597277",
+    "title": "Great Trader Joe's product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000148",
+    "brand": "CVS Health",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-07T15:04:55.597277",
+    "title": "Great CVS Health product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000149",
+    "brand": "Volkswagen",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-15T05:04:55.597277",
+    "title": "Great Volkswagen product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000150",
+    "brand": "YouTube",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-24T15:04:55.597277",
+    "title": "Great YouTube product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000151",
+    "brand": "Novo Nordisk",
+    "category": "Healthcare",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-11-15T07:04:55.597277",
+    "title": "Average Novo Nordisk product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000152",
+    "brand": "Walmart",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-10T05:04:55.597277",
+    "title": "Great Walmart product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000153",
+    "brand": "Novo Nordisk",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-29T04:04:55.597277",
+    "title": "Great Novo Nordisk product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000154",
+    "brand": "Robinhood",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-11T22:04:55.597277",
+    "title": "Great Robinhood product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000155",
+    "brand": "Target",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-28T23:04:55.597277",
+    "title": "Great Target product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000156",
+    "brand": "Coca-Cola",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-25T14:04:55.597277",
+    "title": "Great Coca-Cola product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000157",
+    "brand": "Tesla",
+    "category": "Technology",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-11-01T08:04:55.597277",
+    "title": "Poor Tesla product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000158",
+    "brand": "Amazon Prime Video",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-19T23:04:55.597277",
+    "title": "Great Amazon Prime Video product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000159",
+    "brand": "BMW",
+    "category": "Automotive",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-15T06:04:55.597277",
+    "title": "Great BMW product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000160",
+    "brand": "UnitedHealth",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-22T18:04:55.597277",
+    "title": "Great UnitedHealth product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000161",
+    "brand": "Patagonia",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-31T21:04:55.597277",
+    "title": "Great Patagonia product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000162",
+    "brand": "McDonald's",
+    "category": "Food & Beverage",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-08-24T12:04:55.597277",
+    "title": "Average McDonald's product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000163",
+    "brand": "Volkswagen",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-16T14:04:55.597277",
+    "title": "Great Volkswagen product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000164",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-11T00:04:55.597277",
+    "title": "Great Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000165",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-12-15T12:04:55.597277",
+    "title": "Poor Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000166",
+    "brand": "Coinbase",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-28T11:04:55.597277",
+    "title": "Great Coinbase product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000167",
+    "brand": "Square",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-15T13:04:55.597277",
+    "title": "Great Square product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000168",
+    "brand": "Beyond Meat",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-21T01:04:55.597277",
+    "title": "Great Beyond Meat product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000169",
+    "brand": "Meta",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-10T21:04:55.597277",
+    "title": "Great Meta product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000170",
+    "brand": "Stripe",
+    "category": "Finance",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-08-25T00:04:55.597277",
+    "title": "Poor Stripe product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000171",
+    "brand": "Paramount+",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-31T05:04:55.597277",
+    "title": "Great Paramount+ product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000172",
+    "brand": "Nestl\u00e9",
+    "category": "Food & Beverage",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-12T17:04:55.597277",
+    "title": "Great Nestl\u00e9 product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000173",
+    "brand": "Google",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2026-01-28T12:04:55.597277",
+    "title": "Average Google product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000174",
+    "brand": "Volkswagen",
+    "category": "Automotive",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-27T19:04:55.597277",
+    "title": "Great Volkswagen product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000175",
+    "brand": "Nike",
+    "category": "Fashion",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-08-25T22:04:55.597277",
+    "title": "Average Nike product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000176",
+    "brand": "PepsiCo",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-28T11:04:55.597277",
+    "title": "Great PepsiCo product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000177",
+    "brand": "Coinbase",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-28T18:04:55.597277",
+    "title": "Great Coinbase product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000178",
+    "brand": "Coinbase",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-20T21:04:55.597277",
+    "title": "Great Coinbase product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000179",
+    "brand": "Anthropic",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-08T01:04:55.597277",
+    "title": "Great Anthropic product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000180",
+    "brand": "TikTok",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-14T22:04:55.597277",
+    "title": "Great TikTok product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000181",
+    "brand": "NVIDIA",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-26T00:04:55.597277",
+    "title": "Great NVIDIA product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000182",
+    "brand": "PayPal",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-22T18:04:55.597277",
+    "title": "Great PayPal product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000183",
+    "brand": "Netflix",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-20T07:04:55.597277",
+    "title": "Great Netflix product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000184",
+    "brand": "Patagonia",
+    "category": "Fashion",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-10-11T21:04:55.597277",
+    "title": "Poor Patagonia product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000185",
+    "brand": "OpenAI",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-08T02:04:55.597277",
+    "title": "Great OpenAI product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000186",
+    "brand": "Alibaba",
+    "category": "E-commerce",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-09-03T03:04:55.597277",
+    "title": "Average Alibaba product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000187",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-25T16:04:55.597277",
+    "title": "Great Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000188",
+    "brand": "NVIDIA",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-15T13:04:55.597277",
+    "title": "Great NVIDIA product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000189",
+    "brand": "North Face",
+    "category": "Fashion",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-12-31T16:04:55.597277",
+    "title": "Poor North Face product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000190",
+    "brand": "Goldman Sachs",
+    "category": "Finance",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-11-17T18:04:55.597277",
+    "title": "Average Goldman Sachs product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000191",
+    "brand": "Louis Vuitton",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-15T02:04:55.597277",
+    "title": "Great Louis Vuitton product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000192",
+    "brand": "Tesla",
+    "category": "Automotive",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-20T18:04:55.597277",
+    "title": "Great Tesla product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000193",
+    "brand": "Alibaba",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-09T12:04:55.597277",
+    "title": "Great Alibaba product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000194",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-12-18T09:04:55.597277",
+    "title": "Poor Amazon product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000195",
+    "brand": "H&M",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-17T04:04:55.597277",
+    "title": "Great H&M product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000196",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-11-16T13:04:55.597277",
+    "title": "Poor Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000197",
+    "brand": "Meta",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-14T11:04:55.597277",
+    "title": "Great Meta product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000198",
+    "brand": "Visa",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-26T15:04:55.597277",
+    "title": "Great Visa product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000199",
+    "brand": "Adidas",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-22T19:04:55.597277",
+    "title": "Great Adidas product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000200",
+    "brand": "Disney",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-19T00:04:55.597277",
+    "title": "Great Disney product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000201",
+    "brand": "Uniqlo",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-31T09:04:55.597277",
+    "title": "Great Uniqlo product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000202",
+    "brand": "Oatly",
+    "category": "Food & Beverage",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-12-20T06:04:55.597277",
+    "title": "Average Oatly product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000203",
+    "brand": "Google",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-30T08:04:55.597277",
+    "title": "Great Google product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000204",
+    "brand": "Chewy",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-24T13:04:55.597277",
+    "title": "Great Chewy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000205",
+    "brand": "PepsiCo",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-20T09:04:55.597277",
+    "title": "Great PepsiCo product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000206",
+    "brand": "Netflix",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-15T09:04:55.597277",
+    "title": "Great Netflix product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000207",
+    "brand": "Walmart",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-07T06:04:55.597277",
+    "title": "Great Walmart product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000208",
+    "brand": "North Face",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-26T04:04:55.597277",
+    "title": "Great North Face product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000209",
+    "brand": "Square",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-13T22:04:55.597277",
+    "title": "Great Square product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000210",
+    "brand": "BYD",
+    "category": "Automotive",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-05T03:04:55.597277",
+    "title": "Great BYD product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000211",
+    "brand": "Beyond Meat",
+    "category": "Food & Beverage",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-03T08:04:55.597277",
+    "title": "Great Beyond Meat product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000212",
+    "brand": "Shopify",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-27T21:04:55.597277",
+    "title": "Great Shopify product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000213",
+    "brand": "Microsoft",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-13T22:04:55.597277",
+    "title": "Great Microsoft product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000214",
+    "brand": "Disney",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-01T18:04:55.597277",
+    "title": "Great Disney product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000215",
+    "brand": "Starbucks",
+    "category": "Food & Beverage",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-29T06:04:55.597277",
+    "title": "Great Starbucks product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000216",
+    "brand": "Apple",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-21T10:04:55.597277",
+    "title": "Great Apple product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000217",
+    "brand": "McDonald's",
+    "category": "Food & Beverage",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-10T14:04:55.597277",
+    "title": "Great McDonald's product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000218",
+    "brand": "Google",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-09T01:04:55.597277",
+    "title": "Great Google product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000219",
+    "brand": "Eli Lilly",
+    "category": "Healthcare",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-10-08T19:04:55.597277",
+    "title": "Poor Eli Lilly product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000220",
+    "brand": "Disney",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-25T13:04:55.597277",
+    "title": "Great Disney product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000221",
+    "brand": "McDonald's",
+    "category": "Food & Beverage",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-10-27T22:04:55.597277",
+    "title": "Average McDonald's product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000222",
+    "brand": "Teladoc",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-05T20:04:55.597277",
+    "title": "Great Teladoc product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000223",
+    "brand": "eBay",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-08-22T12:04:55.597277",
+    "title": "Great eBay product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000224",
+    "brand": "Paramount+",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-25T12:04:55.597277",
+    "title": "Great Paramount+ product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000225",
+    "brand": "Eli Lilly",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-30T04:04:55.597277",
+    "title": "Great Eli Lilly product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000226",
+    "brand": "Amazon Prime Video",
+    "category": "Entertainment",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-09-14T13:04:55.597277",
+    "title": "Poor Amazon Prime Video product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000227",
+    "brand": "Zara",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-18T03:04:55.597277",
+    "title": "Great Zara product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000228",
+    "brand": "North Face",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-15T11:04:55.597277",
+    "title": "Great North Face product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000229",
+    "brand": "Visa",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-16T00:04:55.597277",
+    "title": "Great Visa product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000230",
+    "brand": "Patagonia",
+    "category": "Fashion",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-10-24T00:04:55.597277",
+    "title": "Poor Patagonia product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000231",
+    "brand": "UnitedHealth",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-15T02:04:55.597277",
+    "title": "Great UnitedHealth product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000232",
+    "brand": "Coinbase",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-12T01:04:55.597277",
+    "title": "Great Coinbase product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000233",
+    "brand": "Wayfair",
+    "category": "E-commerce",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-09-04T21:04:55.597277",
+    "title": "Poor Wayfair product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000234",
+    "brand": "eBay",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-24T00:04:55.597277",
+    "title": "Great eBay product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000235",
+    "brand": "Coinbase",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-02T06:04:55.597277",
+    "title": "Great Coinbase product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000236",
+    "brand": "Moderna",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-16T16:04:55.597277",
+    "title": "Great Moderna product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000237",
+    "brand": "Wayfair",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-27T18:04:55.597277",
+    "title": "Great Wayfair product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000238",
+    "brand": "Rivian",
+    "category": "Automotive",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-12T06:04:55.597277",
+    "title": "Great Rivian product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000239",
+    "brand": "Microsoft",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-22T17:04:55.597277",
+    "title": "Great Microsoft product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000240",
+    "brand": "Whole Foods",
+    "category": "Food & Beverage",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-12-15T10:04:55.597277",
+    "title": "Average Whole Foods product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000241",
+    "brand": "Adidas",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-26T04:04:55.597277",
+    "title": "Great Adidas product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000242",
+    "brand": "Coca-Cola",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-11T01:04:55.597277",
+    "title": "Great Coca-Cola product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000243",
+    "brand": "eBay",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-03T13:04:55.597277",
+    "title": "Great eBay product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000244",
+    "brand": "Patagonia",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-29T18:04:55.597277",
+    "title": "Great Patagonia product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000245",
+    "brand": "Samsung",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-04T02:04:55.597277",
+    "title": "Great Samsung product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000246",
+    "brand": "Tesla",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-10-13T06:04:55.597277",
+    "title": "Average Tesla product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000247",
+    "brand": "Amazon",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-20T18:04:55.597277",
+    "title": "Great Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000248",
+    "brand": "Anthropic",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-10T19:04:55.597277",
+    "title": "Great Anthropic product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000249",
+    "brand": "Target",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-11T06:04:55.597277",
+    "title": "Great Target product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000250",
+    "brand": "Visa",
+    "category": "Finance",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-09-07T14:04:55.597277",
+    "title": "Poor Visa product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000251",
+    "brand": "Johnson & Johnson",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-10T10:04:55.597277",
+    "title": "Great Johnson & Johnson product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000252",
+    "brand": "Coinbase",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-08T12:04:55.597277",
+    "title": "Great Coinbase product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000253",
+    "brand": "HBO Max",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-15T14:04:55.597277",
+    "title": "Great HBO Max product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000254",
+    "brand": "Uniqlo",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-30T20:04:55.597277",
+    "title": "Great Uniqlo product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000255",
+    "brand": "Best Buy",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-10T12:04:55.597277",
+    "title": "Great Best Buy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000256",
+    "brand": "Google",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-20T07:04:55.597277",
+    "title": "Great Google product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000257",
+    "brand": "Chewy",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-05T01:04:55.597277",
+    "title": "Great Chewy product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000258",
+    "brand": "Anthropic",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-11T16:04:55.597277",
+    "title": "Great Anthropic product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000259",
+    "brand": "HBO Max",
+    "category": "Entertainment",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-08-28T05:04:55.597277",
+    "title": "Poor HBO Max product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000260",
+    "brand": "Lululemon",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-23T21:04:55.597277",
+    "title": "Great Lululemon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000261",
+    "brand": "Nestl\u00e9",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-04T22:04:55.597277",
+    "title": "Great Nestl\u00e9 product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000262",
+    "brand": "Fidelity",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-24T00:04:55.597277",
+    "title": "Great Fidelity product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000263",
+    "brand": "eBay",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-27T08:04:55.597277",
+    "title": "Great eBay product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000264",
+    "brand": "Walmart",
+    "category": "E-commerce",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2026-01-23T07:04:55.597277",
+    "title": "Poor Walmart product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000265",
+    "brand": "Meta",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-24T14:04:55.597277",
+    "title": "Great Meta product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000266",
+    "brand": "Teladoc",
+    "category": "Healthcare",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-08T11:04:55.597277",
+    "title": "Great Teladoc product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000267",
+    "brand": "Meta",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-10-15T03:04:55.597277",
+    "title": "Average Meta product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000268",
+    "brand": "H&M",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-15T15:04:55.597277",
+    "title": "Great H&M product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000269",
+    "brand": "Amazon Prime Video",
+    "category": "Entertainment",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-12-28T11:04:55.597277",
+    "title": "Poor Amazon Prime Video product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000270",
+    "brand": "eBay",
+    "category": "E-commerce",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-08-27T17:04:55.597277",
+    "title": "Average eBay product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000271",
+    "brand": "Tesla",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-17T01:04:55.597277",
+    "title": "Great Tesla product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000272",
+    "brand": "Alibaba",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-13T09:04:55.597277",
+    "title": "Great Alibaba product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000273",
+    "brand": "Walmart",
+    "category": "E-commerce",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-08-11T18:04:55.597277",
+    "title": "Poor Walmart product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000274",
+    "brand": "Meta",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-05T20:04:55.597277",
+    "title": "Great Meta product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000275",
+    "brand": "Tesla",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-08T00:04:55.597277",
+    "title": "Great Tesla product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000276",
+    "brand": "Coca-Cola",
+    "category": "Food & Beverage",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-24T11:04:55.597277",
+    "title": "Great Coca-Cola product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000277",
+    "brand": "Louis Vuitton",
+    "category": "Fashion",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-11T07:04:55.597277",
+    "title": "Great Louis Vuitton product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000278",
+    "brand": "Samsung",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2026-01-06T01:04:55.597277",
+    "title": "Great Samsung product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000279",
+    "brand": "Amazon Prime Video",
+    "category": "Entertainment",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-10-01T08:04:55.597277",
+    "title": "Great Amazon Prime Video product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000280",
+    "brand": "Twitch",
+    "category": "Entertainment",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2026-01-07T11:04:55.597277",
+    "title": "Poor Twitch product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000281",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-09T09:04:55.597277",
+    "title": "Great Amazon product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000282",
+    "brand": "Google",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-08-15T13:04:55.597277",
+    "title": "Average Google product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000283",
+    "brand": "Visa",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2026-01-06T00:04:55.597277",
+    "title": "Great Visa product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000284",
+    "brand": "Amazon",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-10-13T08:04:55.597277",
+    "title": "Great Amazon product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000285",
+    "brand": "Eli Lilly",
+    "category": "Healthcare",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-12-17T13:04:55.597277",
+    "title": "Great Eli Lilly product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000286",
+    "brand": "Fidelity",
+    "category": "Finance",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-09T14:04:55.597277",
+    "title": "Great Fidelity product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000287",
+    "brand": "Wayfair",
+    "category": "E-commerce",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-09-22T21:04:55.597277",
+    "title": "Great Wayfair product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000288",
+    "brand": "Zara",
+    "category": "Fashion",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-09-03T07:04:55.597277",
+    "title": "Great Zara product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000289",
+    "brand": "Apple TV+",
+    "category": "Entertainment",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-08-08T06:04:55.597277",
+    "title": "Great Apple TV+ product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000290",
+    "brand": "Google",
+    "category": "Technology",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-10-13T07:04:55.597277",
+    "title": "Average Google product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000291",
+    "brand": "Trader Joe's",
+    "category": "Food & Beverage",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-12-23T23:04:55.597277",
+    "title": "Average Trader Joe's product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000292",
+    "brand": "Anthropic",
+    "category": "Technology",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-09T04:04:55.597277",
+    "title": "Great Anthropic product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000293",
+    "brand": "Merck",
+    "category": "Healthcare",
+    "rating": 1,
+    "sentiment": "negative",
+    "timestamp": "2025-10-03T14:04:55.597277",
+    "title": "Poor Merck product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000294",
+    "brand": "OpenAI",
+    "category": "Technology",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-11-07T00:04:55.597277",
+    "title": "Great OpenAI product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000295",
+    "brand": "Tesla",
+    "category": "Automotive",
+    "rating": 3,
+    "sentiment": "neutral",
+    "timestamp": "2025-11-26T02:04:55.597277",
+    "title": "Average Tesla product",
+    "verified_purchase": false
+  },
+  {
+    "id": "review_000296",
+    "brand": "Mercedes-Benz",
+    "category": "Automotive",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-20T19:04:55.597277",
+    "title": "Great Mercedes-Benz product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000297",
+    "brand": "Alibaba",
+    "category": "E-commerce",
+    "rating": 5,
+    "sentiment": "positive",
+    "timestamp": "2025-11-06T14:04:55.597277",
+    "title": "Great Alibaba product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000298",
+    "brand": "Square",
+    "category": "Finance",
+    "rating": 4,
+    "sentiment": "positive",
+    "timestamp": "2025-12-15T03:04:55.597277",
+    "title": "Great Square product",
+    "verified_purchase": true
+  },
+  {
+    "id": "review_000299",
+    "brand": "BMW",
+    "category": "Automotive",
+    "rating": 2,
+    "sentiment": "negative",
+    "timestamp": "2025-09-19T22:04:55.597277",
+    "title": "Poor BMW product",
+    "verified_purchase": true
+  }
+]

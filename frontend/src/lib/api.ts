@@ -394,5 +394,121 @@ export const scoresAPI = {
 export const evaluationsAPI = evaluationsApi;
 export const authAPI = authApi;
 
+// ============ Insights API ============
+
+export const insightsApi = {
+  async getTrending(category?: string, limit = 10) {
+    let url = `/insights/trending?limit=${limit}`;
+    if (category) url += `&category=${encodeURIComponent(category)}`;
+    return fetchApi<{
+      brands: Array<{
+        brand: string;
+        category: string;
+        mention_count: number;
+        positive_count: number;
+        negative_count: number;
+        neutral_count: number;
+        positive_percentage: number;
+        sentiment_score: number;
+        model_coverage: number;
+      }>;
+      total_mentions: number;
+      categories_available: string[];
+    }>(url);
+  },
+
+  async getLLMComparison(brand?: string) {
+    let url = '/insights/llm-comparison';
+    if (brand) url += `?brand=${encodeURIComponent(brand)}`;
+    return fetchApi<{
+      models: Array<{
+        model: string;
+        total_mentions: number;
+        unique_brands: number;
+        positive_rate: number;
+        negative_rate: number;
+        neutral_rate: number;
+        top_brands: [string, number][];
+      }>;
+      total_models: number;
+    }>(url);
+  },
+
+  async getSentiment(brand: string) {
+    return fetchApi<{
+      brand: string;
+      total_mentions: number;
+      sentiment_distribution: {
+        positive: number;
+        negative: number;
+        neutral: number;
+      };
+      sentiment_percentages: {
+        positive: number;
+        negative: number;
+        neutral: number;
+      };
+      average_confidence: number;
+      sentiment_score: number;
+      by_model: Array<{
+        model: string;
+        positive: number;
+        negative: number;
+        neutral: number;
+      }>;
+    }>(`/insights/sentiment/${encodeURIComponent(brand)}`);
+  },
+
+  async getCategories() {
+    return fetchApi<{
+      categories: Array<{
+        category: string;
+        brand_count: number;
+        mention_count: number;
+      }>;
+      total: number;
+    }>('/insights/categories');
+  },
+
+  async getSummary() {
+    return fetchApi<{
+      total_mentions: number;
+      unique_brands: number;
+      categories: number;
+      sentiment_overview: {
+        positive: number;
+        negative: number;
+        neutral: number;
+      };
+      data_sources: {
+        llm_conversations: number;
+        reviews: number;
+      };
+    }>('/insights/summary');
+  },
+
+  async getTemporal(brand?: string, days = 30) {
+    let url = `/insights/temporal?days=${days}`;
+    if (brand) url += `&brand=${encodeURIComponent(brand)}`;
+    return fetchApi<{
+      data: Array<{
+        date: string;
+        total: number;
+        positive: number;
+        negative: number;
+        neutral: number;
+      }>;
+      brand: string | null;
+      period_days: number;
+    }>(url);
+  },
+
+  async refresh() {
+    return fetchApi<{ status: string; message: string }>('/insights/refresh', {
+      method: 'POST',
+    });
+  },
+};
+
 // Re-export types for convenience
 export type { Brand, ScoreCard, BrandWithScore } from './types';
