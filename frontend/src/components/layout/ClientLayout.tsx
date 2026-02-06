@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
@@ -14,6 +15,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
   return (
+    <LanguageProvider>
     <AuthProvider>
       <NotificationProvider>
         <AuthGuard>
@@ -35,5 +37,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         </AuthGuard>
       </NotificationProvider>
     </AuthProvider>
+    </LanguageProvider>
   );
 }

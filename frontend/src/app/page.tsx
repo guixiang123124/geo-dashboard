@@ -21,6 +21,9 @@ import {
   Plus,
   Clock,
   FileText,
+  PieChart,
+  ArrowRight,
+  Search,
 } from 'lucide-react';
 
 export default function Home() {
@@ -439,6 +442,158 @@ export default function Home() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Share of Voice + Weekly Trend (Demo) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Mini SOV */}
+          <Card className="border-slate-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <PieChart className="w-5 h-5 text-violet-600" />
+                Share of Voice
+              </CardTitle>
+              <p className="text-sm text-slate-500">品牌在 AI 回答中的市场占有率</p>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const sovData = [
+                  { name: "Carter's", pct: 28, color: '#8b5cf6' },
+                  { name: 'Primary.com', pct: 16, color: '#3b82f6' },
+                  { name: 'Hanna Andersson', pct: 14, color: '#10b981' },
+                  { name: 'Tea Collection', pct: 12, color: '#f59e0b' },
+                  { name: 'Janie and Jack', pct: 10, color: '#ec4899' },
+                  { name: 'Others', pct: 20, color: '#94a3b8' },
+                ];
+                let cum = 0;
+                const segs = sovData.map(d => {
+                  const start = cum * 3.6;
+                  cum += d.pct;
+                  return { ...d, start, end: cum * 3.6 };
+                });
+                const slice = (s: number, e: number, c: string, i: number) => {
+                  const r = 70, cx = 85, cy = 85;
+                  const sr = (s - 90) * Math.PI / 180, er = (e - 90) * Math.PI / 180;
+                  const x1 = cx + r * Math.cos(sr), y1 = cy + r * Math.sin(sr);
+                  const x2 = cx + r * Math.cos(er), y2 = cy + r * Math.sin(er);
+                  const la = e - s > 180 ? 1 : 0;
+                  return <path key={i} d={`M${cx} ${cy}L${x1} ${y1}A${r} ${r} 0 ${la} 1 ${x2} ${y2}Z`} fill={c} stroke="white" strokeWidth="2" />;
+                };
+                return (
+                  <div className="flex items-center gap-6">
+                    <svg viewBox="0 0 170 170" className="w-36 h-36 flex-shrink-0">
+                      {segs.map((s, i) => slice(s.start, s.end, s.color, i))}
+                      <circle cx="85" cy="85" r="38" fill="white" />
+                      <text x="85" y="82" textAnchor="middle" className="text-lg font-bold" fill="#1e293b">28%</text>
+                      <text x="85" y="97" textAnchor="middle" className="text-[10px]" fill="#64748b">Top Brand</text>
+                    </svg>
+                    <div className="flex-1 space-y-1.5">
+                      {sovData.map((d, i) => (
+                        <div key={i} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                            <span className="text-slate-700 truncate">{d.name}</span>
+                          </div>
+                          <span className="font-semibold text-slate-900">{d.pct}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+              <Link href="/compete" className="mt-4 flex items-center gap-1 text-sm text-violet-600 hover:text-violet-700 font-medium">
+                查看竞品详细对标 <ArrowRight className="w-4 h-4" />
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Weekly Trend Sparklines */}
+          <Card className="border-slate-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-emerald-600" />
+                可见性趋势
+              </CardTitle>
+              <p className="text-sm text-slate-500">近 8 周品牌 AI 可见性变化 (Demo)</p>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const trendBrands = [
+                  { name: "Carter's", data: [22, 24, 23, 26, 25, 28, 30, 32], color: '#8b5cf6', change: +4 },
+                  { name: 'Primary.com', data: [12, 14, 15, 16, 18, 17, 19, 21], color: '#3b82f6', change: +5 },
+                  { name: 'Hanna Andersson', data: [18, 17, 16, 15, 16, 15, 14, 14], color: '#10b981', change: -2 },
+                  { name: 'Tea Collection', data: [8, 9, 10, 11, 12, 13, 12, 14], color: '#f59e0b', change: +3 },
+                  { name: 'Janie and Jack', data: [10, 10, 11, 9, 10, 11, 10, 11], color: '#ec4899', change: 0 },
+                ];
+                const weeks = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'];
+                return (
+                  <div className="space-y-3">
+                    {trendBrands.map((brand, bi) => {
+                      const max = Math.max(...brand.data);
+                      const min = Math.min(...brand.data);
+                      const range = max - min || 1;
+                      const points = brand.data.map((v, i) => {
+                        const x = 10 + (i / 7) * 120;
+                        const y = 28 - ((v - min) / range) * 22;
+                        return `${x},${y}`;
+                      }).join(' ');
+                      return (
+                        <div key={bi} className="flex items-center gap-3">
+                          <span className="text-xs font-medium text-slate-600 w-28 truncate">{brand.name}</span>
+                          <svg viewBox="0 0 140 32" className="flex-1 h-8">
+                            <polyline points={points} fill="none" stroke={brand.color} strokeWidth="2" strokeLinejoin="round" />
+                          </svg>
+                          <span className="text-xs font-bold w-8 text-right" style={{ color: brand.change > 0 ? '#10b981' : brand.change < 0 ? '#ef4444' : '#64748b' }}>
+                            {brand.change > 0 ? '+' : ''}{brand.change}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+              <Link href="/trends" className="mt-4 flex items-center gap-1 text-sm text-violet-600 hover:text-violet-700 font-medium">
+                查看完整趋势分析 <ArrowRight className="w-4 h-4" />
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Access: New Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Link href="/prompts">
+            <Card className="border-slate-200 hover:border-violet-300 hover:shadow-md transition-all cursor-pointer group">
+              <CardContent className="p-6">
+                <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-violet-200 transition-colors">
+                  <Search className="w-5 h-5 text-violet-600" />
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-1">Prompt 研究</h3>
+                <p className="text-sm text-slate-500">分析用户在 AI 中的真实提问，发现品牌曝光机会</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/compete">
+            <Card className="border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer group">
+              <CardContent className="p-6">
+                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-indigo-200 transition-colors">
+                  <Users className="w-5 h-5 text-indigo-600" />
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-1">竞品对标</h3>
+                <p className="text-sm text-slate-500">Head-to-head 品牌对比，发现 Citation Gap</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/trends">
+            <Card className="border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group">
+              <CardContent className="p-6">
+                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-colors">
+                  <TrendingUp className="w-5 h-5 text-emerald-600" />
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-1">趋势追踪</h3>
+                <p className="text-sm text-slate-500">追踪品牌可见性变化，季节性趋势和 AI 平台差异</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* GEO Methodology */}

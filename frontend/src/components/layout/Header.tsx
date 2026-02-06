@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ChevronRight, User, LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 
 const routeNames: Record<string, string> = {
@@ -23,6 +24,7 @@ export function Header() {
     const pathname = usePathname();
     const router = useRouter();
     const { user, logout } = useAuth();
+    const { t } = useLanguage();
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -92,9 +94,9 @@ export function Header() {
                 ) : (
                     <div>
                         <h2 className="text-lg font-bold text-slate-900">
-                            Welcome back{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
+                            {t('header.welcome')}{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
                         </h2>
-                        <p className="text-sm text-slate-500">Track your brand performance in the AI era</p>
+                        <p className="text-sm text-slate-500">{t('header.subtitle')}</p>
                     </div>
                 )}
             </div>
@@ -104,50 +106,67 @@ export function Header() {
                 {/* Notifications */}
                 <NotificationPanel />
 
-                {/* User Menu */}
-                <div className="relative" ref={menuRef}>
-                    <button
-                        onClick={() => setMenuOpen(prev => !prev)}
-                        className="flex items-center gap-3 pl-3 border-l border-slate-200 hover:opacity-80 transition-opacity"
-                    >
-                        <div className="text-right hidden md:block">
-                            <p className="text-sm font-semibold text-slate-900">{displayName}</p>
-                            <p className="text-xs text-slate-500">{user?.email || 'Loading...'}</p>
-                        </div>
-                        <div className="flex items-center justify-center w-10 h-10 bg-violet-600 text-white rounded-full">
-                            {initials ? (
-                                <span className="text-sm font-bold">{initials}</span>
-                            ) : (
-                                <User className="w-5 h-5" />
-                            )}
-                        </div>
-                    </button>
-
-                    {/* Dropdown menu */}
-                    {menuOpen && (
-                        <div className="absolute right-0 top-14 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
-                            <div className="px-4 py-3 border-b border-slate-100">
+                {user ? (
+                    /* User Menu — logged in */
+                    <div className="relative" ref={menuRef}>
+                        <button
+                            onClick={() => setMenuOpen(prev => !prev)}
+                            className="flex items-center gap-3 pl-3 border-l border-slate-200 hover:opacity-80 transition-opacity"
+                        >
+                            <div className="text-right hidden md:block">
                                 <p className="text-sm font-semibold text-slate-900">{displayName}</p>
-                                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                                <p className="text-xs text-slate-500">{user?.email}</p>
                             </div>
-                            <Link
-                                href="/settings"
-                                onClick={() => setMenuOpen(false)}
-                                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                            >
-                                <Settings className="w-4 h-4" />
-                                Settings
-                            </Link>
-                            <button
-                                onClick={handleLogout}
-                                className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                            >
-                                <LogOut className="w-4 h-4" />
-                                Sign out
-                            </button>
-                        </div>
-                    )}
-                </div>
+                            <div className="flex items-center justify-center w-10 h-10 bg-violet-600 text-white rounded-full">
+                                {initials ? (
+                                    <span className="text-sm font-bold">{initials}</span>
+                                ) : (
+                                    <User className="w-5 h-5" />
+                                )}
+                            </div>
+                        </button>
+
+                        {menuOpen && (
+                            <div className="absolute right-0 top-14 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+                                <div className="px-4 py-3 border-b border-slate-100">
+                                    <p className="text-sm font-semibold text-slate-900">{displayName}</p>
+                                    <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                                </div>
+                                <Link
+                                    href="/settings"
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                >
+                                    <Settings className="w-4 h-4" />
+                                    {t('header.settings')}
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    {t('header.signout')}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    /* Guest — show Sign In / Sign Up */
+                    <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
+                        <Link
+                            href="/auth/login"
+                            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                        >
+                            {t('header.signin')}
+                        </Link>
+                        <Link
+                            href="/auth/register"
+                            className="px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors"
+                        >
+                            {t('header.signup')}
+                        </Link>
+                    </div>
+                )}
             </div>
         </header>
     );
