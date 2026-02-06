@@ -18,6 +18,8 @@ import {
   GitCompareArrows,
   FileText,
   Lightbulb,
+  BookOpen,
+  Wand2,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -25,6 +27,8 @@ import { cn } from '@/lib/utils';
 const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Insights Explorer', href: '/insights', icon: Lightbulb },
+    { name: 'GEO 学习中心', href: '/learn', icon: BookOpen },
+    { name: '优化建议', href: '/optimize', icon: Wand2 },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Trends', href: '/trends', icon: LineChart },
     { name: 'Compare', href: '/compare', icon: GitCompareArrows },

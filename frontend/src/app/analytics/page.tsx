@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { RadarChart, HeatmapChart, FunnelChart, ModelComparisonChart } from '@/components/charts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShareOfVoice, PromptResearch } from '@/components/geo';
 import { useBrands } from '@/hooks/useBrands';
 import { RefreshCw, AlertCircle, BarChart3, TrendingUp, Award, Eye, Link2, FileText, Target, Users, Activity } from 'lucide-react';
 
@@ -367,6 +368,15 @@ export default function AnalyticsPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Share of Voice & Prompt Research */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <ShareOfVoice 
+                        title="Share of Voice"
+                        description="品牌在 AI 回答中的提及占比 (Demo)"
+                    />
+                    <PromptResearch />
+                </div>
 
                 {/* Top Brands Ranking */}
                 <Card>
