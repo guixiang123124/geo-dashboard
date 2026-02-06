@@ -20,6 +20,7 @@ import {
   Lightbulb,
   BookOpen,
   Wand2,
+  Heart,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -36,6 +37,7 @@ const navigation = [
     { name: 'Evaluations', href: '/evaluations', icon: TrendingUp },
     { name: 'Prompts', href: '/prompts', icon: MessageSquareText },
     { name: 'Reports', href: '/reports', icon: FileText },
+    { name: 'About', href: '/about', icon: Heart },
     { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
