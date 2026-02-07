@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { RadarChart, HeatmapChart, FunnelChart, ModelComparisonChart } from '@/components/charts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShareOfVoice, PromptResearch } from '@/components/geo';
 import { useBrands } from '@/hooks/useBrands';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { RefreshCw, AlertCircle, BarChart3, TrendingUp, Award, Eye, Link2, FileText, Target, Users, Activity } from 'lucide-react';
 
 function getScoreColor(score: number): string {

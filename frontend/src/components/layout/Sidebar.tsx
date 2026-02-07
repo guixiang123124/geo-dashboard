@@ -22,6 +22,7 @@ import {
   Wand2,
   Heart,
   Globe,
+  Shield,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -39,6 +40,7 @@ const navigation = [
     { nameKey: 'nav.brands', href: '/brands', icon: Package },
     { nameKey: 'nav.evaluations', href: '/evaluations', icon: TrendingUp },
     { nameKey: 'nav.reports', href: '/reports', icon: FileText },
+    { nameKey: 'nav.audit', href: '/audit', icon: Shield },
     { nameKey: 'nav.about', href: '/about', icon: Heart },
     { nameKey: 'nav.settings', href: '/settings', icon: Settings },
 ];

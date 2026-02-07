@@ -17,7 +17,10 @@ import google.generativeai as genai
 sys.stdout.reconfigure(line_buffering=True)
 
 # ── Config ──────────────────────────────────────────────────────────────
-API_KEY = "AIzaSyCfPf5sSpWUUni9UJXhO4t_RLbJTE5qW50"
+import os
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
+API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 MODEL = "gemini-2.0-flash"
 DB_PATH = "geo_dashboard.db"
 RPM_LIMIT = 14  # stay under 15 RPM
