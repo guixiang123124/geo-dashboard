@@ -8,11 +8,11 @@ import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 
-const AUTH_ROUTES = ['/auth/login', '/auth/register'];
+const BARE_ROUTES = ['/auth/login', '/auth/register', '/landing'];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthRoute = AUTH_ROUTES.includes(pathname);
+  const isAuthRoute = BARE_ROUTES.includes(pathname);
 
   return (
     <LanguageProvider>
