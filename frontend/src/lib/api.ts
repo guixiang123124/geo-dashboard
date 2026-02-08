@@ -73,7 +73,9 @@ async function fetchApi<T>(
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_V1}${endpoint}`, {
+  const fullUrl = `${API_V1}${endpoint}`;
+  console.log('[GEO-DEBUG] fetchApi URL:', fullUrl, 'API_V1:', API_V1);
+  const response = await fetch(fullUrl, {
     ...options,
     headers,
   });
