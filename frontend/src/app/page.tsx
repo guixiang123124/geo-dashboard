@@ -35,7 +35,7 @@ export default function Home() {
         <div className="text-center space-y-4">
           <Loader2 className="w-10 h-10 animate-spin text-violet-600 mx-auto" />
           <div>
-            <p className="text-lg font-semibold text-slate-900">Loading GEO Insights</p>
+            <p className="text-lg font-semibold text-slate-900">Loading Luminos</p>
             <p className="text-sm text-slate-500 mt-1">Fetching brand performance data...</p>
           </div>
         </div>
@@ -165,7 +165,7 @@ export default function Home() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
           <div className="relative">
             <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
-              GEO Performance Dashboard
+              AI Visibility Dashboard
             </h1>
             <p className="text-lg text-slate-300 mb-6 max-w-2xl">
               Generative Engine Optimization — measuring how AI platforms represent your brands

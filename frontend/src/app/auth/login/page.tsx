@@ -43,7 +43,7 @@ export default function LoginPage() {
             <div className="p-2 bg-violet-600 rounded-lg">
               <BarChart3 className="w-6 h-6" />
             </div>
-            <span className="text-xl font-bold">GEO Insights</span>
+            <span className="text-xl font-bold">Luminos</span>
           </div>
           <p className="text-slate-400 text-sm">Generative Engine Optimization</p>
         </div>
@@ -75,7 +75,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-xs text-slate-500">
-          &copy; {new Date().getFullYear()} GEO Insights. All rights reserved.
+          &copy; {new Date().getFullYear()} Luminos. All rights reserved.
         </p>
       </div>
 
@@ -88,7 +88,7 @@ export default function LoginPage() {
               <div className="p-2 bg-violet-600 rounded-lg">
                 <BarChart3 className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-slate-900">GEO Insights</span>
+              <span className="text-xl font-bold text-slate-900">Luminos</span>
             </div>
           </div>
 

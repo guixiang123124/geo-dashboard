@@ -40,7 +40,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'header.settings': 'Settings',
 
     // Dashboard
-    'dash.title': 'GEO Performance Dashboard',
+    'dash.title': 'AI Visibility Dashboard',
     'dash.subtitle': 'Generative Engine Optimization — measuring how AI platforms represent your brands',
     'dash.runEval': 'Run Evaluation',
     'dash.addBrand': 'Add Brand',

@@ -27,7 +27,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         <div className="text-center space-y-4">
           <Loader2 className="w-10 h-10 animate-spin text-violet-600 mx-auto" />
           <div>
-            <p className="text-lg font-semibold text-slate-900">GEO Insights</p>
+            <p className="text-lg font-semibold text-slate-900">Luminos</p>
             <p className="text-sm text-slate-500 mt-1">Loading...</p>
           </div>
         </div>

@@ -71,14 +71,14 @@ export default function RegisterPage() {
             <div className="p-2 bg-violet-600 rounded-lg">
               <BarChart3 className="w-6 h-6" />
             </div>
-            <span className="text-xl font-bold">GEO Insights</span>
+            <span className="text-xl font-bold">Luminos</span>
           </div>
           <p className="text-slate-400 text-sm">Generative Engine Optimization</p>
         </div>
 
         <div className="space-y-6">
           <h2 className="text-3xl font-bold leading-tight">
-            Get started with GEO Insights
+            Get started with Luminos
           </h2>
           <p className="text-slate-300 text-lg leading-relaxed">
             Create your account to start monitoring how AI platforms represent
@@ -102,7 +102,7 @@ export default function RegisterPage() {
         </div>
 
         <p className="text-xs text-slate-500">
-          &copy; {new Date().getFullYear()} GEO Insights. All rights reserved.
+          &copy; {new Date().getFullYear()} Luminos. All rights reserved.
         </p>
       </div>
 
@@ -115,7 +115,7 @@ export default function RegisterPage() {
               <div className="p-2 bg-violet-600 rounded-lg">
                 <BarChart3 className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-slate-900">GEO Insights</span>
+              <span className="text-xl font-bold text-slate-900">Luminos</span>
             </div>
           </div>
 

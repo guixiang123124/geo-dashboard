@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GEO Insights - AI Era Brand Optimization",
+  title: "Luminos - AI Brand Visibility Platform",
   description: "Track and optimize your brand performance across AI platforms (ChatGPT, Gemini, Claude, Perplexity)",
 };
 

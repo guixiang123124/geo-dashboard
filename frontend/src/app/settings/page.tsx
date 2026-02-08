@@ -168,7 +168,7 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
             Settings
           </h1>
-          <p className="text-slate-500">System configuration, data overview, and export tools for GEO Insights</p>
+          <p className="text-slate-500">System configuration, data overview, and export tools for Luminos</p>
         </div>
 
         {/* System Status */}
@@ -500,7 +500,7 @@ export default function SettingsPage() {
         <Card className="border-slate-200 shadow-sm">
           <CardContent className="py-6">
             <div className="text-center space-y-2">
-              <p className="text-sm font-semibold text-slate-900">GEO Insights Dashboard</p>
+              <p className="text-sm font-semibold text-slate-900">Luminos</p>
               <p className="text-xs text-slate-500">
                 Generative Engine Optimization — Track and improve your brand visibility across AI platforms
               </p>

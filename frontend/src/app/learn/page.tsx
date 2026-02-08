@@ -502,7 +502,7 @@ export default function LearnPage() {
                 <div>
                   <h3 className="text-xl font-bold mb-2">开始优化你的品牌</h3>
                   <p className="text-violet-100">
-                    使用 GEO Insights 追踪你的品牌在 AI 平台中的表现
+                    使用 Luminos 追踪你的品牌在 AI 平台中的表现
                   </p>
                 </div>
                 <a

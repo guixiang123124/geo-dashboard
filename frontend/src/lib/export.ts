@@ -226,7 +226,7 @@ export function exportToPDF(
       </style>
     </head>
     <body>
-      <h1>GEO Insights Report: ${title}</h1>
+      <h1>Luminos Report: ${title}</h1>
       <div class="meta">
         Generated on ${new Date().toLocaleDateString('en-US', {
           weekday: 'long',

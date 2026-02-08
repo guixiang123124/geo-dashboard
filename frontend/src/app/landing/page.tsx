@@ -14,7 +14,7 @@ export default function LandingPage() {
             <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
               <Eye className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-900">GEO Insights</span>
+            <span className="text-xl font-bold text-slate-900">Luminos</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-slate-600">
             <a href="#features" className="hover:text-violet-600 transition">Features</a>
@@ -48,7 +48,7 @@ export default function LandingPage() {
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
             40% of Gen Z use ChatGPT and Gemini for product research. 
-            GEO Insights tells you if AI recommends your brand — and how to make it happen.
+            Luminos tells you if AI recommends your brand — and how to make it happen.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link href="/">
@@ -96,7 +96,7 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 border border-violet-200 ring-1 ring-violet-100">
-              <div className="text-green-600 font-semibold mb-2">✅ With GEO Insights</div>
+              <div className="text-green-600 font-semibold mb-2">✅ With Luminos</div>
               <p className="text-slate-600 text-sm">
                 You know exactly how AI describes your brand, where you rank, what's missing, 
                 and get actionable steps to improve your AI visibility score.
@@ -218,14 +218,14 @@ export default function LandingPage() {
             <div className="w-6 h-6 bg-violet-600 rounded flex items-center justify-center">
               <Eye className="w-4 h-4 text-white" />
             </div>
-            <span className="text-white font-semibold">GEO Insights</span>
+            <span className="text-white font-semibold">Luminos</span>
           </div>
           <div className="flex gap-6 text-sm">
             <Link href="/about" className="hover:text-white transition">About</Link>
             <Link href="/learn" className="hover:text-white transition">Learn GEO</Link>
             <a href="https://github.com/guixiang123124/geo-dashboard" className="hover:text-white transition">GitHub</a>
           </div>
-          <div className="text-sm">© 2026 GEO Insights. Built with ❤️</div>
+          <div className="text-sm">© 2026 Luminos. Built with ❤️</div>
         </div>
       </footer>
     </div>
