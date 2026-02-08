@@ -25,8 +25,12 @@ import type {
   BrandComparisonData,
 } from './types';
 
+// In production (Vercel), use relative path so requests go through Vercel rewrites (same origin, no CORS/mixed content).
+// In development, use localhost.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-const API_V1 = `${API_BASE_URL}/api/v1`;
+const API_V1 = typeof window !== 'undefined' && window.location.protocol === 'https:'
+  ? '/api/v1'
+  : `${API_BASE_URL}/api/v1`;
 
 // Default workspace ID for demo/development
 export const DEFAULT_WORKSPACE_ID = process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE_ID || 'ws-demo-001';
@@ -368,7 +372,10 @@ export const modelsApi = {
 
 export async function checkApiHealth(): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`);
+    const healthUrl = typeof window !== 'undefined' && window.location.protocol === 'https:'
+      ? '/health'
+      : `${API_BASE_URL}/health`;
+    const response = await fetch(healthUrl);
     return response.ok;
   } catch {
     return false;

@@ -57,7 +57,7 @@ export default function Home() {
             <p className="text-slate-700 mb-4">{error}</p>
             <p className="text-sm text-slate-500">
               Make sure the backend API is running at{' '}
-              <code className="bg-slate-100 px-2 py-1 rounded text-slate-700">http://localhost:8000</code>
+              <code className="bg-slate-100 px-2 py-1 rounded text-slate-700">the backend API</code>
             </p>
             <Button onClick={() => window.location.reload()} className="mt-4">
               Retry
