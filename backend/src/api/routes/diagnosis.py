@@ -194,7 +194,7 @@ Positioning: {profile.positioning}
 Target audience: {profile.target_audience}
 Products: {', '.join(profile.key_products)}
 
-Generate prompts in 4 categories (5 each):
+Generate exactly 10 prompts in 4 categories (2-3 each):
 1. "discovery" — general product discovery ("best X for Y")
 2. "comparison" — brand comparisons ("X vs Y", "is X worth it")
 3. "purchase" — buying intent ("where to buy X", "X coupon codes")
@@ -209,7 +209,7 @@ Return ONLY valid JSON, no markdown fences."""
         text = re.sub(r'\s*```$', '', text.strip())
         prompts = json.loads(text)
         if isinstance(prompts, list):
-            return prompts[:25]  # cap at 25
+            return prompts[:10]  # cap at 10 to stay under Railway proxy timeout
     except json.JSONDecodeError:
         pass
 
@@ -360,8 +360,8 @@ Return ONLY valid JSON, no markdown fences."""
             if eval_result.get("has_citation"):
                 cited_count += 1
 
-            # Rate limit: ~4 req/sec to stay under Gemini limits
-            await asyncio.sleep(0.3)
+            # Rate limit: keep under Gemini 15 RPM
+            await asyncio.sleep(0.15)
         except Exception as e:
             results.append(PromptResult(
                 prompt=sp["text"],
