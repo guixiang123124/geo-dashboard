@@ -122,7 +122,7 @@ async def crawl_website(domain: str) -> str:
     return "\n\n".join(texts)[:8000]
 
 
-async def gemini_generate(prompt: str) -> str:
+async def gemini_generate(prompt: str, max_tokens: int = 512) -> str:
     """Call Gemini and return text response."""
     client = get_genai_client()
     if not client:
@@ -130,9 +130,11 @@ async def gemini_generate(prompt: str) -> str:
 
     try:
         response = await asyncio.to_thread(
-            client.models.generate_content,
-            model=GEMINI_MODEL,
-            contents=prompt,
+            lambda: client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config={"max_output_tokens": max_tokens, "temperature": 0.7},
+            )
         )
         return response.text
     except Exception as e:
@@ -158,7 +160,7 @@ Return a JSON object with exactly these keys:
 
 Return ONLY valid JSON, no markdown fences."""
 
-    text = await gemini_generate(prompt)
+    text = await gemini_generate(prompt, max_tokens=1024)
     # Parse JSON from response
     try:
         # Strip markdown fences if present
@@ -203,7 +205,7 @@ Generate exactly 10 prompts in 4 categories (2-3 each):
 Return a JSON array of objects with keys: "text", "intent" (one of the 4 categories above).
 Return ONLY valid JSON, no markdown fences."""
 
-    text = await gemini_generate(prompt)
+    text = await gemini_generate(prompt, max_tokens=1024)
     try:
         text = re.sub(r'^```json?\s*', '', text.strip())
         text = re.sub(r'\s*```$', '', text.strip())
@@ -312,7 +314,7 @@ async def diagnose_brand(req: DiagnosisRequest):
         profile_prompt = f"""Create a brief brand profile for "{brand_name}".
 Return JSON with keys: name, category, positioning, target_audience, key_products (list).
 Return ONLY valid JSON, no markdown fences."""
-        text = await gemini_generate(profile_prompt)
+        text = await gemini_generate(profile_prompt, max_tokens=1024)
         try:
             text = re.sub(r'^```json?\s*', '', text.strip())
             text = re.sub(r'\s*```$', '', text.strip())
@@ -366,18 +368,12 @@ Return ONLY valid JSON, no markdown fences."""
                 snippet=f"Error: {str(e)[:100]}",
             ), False)
 
-    # Run in batches of 3 concurrent requests
-    BATCH_SIZE = 3
-    for i in range(0, len(smart_prompts), BATCH_SIZE):
-        batch = smart_prompts[i:i + BATCH_SIZE]
-        batch_results = await asyncio.gather(*[eval_one(sp) for sp in batch])
-        for pr, has_cite in batch_results:
-            results.append(pr)
-            if has_cite:
-                cited_count += 1
-        # Small delay between batches
-        if i + BATCH_SIZE < len(smart_prompts):
-            await asyncio.sleep(0.2)
+    # Run ALL prompts concurrently (Tier 1 = 1500 RPM, no rate limit concern)
+    all_results = await asyncio.gather(*[eval_one(sp) for sp in smart_prompts])
+    for pr, has_cite in all_results:
+        results.append(pr)
+        if has_cite:
+            cited_count += 1
 
     # Step 5: Calculate scores
     total = len(results)
