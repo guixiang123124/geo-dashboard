@@ -66,10 +66,15 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
+    import os
+    db_url = os.environ.get("DATABASE_URL", "NOT_SET")
+    db_prefix = db_url[:50] + "..." if len(db_url) > 50 else db_url
     return {
         "status": "healthy",
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
+        "db_url_prefix": db_prefix,
+        "db_url_len": len(db_url),
     }
 
 
