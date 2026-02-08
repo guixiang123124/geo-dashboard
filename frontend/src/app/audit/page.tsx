@@ -141,6 +141,9 @@ export default function AuditPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'prompts'>('overview');
 
+  const [showCustomPrompts, setShowCustomPrompts] = useState(false);
+  const [customPromptsText, setCustomPromptsText] = useState('');
+
   // Popular brands for quick access
   const popularBrands = [
     "Carter's", 'Zara Kids', 'H&M Kids', 'Gap Kids', 'Hanna Andersson',
@@ -162,11 +165,23 @@ export default function AuditPage() {
     }, 5000);
 
     try {
-      const body: Record<string, string> = {};
+      const body: Record<string, unknown> = {};
       if (mode === 'domain') {
         body.domain = input.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
       } else {
         body.brand_name = input.trim();
+      }
+
+      // Add custom prompts if provided
+      if (customPromptsText.trim()) {
+        const customPrompts = customPromptsText
+          .split('\n')
+          .map(l => l.trim())
+          .filter(Boolean)
+          .slice(0, 5);
+        if (customPrompts.length > 0) {
+          body.custom_prompts = customPrompts;
+        }
       }
 
       const res = await fetch(`${API_URL}/api/v1/diagnosis`, {
@@ -299,6 +314,34 @@ export default function AuditPage() {
                 {brand}
               </button>
             ))}
+          </div>
+
+          {/* Advanced: Custom Prompts */}
+          <div className="border-t pt-4">
+            <button
+              onClick={() => setShowCustomPrompts(!showCustomPrompts)}
+              className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-violet-600 transition-colors"
+            >
+              <ChevronRight className={`w-4 h-4 transition-transform ${showCustomPrompts ? 'rotate-90' : ''}`} />
+              Advanced: Custom Prompts
+            </button>
+            {showCustomPrompts && (
+              <div className="mt-3 space-y-2">
+                <p className="text-xs text-slate-400">
+                  Add up to 5 custom search queries (one per line) to include in the diagnosis.
+                </p>
+                <textarea
+                  value={customPromptsText}
+                  onChange={(e) => setCustomPromptsText(e.target.value)}
+                  placeholder={"best organic baby clothing brands\nwhere to buy affordable kids pajamas\nis Carter's better than Hanna Andersson"}
+                  rows={4}
+                  className="w-full px-4 py-3 text-sm rounded-lg border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all resize-none"
+                />
+                <p className="text-xs text-slate-400">
+                  {customPromptsText.split('\n').filter(l => l.trim()).length}/5 custom prompts
+                </p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -39,6 +39,7 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: Optional[str] = None
     ANTHROPIC_API_KEY: Optional[str] = None
     PERPLEXITY_API_KEY: Optional[str] = None
+    XAI_API_KEY: Optional[str] = None
 
     # AI Model Configuration
     OPENAI_MODEL: str = "gpt-4-turbo-preview"

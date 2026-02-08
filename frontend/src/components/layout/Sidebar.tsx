@@ -23,6 +23,7 @@ import {
   Heart,
   Globe,
   Shield,
+  DollarSign,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -41,6 +42,7 @@ const navigation = [
     { nameKey: 'nav.evaluations', href: '/evaluations', icon: TrendingUp },
     { nameKey: 'nav.reports', href: '/reports', icon: FileText },
     { nameKey: 'nav.audit', href: '/audit', icon: Shield },
+    { nameKey: 'nav.pricing', href: '/pricing', icon: DollarSign },
     { nameKey: 'nav.about', href: '/about', icon: Heart },
     { nameKey: 'nav.settings', href: '/settings', icon: Settings },
 ];

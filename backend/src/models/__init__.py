@@ -9,6 +9,7 @@ from .evaluation import EvaluationRun, EvaluationResult
 from .scorecard import ScoreCard
 from .user import User
 from .public_insight import PublicInsight, BrandMention
+from .diagnosis import DiagnosisRecord
 
 __all__ = [
     "Workspace",
@@ -20,4 +21,5 @@ __all__ = [
     "User",
     "PublicInsight",
     "BrandMention",
+    "DiagnosisRecord",
 ]

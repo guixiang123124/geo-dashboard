@@ -1,10 +1,38 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, BarChart3, Eye, Globe, Zap, Shield, TrendingUp, Star, CheckCircle2, Users, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { ArrowRight, BarChart3, Eye, Globe, Zap, Shield, TrendingUp, Star, CheckCircle2, Users, Search, Clock, Sparkles, Target, MessageSquare, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+function ScoreBar({ label, score, color }: { label: string; score: number; color: string }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-sm">
+        <span className="text-slate-600">{label}</span>
+        <span className="font-semibold text-slate-900">{score}/100</span>
+      </div>
+      <div className="w-full bg-slate-100 rounded-full h-2">
+        <div className={`${color} h-2 rounded-full`} style={{ width: `${score}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export default function LandingPage() {
+  const [brandInput, setBrandInput] = useState('');
+  const router = useRouter();
+
+  function handleAudit(e: React.FormEvent) {
+    e.preventDefault();
+    if (brandInput.trim()) {
+      router.push(`/audit?q=${encodeURIComponent(brandInput.trim())}`);
+    } else {
+      router.push('/audit');
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
@@ -20,12 +48,13 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-violet-600 transition">Features</a>
             <a href="#how" className="hover:text-violet-600 transition">How It Works</a>
             <a href="#pricing" className="hover:text-violet-600 transition">Pricing</a>
+            <Link href="/audit" className="hover:text-violet-600 transition font-medium text-violet-600">Free Brand Audit</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/">
               <Button variant="outline" size="sm">Sign In</Button>
             </Link>
-            <Link href="/">
+            <Link href="/audit">
               <Button size="sm" className="bg-violet-600 hover:bg-violet-700">Get Started Free</Button>
             </Link>
           </div>
@@ -37,7 +66,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-full px-4 py-1.5 text-sm text-violet-700 mb-6">
             <Zap className="w-4 h-4" />
-            The first GEO analytics platform for brands
+            Free Instant AI Visibility Diagnosis
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-slate-900 leading-tight mb-6">
             Is Your Brand Visible
@@ -47,28 +76,40 @@ export default function LandingPage() {
             </span>
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-            40% of Gen Z use ChatGPT and Gemini for product research. 
-            Luminos tells you if AI recommends your brand — and how to make it happen.
+            40% of Gen Z use ChatGPT and Gemini for product research.
+            Get your AI visibility score in 10 seconds — completely free.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link href="/">
-              <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8 h-14">
-                Try Free Dashboard
+
+          {/* Inline brand/domain input */}
+          <form onSubmit={handleAudit} className="max-w-xl mx-auto mb-8">
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  value={brandInput}
+                  onChange={(e) => setBrandInput(e.target.value)}
+                  placeholder="Enter your brand or domain (e.g., carters.com)"
+                  className="w-full pl-12 pr-4 py-4 text-lg rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
+                />
+              </div>
+              <Button
+                type="submit"
+                size="lg"
+                className="bg-violet-600 hover:bg-violet-700 text-lg px-8 h-auto rounded-xl"
+              >
+                Diagnose Free
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-            </Link>
-            <Link href="/about">
-              <Button size="lg" variant="outline" className="text-lg px-8 h-14">
-                Learn About GEO
-              </Button>
-            </Link>
-          </div>
+            </div>
+          </form>
+
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
             {[
-              ['30+', 'Brands Tracked'],
-              ['4', 'AI Models'],
-              ['120+', 'Test Prompts'],
+              ['10s', 'Diagnosis Time'],
+              ['10+', 'AI-Generated Prompts'],
+              ['4', 'AI Platforms (coming soon)'],
             ].map(([num, label]) => (
               <div key={label}>
                 <div className="text-3xl font-bold text-violet-600">{num}</div>
@@ -84,21 +125,21 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">The Problem</h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-12">
-            Traditional SEO optimizes for Google's algorithm. But AI search engines like ChatGPT, Gemini, and Claude 
-            generate answers — they don't just link. If AI doesn't know your brand, your customers won't either.
+            Traditional SEO optimizes for Google&apos;s algorithm. But AI search engines like ChatGPT, Gemini, and Claude
+            generate answers — they don&apos;t just link. If AI doesn&apos;t know your brand, your customers won&apos;t either.
           </p>
           <div className="grid md:grid-cols-2 gap-8 text-left">
             <div className="bg-white rounded-xl p-6 border border-slate-200">
               <div className="text-red-500 font-semibold mb-2">❌ Without GEO</div>
               <p className="text-slate-600 text-sm">
-                "What are the best kids clothing brands?" → AI recommends your competitors. 
-                You're invisible. Lost revenue you never knew about.
+                &ldquo;What are the best kids clothing brands?&rdquo; → AI recommends your competitors.
+                You&apos;re invisible. Lost revenue you never knew about.
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 border border-violet-200 ring-1 ring-violet-100">
               <div className="text-green-600 font-semibold mb-2">✅ With Luminos</div>
               <p className="text-slate-600 text-sm">
-                You know exactly how AI describes your brand, where you rank, what's missing, 
+                You know exactly how AI describes your brand, where you rank, what&apos;s missing,
                 and get actionable steps to improve your AI visibility score.
               </p>
             </div>
@@ -140,10 +181,10 @@ export default function LandingPage() {
           <h2 className="text-3xl font-bold text-slate-900 text-center mb-16">How It Works</h2>
           <div className="space-y-8">
             {[
-              { step: '1', title: 'Add Your Brand', desc: 'Enter your brand name and website. We auto-detect your industry and competitors.' },
-              { step: '2', title: 'AI Evaluates', desc: 'We send 120+ real-world prompts to Gemini, ChatGPT, and Claude. Each response is analyzed for your brand presence.' },
-              { step: '3', title: 'Get Your Score', desc: 'Receive a comprehensive GEO Score with visibility, citation, representation, and intent metrics.' },
-              { step: '4', title: 'Optimize', desc: 'Follow actionable recommendations to improve how AI sees and recommends your brand.' },
+              { step: '1', title: 'Enter Your Domain or Brand', desc: 'Type your website URL or brand name. We auto-detect your industry, products, and positioning.' },
+              { step: '2', title: 'AI Crawls & Generates Smart Prompts', desc: 'We crawl your site and use AI to generate 10+ tailored search prompts that real consumers would ask.' },
+              { step: '3', title: 'Real-Time Evaluation Across AI Platforms', desc: 'Each prompt is tested against AI platforms (Gemini, with ChatGPT, Claude, and Perplexity coming soon).' },
+              { step: '4', title: 'Get Score + Recommendations in 10 Seconds', desc: 'Receive a comprehensive GEO Score with visibility, citation, framing, and intent metrics — plus actionable recommendations.' },
             ].map(({ step, title, desc }) => (
               <div key={step} className="flex gap-6 items-start">
                 <div className="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
@@ -159,8 +200,65 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Live Demo Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Live Demo</h2>
+            <p className="text-lg text-slate-600">Here&apos;s what a real diagnosis looks like</p>
+          </div>
+          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Carter&apos;s</h3>
+                  <p className="text-violet-200 mt-1">Kids &amp; Baby Clothing</p>
+                  <div className="flex items-center gap-1 mt-2 text-violet-300">
+                    <Globe className="w-4 h-4" />
+                    <span className="text-sm">carters.com</span>
+                  </div>
+                  <div className="flex items-center gap-1 mt-1 text-violet-300">
+                    <Clock className="w-4 h-4" />
+                    <span className="text-sm">8.2s · 10 smart prompts</span>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-6xl font-bold">55</div>
+                  <div className="text-violet-200 text-sm mt-1">AI Visibility Score</div>
+                  <div className="text-2xl mt-1">
+                    Grade: <span className="text-yellow-300 font-bold">C</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Score breakdown */}
+            <div className="p-8 space-y-4">
+              <h4 className="font-semibold text-slate-900 text-lg mb-4">Score Breakdown</h4>
+              <ScoreBar label="Visibility" score={70} color="bg-emerald-500" />
+              <ScoreBar label="Citation" score={20} color="bg-orange-500" />
+              <ScoreBar label="Framing" score={65} color="bg-emerald-500" />
+              <ScoreBar label="Intent Coverage" score={75} color="bg-emerald-500" />
+              <div className="pt-4 border-t flex items-center justify-between text-sm text-slate-500">
+                <span>7/10 prompts mentioned brand</span>
+                <span>Powered by Gemini 2.0 Flash</span>
+              </div>
+            </div>
+            {/* CTA overlay */}
+            <div className="bg-violet-50 border-t border-violet-100 p-6 text-center">
+              <p className="text-slate-700 mb-3 font-medium">Want to see your brand&apos;s score?</p>
+              <Link href="/audit">
+                <Button className="bg-violet-600 hover:bg-violet-700 px-8">
+                  Run Free Diagnosis <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
-      <section id="pricing" className="py-20 px-6">
+      <section id="pricing" className="py-20 px-6 bg-slate-50">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">Simple Pricing</h2>
           <p className="text-lg text-slate-600 text-center mb-12">Start free. Upgrade when you need more.</p>
@@ -168,9 +266,9 @@ export default function LandingPage() {
             {[
               { name: 'Free', price: '$0', period: 'forever', features: ['3 brands', '1 AI model (Gemini)', 'Basic GEO Score', 'Monthly reports', 'Community support'], cta: 'Get Started', highlight: false },
               { name: 'Pro', price: '$49', period: '/month', features: ['20 brands', '3 AI models', 'Full GEO Score + trends', 'Prompt research', 'Competitive benchmark', 'Priority support'], cta: 'Start Pro Trial', highlight: true },
-              { name: 'Business', price: '$199', period: '/month', features: ['Unlimited brands', 'All AI models', 'API access', 'White-label reports', 'Content audit', 'Dedicated manager'], cta: 'Contact Sales', highlight: false },
+              { name: 'Business', price: '$299', period: '/month', features: ['Unlimited brands', 'All AI models', 'API access', 'White-label reports', 'Content audit', 'Dedicated manager'], cta: 'Contact Sales', highlight: false },
             ].map(({ name, price, period, features, cta, highlight }) => (
-              <div key={name} className={`rounded-xl p-8 border-2 ${highlight ? 'border-violet-500 ring-2 ring-violet-100 scale-105' : 'border-slate-200'}`}>
+              <div key={name} className={`rounded-xl p-8 border-2 bg-white ${highlight ? 'border-violet-500 ring-2 ring-violet-100 scale-105' : 'border-slate-200'}`}>
                 {highlight && <div className="text-xs font-semibold text-violet-600 uppercase mb-2">Most Popular</div>}
                 <h3 className="text-xl font-bold text-slate-900">{name}</h3>
                 <div className="mt-2 mb-6">
@@ -184,7 +282,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/">
+                <Link href="/audit">
                   <Button className={`w-full ${highlight ? 'bg-violet-600 hover:bg-violet-700' : ''}`} variant={highlight ? 'default' : 'outline'}>
                     {cta}
                   </Button>
@@ -200,11 +298,11 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to See How AI Views Your Brand?</h2>
           <p className="text-lg text-violet-100 mb-8">
-            Join 30+ brands already tracking their GEO performance. Free forever plan available.
+            Get your free AI visibility diagnosis in 10 seconds. No credit card required.
           </p>
-          <Link href="/">
+          <Link href="/audit">
             <Button size="lg" className="bg-white text-violet-700 hover:bg-violet-50 text-lg px-8 h-14">
-              Start Free — No Credit Card
+              Start Free Diagnosis
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
@@ -223,6 +321,8 @@ export default function LandingPage() {
           <div className="flex gap-6 text-sm">
             <Link href="/about" className="hover:text-white transition">About</Link>
             <Link href="/learn" className="hover:text-white transition">Learn GEO</Link>
+            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
+            <Link href="/audit" className="hover:text-white transition">Free Brand Audit</Link>
             <a href="https://github.com/guixiang123124/geo-dashboard" className="hover:text-white transition">GitHub</a>
           </div>
           <div className="text-sm">© 2026 Luminos. Built with ❤️</div>

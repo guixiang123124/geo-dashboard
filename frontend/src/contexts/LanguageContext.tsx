@@ -28,6 +28,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.evaluations': 'Evaluations',
     'nav.reports': 'Reports',
     'nav.audit': 'AI Audit',
+    'nav.pricing': 'Pricing',
     'nav.about': 'About',
     'nav.settings': 'Settings',
 
@@ -182,6 +183,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.evaluations': '评估记录',
     'nav.reports': '报告中心',
     'nav.audit': 'AI 审计',
+    'nav.pricing': '定价',
     'nav.about': '关于',
     'nav.settings': '设置',
 
