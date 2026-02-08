@@ -20,7 +20,7 @@ from ...schemas.brand_schemas import (
 router = APIRouter()
 
 
-@router.get("/", response_model=BrandListResponse)
+@router.get("", response_model=BrandListResponse)
 async def list_brands(
     workspace_id: str = Query(..., description="Workspace ID"),
     page: int = Query(1, ge=1),
@@ -78,7 +78,7 @@ async def get_brand(
     return brand
 
 
-@router.post("/", response_model=BrandResponse, status_code=201)
+@router.post("", response_model=BrandResponse, status_code=201)
 async def create_brand(
     brand_data: BrandCreate,
     workspace_id: str = Query(..., description="Workspace ID"),

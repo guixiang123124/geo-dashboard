@@ -37,6 +37,7 @@ app = FastAPI(
     version=settings.APP_VERSION,
     description="API for tracking brand performance in AI chatbot responses",
     lifespan=lifespan,
+    redirect_slashes=False,
 )
 
 # Configure CORS

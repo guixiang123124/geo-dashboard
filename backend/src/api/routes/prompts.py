@@ -39,7 +39,7 @@ async def list_categories(
     ]
 
 
-@router.get("/", response_model=PromptListResponse)
+@router.get("", response_model=PromptListResponse)
 async def list_prompts(
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
@@ -99,7 +99,7 @@ async def get_prompt(
     return prompt
 
 
-@router.post("/", response_model=PromptResponse, status_code=201)
+@router.post("", response_model=PromptResponse, status_code=201)
 async def create_prompt(
     prompt_data: PromptCreate,
     db: AsyncSession = Depends(get_db),

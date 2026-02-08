@@ -73,15 +73,7 @@ async function fetchApi<T>(
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
 
-  // Ensure trailing slash before query params to avoid 307 redirect from FastAPI
-  let normalizedEndpoint = endpoint;
-  const qIndex = normalizedEndpoint.indexOf('?');
-  const pathPart = qIndex >= 0 ? normalizedEndpoint.substring(0, qIndex) : normalizedEndpoint;
-  const queryPart = qIndex >= 0 ? normalizedEndpoint.substring(qIndex) : '';
-  if (!pathPart.endsWith('/')) {
-    normalizedEndpoint = pathPart + '/' + queryPart;
-  }
-  const fullUrl = `${API_V1}${normalizedEndpoint}`;
+  const fullUrl = `${API_V1}${endpoint}`;
   const response = await fetch(fullUrl, {
     ...options,
     headers,

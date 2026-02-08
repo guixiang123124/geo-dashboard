@@ -20,7 +20,7 @@ from ...schemas.evaluation_schemas import (
 router = APIRouter()
 
 
-@router.get("/", response_model=List[EvaluationRunResponse])
+@router.get("", response_model=List[EvaluationRunResponse])
 async def list_evaluation_runs(
     workspace_id: str = Query(..., description="Workspace ID"),
     status: str = Query(None, description="Filter by status"),
@@ -76,7 +76,7 @@ async def get_evaluation_run(
     )
 
 
-@router.post("/", response_model=EvaluationRunResponse, status_code=201)
+@router.post("", response_model=EvaluationRunResponse, status_code=201)
 async def create_evaluation_run(
     run_data: EvaluationRunCreate,
     workspace_id: str = Query(..., description="Workspace ID"),
