@@ -342,33 +342,42 @@ Return ONLY valid JSON, no markdown fences."""
 
     print(f"[diagnosis] Step 3 done: generated {len(smart_prompts)} prompts")
 
-    # Step 4: Evaluate each prompt (with rate limiting for Gemini free tier)
+    # Step 4: Evaluate prompts concurrently (batch of 3 to respect rate limits)
     results = []
     cited_count = 0
 
-    for sp in smart_prompts:
+    async def eval_one(sp: dict) -> tuple:
+        """Evaluate a single prompt, return (PromptResult, has_citation)."""
         try:
             eval_result = await evaluate_prompt(profile.name, sp["text"])
-            results.append(PromptResult(
+            return (PromptResult(
                 prompt=sp["text"],
                 intent=sp.get("intent", "discovery"),
                 mentioned=eval_result["mentioned"],
                 rank=eval_result["rank"],
                 sentiment=eval_result["sentiment"],
                 snippet=eval_result["snippet"],
-            ))
-            if eval_result.get("has_citation"):
-                cited_count += 1
-
-            # Rate limit: keep under Gemini 15 RPM
-            await asyncio.sleep(0.15)
+            ), eval_result.get("has_citation", False))
         except Exception as e:
-            results.append(PromptResult(
+            return (PromptResult(
                 prompt=sp["text"],
                 intent=sp.get("intent", "discovery"),
                 mentioned=False,
                 snippet=f"Error: {str(e)[:100]}",
-            ))
+            ), False)
+
+    # Run in batches of 3 concurrent requests
+    BATCH_SIZE = 3
+    for i in range(0, len(smart_prompts), BATCH_SIZE):
+        batch = smart_prompts[i:i + BATCH_SIZE]
+        batch_results = await asyncio.gather(*[eval_one(sp) for sp in batch])
+        for pr, has_cite in batch_results:
+            results.append(pr)
+            if has_cite:
+                cited_count += 1
+        # Small delay between batches
+        if i + BATCH_SIZE < len(smart_prompts):
+            await asyncio.sleep(0.2)
 
     # Step 5: Calculate scores
     total = len(results)
