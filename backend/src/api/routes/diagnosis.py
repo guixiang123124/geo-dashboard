@@ -126,17 +126,18 @@ async def gemini_generate(prompt: str) -> str:
     """Call Gemini and return text response."""
     client = get_genai_client()
     if not client:
-        raise HTTPException(500, "Gemini SDK not available")
+        raise HTTPException(500, "Gemini SDK not available — google-genai not installed")
 
-    loop = asyncio.get_event_loop()
-    response = await loop.run_in_executor(
-        None,
-        lambda: client.models.generate_content(
+    try:
+        response = await asyncio.to_thread(
+            client.models.generate_content,
             model=GEMINI_MODEL,
             contents=prompt,
         )
-    )
-    return response.text
+        return response.text
+    except Exception as e:
+        print(f"[diagnosis] Gemini API error: {e}")
+        raise HTTPException(500, f"Gemini API error: {str(e)[:200]}")
 
 
 async def extract_brand_profile(domain: str, brand_name: Optional[str], site_text: str) -> BrandProfile:
@@ -288,6 +289,8 @@ async def diagnose_brand(req: DiagnosisRequest):
     if not settings.GOOGLE_API_KEY:
         raise HTTPException(500, "Gemini API key not configured")
 
+    print(f"[diagnosis] Starting diagnosis: domain={req.domain}, brand={req.brand_name}")
+
     start_time = time.time()
     domain = req.domain or ""
     brand_name = req.brand_name
@@ -298,6 +301,8 @@ async def diagnose_brand(req: DiagnosisRequest):
         # Clean domain
         domain = domain.replace("https://", "").replace("http://", "").rstrip("/")
         site_text = await crawl_website(domain)
+
+    print(f"[diagnosis] Step 1 done: crawled {len(site_text)} chars")
 
     # Step 2: Extract brand profile
     if site_text:
@@ -330,8 +335,12 @@ Return ONLY valid JSON, no markdown fences."""
                 key_products=[],
             )
 
+    print(f"[diagnosis] Step 2 done: profile={profile.name}, category={profile.category}")
+
     # Step 3: Generate smart prompts
     smart_prompts = await generate_smart_prompts(profile)
+
+    print(f"[diagnosis] Step 3 done: generated {len(smart_prompts)} prompts")
 
     # Step 4: Evaluate each prompt (with rate limiting for Gemini free tier)
     results = []
