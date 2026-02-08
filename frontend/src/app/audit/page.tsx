@@ -1,358 +1,411 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/contexts/LanguageContext';
 import {
-  Search, Shield, CheckCircle2, AlertTriangle, XCircle, Globe, FileText,
-  Code, Eye, Award, ExternalLink, ArrowRight, BarChart3, Zap, Lock, Star
+  Search, Eye, Link2, MessageSquare, Target, TrendingUp, TrendingDown,
+  AlertTriangle, CheckCircle2, XCircle, ArrowRight, Zap, BarChart3,
+  Globe, Loader2, ChevronRight, Star, Shield, Award, Sparkles
 } from 'lucide-react';
 
-// Demo audit data for Carter's
-const demoAudit = {
-  url: 'carters.com',
-  overallScore: 72,
-  grade: 'B+',
-  percentile: 65,
-  technical: [
-    { name: 'Schema.org Product markup', status: 'pass', detail: 'Found on 92% of product pages' },
-    { name: 'FAQ structured data', status: 'pass', detail: '15 FAQ pages with proper markup' },
-    { name: 'Organization schema', status: 'warn', detail: 'Missing on main pages' },
-    { name: 'Meta descriptions', status: 'pass', detail: 'Present on 85% of pages' },
-    { name: 'HowTo / Review schema', status: 'fail', detail: 'No HowTo or Review schema detected' },
-    { name: 'Sitemap.xml accessible', status: 'pass', detail: 'Valid sitemap with 12,450 URLs' },
-  ],
-  content: {
-    headings: { score: 8, max: 10, detail: 'Good H1→H2→H3 hierarchy on most pages' },
-    lists: { score: 8, max: 10, detail: 'Product features use bullet lists' },
-    tables: { score: 3, max: 10, detail: 'Size charts exist but not using <table> markup' },
-    faqs: { score: 7, max: 10, detail: '15 FAQ pages, could expand to category pages' },
-    wordCount: { score: 6, max: 10, detail: 'Avg 280 words/page, recommend 500+' },
-  },
-  eeat: {
-    experience: { score: 82, detail: 'Product reviews with customer photos' },
-    expertise: { score: 75, detail: 'Detailed size guides and material descriptions' },
-    authority: { score: 68, detail: 'Mentioned on 12 authoritative external sites' },
-    trust: { score: 90, detail: 'SSL, privacy policy, clear return policy' },
-  },
-  competitors: [
-    { name: "Carter's", schema: 72, content: 75, eeat: 79, overall: 72 },
-    { name: 'Hanna Andersson', schema: 65, content: 80, eeat: 85, overall: 68 },
-    { name: 'Primary.com', schema: 80, content: 70, eeat: 72, overall: 70 },
-    { name: 'Tea Collection', schema: 58, content: 82, eeat: 76, overall: 65 },
-  ],
-  actions: [
-    { priority: 'high', text: 'Add Organization schema to homepage and about page', impact: '+5 score' },
-    { priority: 'high', text: 'Implement Review/Rating schema on product pages', impact: '+8 score' },
-    { priority: 'high', text: 'Add HowTo schema to size guide pages', impact: '+4 score' },
-    { priority: 'medium', text: 'Expand FAQ coverage to all category pages', impact: '+3 score' },
-    { priority: 'medium', text: 'Convert size charts to proper HTML tables', impact: '+3 score' },
-    { priority: 'medium', text: 'Increase content depth to 500+ words per page', impact: '+4 score' },
-    { priority: 'low', text: 'Optimize image alt texts with descriptive keywords', impact: '+2 score' },
-    { priority: 'low', text: 'Add breadcrumb structured data', impact: '+1 score' },
-  ],
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+interface BrandScore {
+  composite: number | null;
+  visibility: number | null;
+  citation: number | null;
+  representation: number | null;
+  intent: number | null;
+  total_mentions: number | null;
+  citation_rate: number | null;
+}
+
+interface SearchResult {
+  id: string;
+  name: string;
+  domain: string;
+  category: string;
+  score: BrandScore | null;
+}
+
+function ScoreGrade({ score }: { score: number }) {
+  if (score >= 80) return <span className="text-emerald-600 font-bold">A</span>;
+  if (score >= 60) return <span className="text-green-600 font-bold">B</span>;
+  if (score >= 40) return <span className="text-yellow-600 font-bold">C</span>;
+  if (score >= 20) return <span className="text-orange-600 font-bold">D</span>;
+  return <span className="text-red-600 font-bold">F</span>;
+}
+
+function ScoreBar({ label, score, icon: Icon, weight }: { label: string; score: number; icon: React.ElementType; weight: string }) {
+  const color = score >= 60 ? 'bg-emerald-500' : score >= 40 ? 'bg-yellow-500' : score >= 20 ? 'bg-orange-500' : 'bg-red-500';
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Icon className="w-4 h-4 text-slate-500" />
+          <span className="text-sm font-medium text-slate-700">{label}</span>
+          <span className="text-xs text-slate-400">{weight}</span>
+        </div>
+        <span className="text-lg font-bold text-slate-900">{score}<span className="text-sm text-slate-400">/100</span></span>
+      </div>
+      <div className="w-full bg-slate-100 rounded-full h-2.5">
+        <div className={`${color} h-2.5 rounded-full transition-all duration-1000`} style={{ width: `${score}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function getInsights(score: BrandScore): { type: 'success' | 'warning' | 'danger'; text: string }[] {
+  const insights: { type: 'success' | 'warning' | 'danger'; text: string }[] = [];
+  
+  if ((score.visibility ?? 0) >= 70) {
+    insights.push({ type: 'success', text: 'Strong AI visibility — your brand is frequently mentioned in AI responses' });
+  } else if ((score.visibility ?? 0) >= 30) {
+    insights.push({ type: 'warning', text: 'Moderate AI visibility — your brand appears in some AI responses but not consistently' });
+  } else {
+    insights.push({ type: 'danger', text: 'Low AI visibility — AI models rarely mention your brand when users ask relevant questions' });
+  }
+  
+  if ((score.citation ?? 0) < 10) {
+    insights.push({ type: 'danger', text: 'Almost zero citations — AI never links back to your website. Adding structured data and authoritative content can help.' });
+  }
+  
+  if ((score.intent ?? 0) >= 80) {
+    insights.push({ type: 'success', text: 'Excellent intent coverage — your brand appears across diverse search intents' });
+  } else if ((score.intent ?? 0) < 40) {
+    insights.push({ type: 'warning', text: 'Limited intent coverage — your brand only appears for specific types of queries' });
+  }
+  
+  if ((score.representation ?? 0) < 20) {
+    insights.push({ type: 'warning', text: 'When mentioned, AI provides minimal context about your brand. Enriching your online presence can improve this.' });
+  }
+  
+  return insights;
+}
+
+function getRecommendations(score: BrandScore): string[] {
+  const recs: string[] = [];
+  if ((score.visibility ?? 0) < 50) {
+    recs.push('Create comprehensive, factual content about your brand that AI models can learn from');
+    recs.push('Build authoritative backlinks from industry publications and review sites');
+  }
+  if ((score.citation ?? 0) < 10) {
+    recs.push('Add Schema.org structured data (Product, Organization, FAQ) to your website');
+    recs.push('Publish detailed product comparisons and buying guides');
+  }
+  if ((score.representation ?? 0) < 30) {
+    recs.push('Ensure your brand description, mission, and unique value proposition are clearly stated across the web');
+    recs.push('Get featured in industry roundups and "best of" articles');
+  }
+  if ((score.intent ?? 0) < 60) {
+    recs.push('Create content targeting different user intents: informational, comparison, and purchase');
+  }
+  if (recs.length === 0) {
+    recs.push('Continue maintaining high-quality content and monitor for changes in AI visibility');
+    recs.push('Consider expanding to track visibility across multiple AI platforms (ChatGPT, Claude, Perplexity)');
+  }
+  return recs.slice(0, 4);
+}
 
 export default function AuditPage() {
-  const { locale } = useLanguage();
-  const zh = locale === 'zh';
-  const [url, setUrl] = useState('carters.com');
-  const [analyzed, setAnalyzed] = useState(true);
-  const data = demoAudit;
+  const [query, setQuery] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [result, setResult] = useState<SearchResult | null>(null);
+  const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const scoreColor = (s: number) =>
-    s >= 80 ? 'text-green-500' : s >= 60 ? 'text-yellow-500' : s >= 40 ? 'text-orange-500' : 'text-red-500';
-  const gradeColor = (g: string) =>
-    g.startsWith('A') ? 'bg-green-100 text-green-700' : g.startsWith('B') ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700';
+  // Popular brands for quick access
+  const popularBrands = [
+    'Carter\'s', 'Zara Kids', 'H&M Kids', 'Gap Kids', 'Hanna Andersson',
+    'Primary', 'Tea Collection', 'Old Navy Kids'
+  ];
 
-  const statusIcon = (s: string) => {
-    if (s === 'pass') return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-    if (s === 'warn') return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-    return <XCircle className="w-5 h-5 text-red-500" />;
-  };
+  async function handleSearch(searchQuery?: string) {
+    const q = searchQuery || query;
+    if (!q.trim()) return;
+    
+    setSearching(true);
+    setError(null);
+    setResult(null);
+    setSuggestions([]);
+    
+    try {
+      const res = await fetch(`${API_URL}/api/v1/brands/search?q=${encodeURIComponent(q)}&workspace_id=ws-demo-001`);
+      if (!res.ok) throw new Error('Search failed');
+      const data = await res.json();
+      
+      if (data.results.length === 0) {
+        setShowResults(true);
+        setError(`"${q}" not found in our database yet. We currently track 30 kids fashion brands.`);
+      } else if (data.results.length === 1) {
+        setResult(data.results[0]);
+        setShowResults(true);
+      } else {
+        setSuggestions(data.results);
+        setShowResults(true);
+      }
+    } catch {
+      setError('Failed to connect to the API. Please try again.');
+    } finally {
+      setSearching(false);
+    }
+  }
 
-  const priorityStyle = (p: string) => {
-    if (p === 'high') return 'bg-red-100 text-red-700 border-red-200';
-    if (p === 'medium') return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-    return 'bg-slate-100 text-slate-600 border-slate-200';
-  };
+  function selectBrand(brand: SearchResult) {
+    setResult(brand);
+    setSuggestions([]);
+    setQuery(brand.name);
+  }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-700 rounded-2xl p-8 text-white">
-        <div className="flex items-center gap-3 mb-2">
-          <Shield className="w-8 h-8" />
-          <h1 className="text-3xl font-bold">{zh ? 'AI 内容审计' : 'AI Content Audit'}</h1>
+    <div className="max-w-4xl mx-auto space-y-8 p-6">
+      {/* Hero Section */}
+      <div className="text-center space-y-4 py-8">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 border border-violet-200">
+          <Sparkles className="w-4 h-4 text-violet-600" />
+          <span className="text-sm font-medium text-violet-700">Free AI Visibility Audit</span>
         </div>
-        <p className="text-violet-100 mb-6 max-w-2xl">
-          {zh
-            ? '分析你的品牌网站对 AI 的友好程度。检查结构化数据、内容格式、E-E-A-T 信号，获取优化建议。'
-            : 'Analyze how AI-friendly your brand website is. Check structured data, content format, E-E-A-T signals, and get optimization recommendations.'}
+        <h1 className="text-4xl font-bold text-slate-900">
+          Is Your Brand Visible to AI?
+        </h1>
+        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          Find out how ChatGPT, Gemini, and other AI platforms see your brand.
+          Get an instant diagnostic report with actionable recommendations.
         </p>
-        <div className="flex gap-3 max-w-xl">
-          <div className="flex-1 relative">
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-300" />
-            <input
-              type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="example.com"
-              className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-violet-300 focus:outline-none focus:ring-2 focus:ring-white/30"
-            />
-          </div>
-          <Button
-            onClick={() => setAnalyzed(true)}
-            className="bg-white text-violet-700 hover:bg-violet-50 px-6 font-semibold"
-          >
-            <Search className="w-4 h-4 mr-2" />
-            {zh ? '分析' : 'Analyze'}
-          </Button>
-        </div>
       </div>
 
-      {analyzed && (
-        <>
-          {/* Overall Score */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="md:col-span-1">
-              <CardContent className="pt-6 flex flex-col items-center">
-                <div className="relative w-40 h-40">
-                  <svg viewBox="0 0 120 120" className="w-full h-full">
-                    <circle cx="60" cy="60" r="50" fill="none" stroke="#e2e8f0" strokeWidth="10" />
-                    <circle
-                      cx="60" cy="60" r="50" fill="none"
-                      stroke={data.overallScore >= 70 ? '#8b5cf6' : '#f59e0b'}
-                      strokeWidth="10" strokeLinecap="round"
-                      strokeDasharray={`${data.overallScore * 3.14} 314`}
-                      transform="rotate(-90 60 60)"
-                    />
-                    <text x="60" y="55" textAnchor="middle" className="text-3xl font-bold fill-slate-900" fontSize="28">{data.overallScore}</text>
-                    <text x="60" y="72" textAnchor="middle" className="fill-slate-500" fontSize="12">/100</text>
-                  </svg>
-                </div>
-                <span className={`mt-2 px-3 py-1 rounded-full text-sm font-semibold ${gradeColor(data.grade)}`}>
-                  {zh ? '等级' : 'Grade'}: {data.grade}
-                </span>
-                <p className="text-sm text-slate-500 mt-2 text-center">
-                  {zh ? `优于 ${data.percentile}% 的童装品牌` : `Better than ${data.percentile}% of kids fashion brands`}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-violet-600" />
-                  {zh ? 'E-E-A-T 信号评估' : 'E-E-A-T Signal Assessment'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {Object.entries(data.eeat).map(([key, val]) => {
-                    const labels: Record<string, [string, string]> = {
-                      experience: ['Experience 经验', 'Experience'],
-                      expertise: ['Expertise 专业', 'Expertise'],
-                      authority: ['Authority 权威', 'Authoritativeness'],
-                      trust: ['Trust 信任', 'Trustworthiness'],
-                    };
-                    const label = zh ? labels[key][0] : labels[key][1];
-                    return (
-                      <div key={key}>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="font-medium text-slate-700">{label}</span>
-                          <span className={scoreColor(val.score)}>{val.score}/100</span>
-                        </div>
-                        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${val.score >= 80 ? 'bg-green-500' : val.score >= 60 ? 'bg-violet-500' : 'bg-orange-500'}`}
-                            style={{ width: `${val.score}%` }}
-                          />
-                        </div>
-                        <p className="text-xs text-slate-400 mt-1">{val.detail}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-                {/* Radar chart */}
-                <div className="mt-6 flex justify-center">
-                  <svg viewBox="0 0 200 200" className="w-48 h-48">
-                    {[80, 60, 40, 20].map((r) => (
-                      <polygon key={r} points={[0,1,2,3].map((i) => {
-                        const a = (i * Math.PI * 2) / 4 - Math.PI / 2;
-                        return `${100 + r * Math.cos(a)},${100 + r * Math.sin(a)}`;
-                      }).join(' ')} fill="none" stroke="#e2e8f0" strokeWidth="1" />
-                    ))}
-                    <polygon
-                      points={[data.eeat.experience.score, data.eeat.expertise.score, data.eeat.authority.score, data.eeat.trust.score]
-                        .map((s, i) => {
-                          const a = (i * Math.PI * 2) / 4 - Math.PI / 2;
-                          const r = (s / 100) * 80;
-                          return `${100 + r * Math.cos(a)},${100 + r * Math.sin(a)}`;
-                        }).join(' ')}
-                      fill="rgba(139,92,246,0.2)" stroke="#8b5cf6" strokeWidth="2"
-                    />
-                    {['E', 'E', 'A', 'T'].map((l, i) => {
-                      const a = (i * Math.PI * 2) / 4 - Math.PI / 2;
-                      return <text key={i} x={100 + 92 * Math.cos(a)} y={100 + 92 * Math.sin(a)} textAnchor="middle" dominantBaseline="middle" className="fill-slate-500 font-semibold" fontSize="12">{l}</text>;
-                    })}
-                  </svg>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Search Box */}
+      <Card className="border-2 border-violet-100 shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                placeholder="Enter a brand name (e.g., Carter's, Zara Kids)..."
+                className="w-full pl-12 pr-4 py-4 text-lg rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
+              />
+            </div>
+            <Button
+              onClick={() => handleSearch()}
+              disabled={searching || !query.trim()}
+              className="px-8 py-4 text-lg bg-violet-600 hover:bg-violet-700 rounded-xl h-auto"
+            >
+              {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Audit'}
+            </Button>
           </div>
+          
+          {/* Quick Access */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="text-sm text-slate-400 py-1">Try:</span>
+            {popularBrands.map((brand) => (
+              <button
+                key={brand}
+                onClick={() => { setQuery(brand); handleSearch(brand); }}
+                className="text-sm px-3 py-1 rounded-full bg-slate-50 hover:bg-violet-50 text-slate-600 hover:text-violet-700 border border-slate-200 hover:border-violet-300 transition-all"
+              >
+                {brand}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-          {/* Technical Checks */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Code className="w-5 h-5 text-violet-600" />
-                {zh ? '技术 SEO for AI 检查' : 'Technical SEO for AI Checks'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {data.technical.map((item, i) => (
-                  <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border ${
-                    item.status === 'pass' ? 'bg-green-50/50 border-green-200' :
-                    item.status === 'warn' ? 'bg-yellow-50/50 border-yellow-200' : 'bg-red-50/50 border-red-200'
-                  }`}>
-                    {statusIcon(item.status)}
-                    <div>
-                      <p className="font-medium text-slate-800 text-sm">{item.name}</p>
-                      <p className="text-xs text-slate-500">{item.detail}</p>
+      {/* Multiple Results */}
+      {suggestions.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Multiple brands found — select one:</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {suggestions.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => selectBrand(s)}
+                className="w-full flex items-center justify-between p-4 rounded-lg hover:bg-violet-50 border border-slate-100 hover:border-violet-200 transition-all"
+              >
+                <div className="text-left">
+                  <div className="font-semibold text-slate-900">{s.name}</div>
+                  <div className="text-sm text-slate-500">{s.category}</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {s.score && (
+                    <span className="text-2xl font-bold text-violet-600">{s.score.composite}</span>
+                  )}
+                  <ChevronRight className="w-5 h-5 text-slate-400" />
+                </div>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Error */}
+      {error && showResults && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="p-6 text-center space-y-4">
+            <AlertTriangle className="w-12 h-12 text-orange-500 mx-auto" />
+            <p className="text-lg text-orange-800">{error}</p>
+            <div className="space-y-2">
+              <p className="text-sm text-orange-600">Want us to audit your brand?</p>
+              <Button className="bg-orange-600 hover:bg-orange-700">
+                Request Custom Audit <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Results */}
+      {result && result.score && (
+        <div className="space-y-6 animate-in fade-in duration-500">
+          {/* Overall Score */}
+          <Card className="overflow-hidden">
+            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">{result.name}</h2>
+                  <p className="text-violet-200 mt-1">{result.category}</p>
+                  {result.domain && (
+                    <div className="flex items-center gap-1 mt-2 text-violet-200">
+                      <Globe className="w-4 h-4" />
+                      <span className="text-sm">{result.domain}</span>
                     </div>
+                  )}
+                </div>
+                <div className="text-center">
+                  <div className="text-6xl font-bold">{result.score.composite}</div>
+                  <div className="text-violet-200 text-sm mt-1">AI Visibility Score</div>
+                  <div className="text-2xl mt-1">
+                    Grade: <ScoreGrade score={result.score.composite ?? 0} />
                   </div>
-                ))}
+                </div>
               </div>
-              <div className="mt-4 flex items-center gap-4 text-sm text-slate-500">
-                <span className="flex items-center gap-1"><CheckCircle2 className="w-4 h-4 text-green-500" /> {zh ? '通过' : 'Pass'}: {data.technical.filter(t=>t.status==='pass').length}</span>
-                <span className="flex items-center gap-1"><AlertTriangle className="w-4 h-4 text-yellow-500" /> {zh ? '警告' : 'Warning'}: {data.technical.filter(t=>t.status==='warn').length}</span>
-                <span className="flex items-center gap-1"><XCircle className="w-4 h-4 text-red-500" /> {zh ? '失败' : 'Fail'}: {data.technical.filter(t=>t.status==='fail').length}</span>
+            </div>
+            
+            {/* Score Dimensions */}
+            <CardContent className="p-8 space-y-5">
+              <h3 className="font-semibold text-slate-900 text-lg">Score Breakdown</h3>
+              <ScoreBar label="Visibility" score={result.score.visibility ?? 0} icon={Eye} weight="35%" />
+              <ScoreBar label="Citation" score={result.score.citation ?? 0} icon={Link2} weight="25%" />
+              <ScoreBar label="Framing" score={result.score.representation ?? 0} icon={MessageSquare} weight="25%" />
+              <ScoreBar label="Intent Coverage" score={result.score.intent ?? 0} icon={Target} weight="15%" />
+              
+              <div className="pt-4 border-t flex items-center justify-between text-sm text-slate-500">
+                <span>Based on 120 prompts across Gemini 2.0 Flash</span>
+                <span>{result.score.total_mentions ?? 0} total mentions</span>
               </div>
             </CardContent>
           </Card>
 
-          {/* Content Structure */}
+          {/* Key Insights */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-violet-600" />
-                {zh ? '内容结构分析' : 'Content Structure Analysis'}
+                <Zap className="w-5 h-5 text-yellow-500" />
+                Key Insights
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-500 mb-4">{zh ? 'AI 从结构化内容中提取信息的效率评分' : 'How efficiently AI can extract information from your content structure'}</p>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {Object.entries(data.content).map(([key, val]) => {
-                  const labels: Record<string, [string, string]> = {
-                    headings: ['标题层级', 'Headings'],
-                    lists: ['列表格式', 'Lists'],
-                    tables: ['表格数据', 'Tables'],
-                    faqs: ['FAQ覆盖', 'FAQs'],
-                    wordCount: ['内容深度', 'Word Count'],
-                  };
-                  const label = zh ? labels[key]?.[0] : labels[key]?.[1];
-                  const pct = (val.score / val.max) * 100;
-                  return (
-                    <div key={key} className="text-center">
-                      <div className="relative w-16 h-16 mx-auto mb-2">
-                        <svg viewBox="0 0 60 60" className="w-full h-full">
-                          <circle cx="30" cy="30" r="24" fill="none" stroke="#e2e8f0" strokeWidth="5" />
-                          <circle cx="30" cy="30" r="24" fill="none"
-                            stroke={pct >= 70 ? '#8b5cf6' : pct >= 40 ? '#f59e0b' : '#ef4444'}
-                            strokeWidth="5" strokeLinecap="round"
-                            strokeDasharray={`${pct * 1.508} 150.8`}
-                            transform="rotate(-90 30 30)"
-                          />
-                          <text x="30" y="34" textAnchor="middle" fontSize="14" className="fill-slate-800 font-bold">{val.score}</text>
-                        </svg>
-                      </div>
-                      <p className="text-xs font-medium text-slate-700">{label}</p>
-                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">{val.detail}</p>
-                    </div>
-                  );
-                })}
-              </div>
+            <CardContent className="space-y-3">
+              {getInsights(result.score).map((insight, i) => (
+                <div key={i} className={`flex items-start gap-3 p-3 rounded-lg ${
+                  insight.type === 'success' ? 'bg-emerald-50' :
+                  insight.type === 'warning' ? 'bg-yellow-50' : 'bg-red-50'
+                }`}>
+                  {insight.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" /> :
+                   insight.type === 'warning' ? <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" /> :
+                   <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />}
+                  <span className={`text-sm ${
+                    insight.type === 'success' ? 'text-emerald-800' :
+                    insight.type === 'warning' ? 'text-yellow-800' : 'text-red-800'
+                  }`}>{insight.text}</span>
+                </div>
+              ))}
             </CardContent>
           </Card>
 
-          {/* Competitor Comparison */}
+          {/* Recommendations */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-violet-600" />
-                {zh ? '竞品内容对比' : 'Competitor Content Comparison'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="text-left py-3 px-2 text-slate-500 font-medium">{zh ? '品牌' : 'Brand'}</th>
-                      <th className="text-center py-3 px-2 text-slate-500 font-medium">Schema</th>
-                      <th className="text-center py-3 px-2 text-slate-500 font-medium">{zh ? '内容' : 'Content'}</th>
-                      <th className="text-center py-3 px-2 text-slate-500 font-medium">E-E-A-T</th>
-                      <th className="text-center py-3 px-2 text-slate-500 font-medium">{zh ? '总分' : 'Overall'}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.competitors.map((comp, i) => (
-                      <tr key={i} className={`border-b border-slate-100 ${i === 0 ? 'bg-violet-50/50' : ''}`}>
-                        <td className="py-3 px-2 font-medium text-slate-800">
-                          {i === 0 && <Star className="w-3 h-3 inline mr-1 text-violet-500" />}
-                          {comp.name}
-                        </td>
-                        {[comp.schema, comp.content, comp.eeat, comp.overall].map((v, j) => (
-                          <td key={j} className="text-center py-3 px-2">
-                            <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
-                              v >= 75 ? 'bg-green-100 text-green-700' : v >= 60 ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
-                            }`}>{v}</span>
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Action Items */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-violet-600" />
-                {zh ? '优化行动清单' : 'Optimization Action Items'}
+                <Star className="w-5 h-5 text-violet-500" />
+                Recommendations
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {data.actions.map((action, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:border-violet-200 transition-colors">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${priorityStyle(action.priority)}`}>
-                      {action.priority === 'high' ? (zh ? '高' : 'HIGH') : action.priority === 'medium' ? (zh ? '中' : 'MED') : (zh ? '低' : 'LOW')}
-                    </span>
-                    <span className="flex-1 text-sm text-slate-700">{action.text}</span>
-                    <span className="text-xs font-semibold text-violet-600 whitespace-nowrap">{action.impact}</span>
+                {getRecommendations(result.score).map((rec, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs font-bold text-violet-700">{i + 1}</span>
+                    </div>
+                    <span className="text-sm text-slate-700">{rec}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-6 p-4 bg-violet-50 rounded-lg border border-violet-200">
-                <p className="text-sm font-semibold text-violet-800 mb-1">
-                  {zh ? '💡 预计提升' : '💡 Estimated Improvement'}
-                </p>
-                <p className="text-sm text-violet-600">
-                  {zh
-                    ? '完成所有高优先级任务后，预计 AI 内容审计分数可提升至 89/100（+17分）'
-                    : 'Completing all high-priority items could raise your AI Content Audit score to 89/100 (+17 points)'}
-                </p>
+            </CardContent>
+          </Card>
+
+          {/* CTA */}
+          <Card className="border-2 border-violet-200 bg-gradient-to-r from-violet-50 to-indigo-50">
+            <CardContent className="p-8 text-center space-y-4">
+              <Award className="w-12 h-12 text-violet-600 mx-auto" />
+              <h3 className="text-xl font-bold text-slate-900">Want to Improve Your Score?</h3>
+              <p className="text-slate-600 max-w-lg mx-auto">
+                Our team can help optimize your brand&apos;s AI visibility across all major platforms.
+                Get a detailed action plan and ongoing monitoring.
+              </p>
+              <div className="flex items-center justify-center gap-4 pt-2">
+                <Button className="bg-violet-600 hover:bg-violet-700 px-6 py-3 h-auto text-base">
+                  Get Full Report <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+                <Button variant="outline" className="px-6 py-3 h-auto text-base border-violet-300 text-violet-700 hover:bg-violet-50">
+                  View Pricing
+                </Button>
               </div>
             </CardContent>
           </Card>
-        </>
+        </div>
+      )}
+
+      {/* No score result */}
+      {result && !result.score && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="p-6 text-center space-y-4">
+            <BarChart3 className="w-12 h-12 text-orange-500 mx-auto" />
+            <h3 className="text-lg font-semibold text-orange-900">Brand found but not yet evaluated</h3>
+            <p className="text-orange-700">{result.name} is in our database but hasn&apos;t been scored yet.</p>
+            <Button className="bg-orange-600 hover:bg-orange-700">
+              Request Evaluation <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Bottom Info - show when no results */}
+      {!showResults && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+          <Card className="text-center p-6">
+            <Eye className="w-8 h-8 text-violet-500 mx-auto mb-3" />
+            <h3 className="font-semibold text-slate-900 mb-2">Visibility Score</h3>
+            <p className="text-sm text-slate-500">How often AI mentions your brand when users ask relevant questions</p>
+          </Card>
+          <Card className="text-center p-6">
+            <Link2 className="w-8 h-8 text-blue-500 mx-auto mb-3" />
+            <h3 className="font-semibold text-slate-900 mb-2">Citation Score</h3>
+            <p className="text-sm text-slate-500">Whether AI links back to your website as a source</p>
+          </Card>
+          <Card className="text-center p-6">
+            <Target className="w-8 h-8 text-green-500 mx-auto mb-3" />
+            <h3 className="font-semibold text-slate-900 mb-2">Intent Coverage</h3>
+            <p className="text-sm text-slate-500">How many types of user questions trigger your brand mention</p>
+          </Card>
+        </div>
       )}
     </div>
   );

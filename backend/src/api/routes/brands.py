@@ -55,6 +55,52 @@ async def list_brands(
     )
 
 
+@router.get("/search")
+async def search_brands(
+    q: str = Query(..., description="Search query (brand name)"),
+    workspace_id: str = Query("ws-demo-001", description="Workspace ID"),
+    db: AsyncSession = Depends(get_db),
+):
+    """Search brands by name (case-insensitive partial match)."""
+    from ...models.scorecard import ScoreCard
+    
+    result = await db.execute(
+        select(Brand).where(
+            Brand.workspace_id == workspace_id,
+            Brand.name.ilike(f"%{q}%"),
+        ).limit(10)
+    )
+    brands = result.scalars().all()
+    
+    # Get scores for matched brands
+    results = []
+    for brand in brands:
+        score_result = await db.execute(
+            select(ScoreCard)
+            .where(ScoreCard.brand_id == brand.id)
+            .order_by(ScoreCard.created_at.desc())
+            .limit(1)
+        )
+        score = score_result.scalar_one_or_none()
+        results.append({
+            "id": brand.id,
+            "name": brand.name,
+            "domain": brand.domain,
+            "category": brand.category,
+            "score": {
+                "composite": score.composite_score if score else None,
+                "visibility": score.visibility_score if score else None,
+                "citation": score.citation_score if score else None,
+                "representation": score.representation_score if score else None,
+                "intent": score.intent_score if score else None,
+                "total_mentions": score.total_mentions if score else None,
+                "citation_rate": score.citation_rate if score else None,
+            } if score else None,
+        })
+    
+    return {"results": results, "total": len(results)}
+
+
 @router.get("/{brand_id}", response_model=BrandResponse)
 async def get_brand(
     brand_id: str,
