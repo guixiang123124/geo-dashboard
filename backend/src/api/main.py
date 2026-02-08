@@ -69,12 +69,29 @@ async def health_check():
     import os
     db_url = os.environ.get("DATABASE_URL", "NOT_SET")
     db_prefix = db_url[:50] + "..." if len(db_url) > 50 else db_url
+    
+    # Test DB connection
+    db_status = "unknown"
+    db_error = None
+    try:
+        from ..core.database import _get_engine
+        from sqlalchemy import text
+        engine = _get_engine()
+        async with engine.connect() as conn:
+            result = await conn.execute(text("SELECT 1"))
+            db_status = "connected"
+    except Exception as e:
+        db_status = "error"
+        db_error = str(e)[:200]
+    
     return {
         "status": "healthy",
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
         "db_url_prefix": db_prefix,
         "db_url_len": len(db_url),
+        "db_status": db_status,
+        "db_error": db_error,
     }
 
 
