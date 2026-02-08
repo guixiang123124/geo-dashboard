@@ -38,3 +38,4 @@ pytest-mock==3.12.0
 
 # Utilities
 python-dateutil==2.8.2
+google-genai>=1.0.0
