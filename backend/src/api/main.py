@@ -15,8 +15,13 @@ async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
     print(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
-    await init_db()
-    print("Database initialized")
+    print(f"Database URL prefix: {settings.DATABASE_URL[:20]}...")
+    try:
+        await init_db()
+        print("Database initialized")
+    except Exception as e:
+        print(f"WARNING: Database init failed: {e}")
+        print("App will start but DB features may not work")
 
     yield
 
