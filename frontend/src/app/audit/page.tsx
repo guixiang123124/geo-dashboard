@@ -1,17 +1,60 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  Search, Eye, Link2, MessageSquare, Target, TrendingUp, TrendingDown,
+  Search, Eye, Link2, MessageSquare, Target, TrendingUp,
   AlertTriangle, CheckCircle2, XCircle, ArrowRight, Zap, BarChart3,
-  Globe, Loader2, ChevronRight, Star, Shield, Award, Sparkles
+  Globe, Loader2, ChevronRight, Star, Award, Sparkles, Clock,
+  ThumbsUp, ThumbsDown, Minus
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-interface BrandScore {
+// ---- Types ----
+
+interface BrandProfile {
+  name: string;
+  domain: string | null;
+  category: string;
+  positioning: string;
+  target_audience: string;
+  key_products: string[];
+}
+
+interface PromptResult {
+  prompt: string;
+  intent: string;
+  mentioned: boolean;
+  rank: number | null;
+  sentiment: string | null;
+  snippet: string | null;
+}
+
+interface DiagnosisScore {
+  composite: number;
+  visibility: number;
+  citation: number;
+  representation: number;
+  intent: number;
+  total_prompts: number;
+  mentioned_count: number;
+}
+
+interface DiagnosisResponse {
+  id: string;
+  brand: BrandProfile;
+  score: DiagnosisScore;
+  results: PromptResult[];
+  insights: string[];
+  recommendations: string[];
+  generated_prompts_count: number;
+  evaluation_time_seconds: number;
+}
+
+// Also support legacy search for existing brands
+interface LegacyBrandScore {
   composite: number | null;
   visibility: number | null;
   citation: number | null;
@@ -21,20 +64,22 @@ interface BrandScore {
   citation_rate: number | null;
 }
 
-interface SearchResult {
+interface LegacySearchResult {
   id: string;
   name: string;
   domain: string;
   category: string;
-  score: BrandScore | null;
+  score: LegacyBrandScore | null;
 }
 
+// ---- Components ----
+
 function ScoreGrade({ score }: { score: number }) {
-  if (score >= 80) return <span className="text-emerald-600 font-bold">A</span>;
-  if (score >= 60) return <span className="text-green-600 font-bold">B</span>;
-  if (score >= 40) return <span className="text-yellow-600 font-bold">C</span>;
-  if (score >= 20) return <span className="text-orange-600 font-bold">D</span>;
-  return <span className="text-red-600 font-bold">F</span>;
+  if (score >= 80) return <span className="text-emerald-400 font-bold">A</span>;
+  if (score >= 60) return <span className="text-green-400 font-bold">B</span>;
+  if (score >= 40) return <span className="text-yellow-400 font-bold">C</span>;
+  if (score >= 20) return <span className="text-orange-400 font-bold">D</span>;
+  return <span className="text-red-400 font-bold">F</span>;
 }
 
 function ScoreBar({ label, score, icon: Icon, weight }: { label: string; score: number; icon: React.ElementType; weight: string }) {
@@ -56,107 +101,126 @@ function ScoreBar({ label, score, icon: Icon, weight }: { label: string; score: 
   );
 }
 
-function getInsights(score: BrandScore): { type: 'success' | 'warning' | 'danger'; text: string }[] {
-  const insights: { type: 'success' | 'warning' | 'danger'; text: string }[] = [];
-  
-  if ((score.visibility ?? 0) >= 70) {
-    insights.push({ type: 'success', text: 'Strong AI visibility — your brand is frequently mentioned in AI responses' });
-  } else if ((score.visibility ?? 0) >= 30) {
-    insights.push({ type: 'warning', text: 'Moderate AI visibility — your brand appears in some AI responses but not consistently' });
-  } else {
-    insights.push({ type: 'danger', text: 'Low AI visibility — AI models rarely mention your brand when users ask relevant questions' });
-  }
-  
-  if ((score.citation ?? 0) < 10) {
-    insights.push({ type: 'danger', text: 'Almost zero citations — AI never links back to your website. Adding structured data and authoritative content can help.' });
-  }
-  
-  if ((score.intent ?? 0) >= 80) {
-    insights.push({ type: 'success', text: 'Excellent intent coverage — your brand appears across diverse search intents' });
-  } else if ((score.intent ?? 0) < 40) {
-    insights.push({ type: 'warning', text: 'Limited intent coverage — your brand only appears for specific types of queries' });
-  }
-  
-  if ((score.representation ?? 0) < 20) {
-    insights.push({ type: 'warning', text: 'When mentioned, AI provides minimal context about your brand. Enriching your online presence can improve this.' });
-  }
-  
-  return insights;
+function IntentBadge({ intent }: { intent: string }) {
+  const colors: Record<string, string> = {
+    discovery: 'bg-blue-100 text-blue-700',
+    comparison: 'bg-purple-100 text-purple-700',
+    purchase: 'bg-green-100 text-green-700',
+    informational: 'bg-amber-100 text-amber-700',
+  };
+  return (
+    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colors[intent] || 'bg-slate-100 text-slate-600'}`}>
+      {intent}
+    </span>
+  );
 }
 
-function getRecommendations(score: BrandScore): string[] {
-  const recs: string[] = [];
-  if ((score.visibility ?? 0) < 50) {
-    recs.push('Create comprehensive, factual content about your brand that AI models can learn from');
-    recs.push('Build authoritative backlinks from industry publications and review sites');
-  }
-  if ((score.citation ?? 0) < 10) {
-    recs.push('Add Schema.org structured data (Product, Organization, FAQ) to your website');
-    recs.push('Publish detailed product comparisons and buying guides');
-  }
-  if ((score.representation ?? 0) < 30) {
-    recs.push('Ensure your brand description, mission, and unique value proposition are clearly stated across the web');
-    recs.push('Get featured in industry roundups and "best of" articles');
-  }
-  if ((score.intent ?? 0) < 60) {
-    recs.push('Create content targeting different user intents: informational, comparison, and purchase');
-  }
-  if (recs.length === 0) {
-    recs.push('Continue maintaining high-quality content and monitor for changes in AI visibility');
-    recs.push('Consider expanding to track visibility across multiple AI platforms (ChatGPT, Claude, Perplexity)');
-  }
-  return recs.slice(0, 4);
+function SentimentIcon({ sentiment }: { sentiment: string | null }) {
+  if (sentiment === 'positive') return <ThumbsUp className="w-3.5 h-3.5 text-emerald-500" />;
+  if (sentiment === 'negative') return <ThumbsDown className="w-3.5 h-3.5 text-red-500" />;
+  return <Minus className="w-3.5 h-3.5 text-slate-400" />;
 }
+
+// ---- Progress animation messages ----
+const PROGRESS_MESSAGES = [
+  'Crawling website...',
+  'Analyzing brand profile...',
+  'Generating smart prompts...',
+  'Evaluating AI responses...',
+  'Calculating scores...',
+  'Preparing report...',
+];
 
 export default function AuditPage() {
-  const [query, setQuery] = useState('');
-  const [searching, setSearching] = useState(false);
-  const [result, setResult] = useState<SearchResult | null>(null);
-  const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
-  const [showResults, setShowResults] = useState(false);
+  const [input, setInput] = useState('');
+  const [mode, setMode] = useState<'domain' | 'brand'>('domain');
+  const [loading, setLoading] = useState(false);
+  const [progressIdx, setProgressIdx] = useState(0);
+  const [diagnosis, setDiagnosis] = useState<DiagnosisResponse | null>(null);
+  const [legacyResult, setLegacyResult] = useState<LegacySearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'prompts'>('overview');
 
   // Popular brands for quick access
   const popularBrands = [
-    'Carter\'s', 'Zara Kids', 'H&M Kids', 'Gap Kids', 'Hanna Andersson',
+    "Carter's", 'Zara Kids', 'H&M Kids', 'Gap Kids', 'Hanna Andersson',
     'Primary', 'Tea Collection', 'Old Navy Kids'
   ];
 
-  async function handleSearch(searchQuery?: string) {
-    const q = searchQuery || query;
-    if (!q.trim()) return;
-    
-    setSearching(true);
+  async function handleDiagnosis() {
+    if (!input.trim()) return;
+
+    setLoading(true);
     setError(null);
-    setResult(null);
-    setSuggestions([]);
-    
+    setDiagnosis(null);
+    setLegacyResult(null);
+    setProgressIdx(0);
+
+    // Progress animation
+    const interval = setInterval(() => {
+      setProgressIdx(prev => Math.min(prev + 1, PROGRESS_MESSAGES.length - 1));
+    }, 5000);
+
     try {
-      const res = await fetch(`${API_URL}/api/v1/brands/search?q=${encodeURIComponent(q)}&workspace_id=ws-demo-001`);
-      if (!res.ok) throw new Error('Search failed');
-      const data = await res.json();
-      
-      if (data.results.length === 0) {
-        setShowResults(true);
-        setError(`"${q}" not found in our database yet. We currently track 30 kids fashion brands.`);
-      } else if (data.results.length === 1) {
-        setResult(data.results[0]);
-        setShowResults(true);
+      const body: Record<string, string> = {};
+      if (mode === 'domain') {
+        body.domain = input.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
       } else {
-        setSuggestions(data.results);
-        setShowResults(true);
+        body.brand_name = input.trim();
       }
-    } catch {
-      setError('Failed to connect to the API. Please try again.');
+
+      const res = await fetch(`${API_URL}/api/v1/diagnosis`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || `Diagnosis failed (${res.status})`);
+      }
+
+      const data: DiagnosisResponse = await res.json();
+      setDiagnosis(data);
+      setActiveTab('overview');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Diagnosis failed';
+      setError(message);
     } finally {
-      setSearching(false);
+      clearInterval(interval);
+      setLoading(false);
     }
   }
 
-  function selectBrand(brand: SearchResult) {
-    setResult(brand);
-    setSuggestions([]);
-    setQuery(brand.name);
+  async function handleQuickSearch(brandName: string) {
+    setInput(brandName);
+    setMode('brand');
+
+    // First try existing database
+    setLoading(true);
+    setError(null);
+    setDiagnosis(null);
+    setLegacyResult(null);
+
+    try {
+      const res = await fetch(`${API_URL}/api/v1/brands/search?q=${encodeURIComponent(brandName)}&workspace_id=ws-demo-001`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.results?.length > 0 && data.results[0].score) {
+          setLegacyResult(data.results[0]);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch {
+      // Fall through to live diagnosis
+    }
+
+    // If not in DB, run live diagnosis
+    setLoading(false);
+    setMode('brand');
+    // Auto-trigger diagnosis
+    setInput(brandName);
   }
 
   return (
@@ -171,42 +235,65 @@ export default function AuditPage() {
           Is Your Brand Visible to AI?
         </h1>
         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-          Find out how ChatGPT, Gemini, and other AI platforms see your brand.
-          Get an instant diagnostic report with actionable recommendations.
+          Enter your website or brand name. We&apos;ll crawl your site, generate tailored prompts,
+          and test how AI platforms see your brand — in under 60 seconds.
         </p>
       </div>
 
-      {/* Search Box */}
+      {/* Input Card */}
       <Card className="border-2 border-violet-100 shadow-lg">
-        <CardContent className="p-6">
+        <CardContent className="p-6 space-y-4">
+          {/* Mode Toggle */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setMode('domain')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                mode === 'domain' ? 'bg-violet-100 text-violet-700 border border-violet-300' : 'text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              <Globe className="w-4 h-4 inline mr-1.5" />
+              Website Domain
+            </button>
+            <button
+              onClick={() => setMode('brand')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                mode === 'brand' ? 'bg-violet-100 text-violet-700 border border-violet-300' : 'text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              <Search className="w-4 h-4 inline mr-1.5" />
+              Brand Name
+            </button>
+          </div>
+
+          {/* Search Input */}
           <div className="flex gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Enter a brand name (e.g., Carter's, Zara Kids)..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleDiagnosis()}
+                placeholder={mode === 'domain' ? 'e.g., carters.com or hannaandersson.com' : "e.g., Carter's, Zara Kids"}
                 className="w-full pl-12 pr-4 py-4 text-lg rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
               />
             </div>
             <Button
-              onClick={() => handleSearch()}
-              disabled={searching || !query.trim()}
+              onClick={handleDiagnosis}
+              disabled={loading || !input.trim()}
               className="px-8 py-4 text-lg bg-violet-600 hover:bg-violet-700 rounded-xl h-auto"
             >
-              {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Audit'}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Diagnose'}
             </Button>
           </div>
-          
+
           {/* Quick Access */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="text-sm text-slate-400 py-1">Try:</span>
+          <div className="flex flex-wrap gap-2">
+            <span className="text-sm text-slate-400 py-1">Quick audit:</span>
             {popularBrands.map((brand) => (
               <button
                 key={brand}
-                onClick={() => { setQuery(brand); handleSearch(brand); }}
+                onClick={() => handleQuickSearch(brand)}
                 className="text-sm px-3 py-1 rounded-full bg-slate-50 hover:bg-violet-50 text-slate-600 hover:text-violet-700 border border-slate-200 hover:border-violet-300 transition-all"
               >
                 {brand}
@@ -216,90 +303,213 @@ export default function AuditPage() {
         </CardContent>
       </Card>
 
-      {/* Multiple Results */}
-      {suggestions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Multiple brands found — select one:</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {suggestions.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => selectBrand(s)}
-                className="w-full flex items-center justify-between p-4 rounded-lg hover:bg-violet-50 border border-slate-100 hover:border-violet-200 transition-all"
-              >
-                <div className="text-left">
-                  <div className="font-semibold text-slate-900">{s.name}</div>
-                  <div className="text-sm text-slate-500">{s.category}</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  {s.score && (
-                    <span className="text-2xl font-bold text-violet-600">{s.score.composite}</span>
-                  )}
-                  <ChevronRight className="w-5 h-5 text-slate-400" />
-                </div>
-              </button>
-            ))}
+      {/* Loading State */}
+      {loading && (
+        <Card className="border-violet-200">
+          <CardContent className="p-8 text-center space-y-6">
+            <Loader2 className="w-12 h-12 text-violet-600 mx-auto animate-spin" />
+            <div>
+              <p className="text-lg font-semibold text-slate-900">{PROGRESS_MESSAGES[progressIdx]}</p>
+              <p className="text-sm text-slate-500 mt-2">
+                Generating tailored prompts and evaluating against Gemini AI...
+              </p>
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-2 max-w-xs mx-auto">
+              <div
+                className="bg-violet-500 h-2 rounded-full transition-all duration-1000"
+                style={{ width: `${((progressIdx + 1) / PROGRESS_MESSAGES.length) * 100}%` }}
+              />
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Error */}
-      {error && showResults && (
+      {error && (
         <Card className="border-orange-200 bg-orange-50">
           <CardContent className="p-6 text-center space-y-4">
             <AlertTriangle className="w-12 h-12 text-orange-500 mx-auto" />
             <p className="text-lg text-orange-800">{error}</p>
-            <div className="space-y-2">
-              <p className="text-sm text-orange-600">Want us to audit your brand?</p>
-              <Button className="bg-orange-600 hover:bg-orange-700">
-                Request Custom Audit <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Results */}
-      {result && result.score && (
-        <div className="space-y-6 animate-in fade-in duration-500">
-          {/* Overall Score */}
+      {/* Legacy Result (existing brand in DB) */}
+      {legacyResult && legacyResult.score && (
+        <div className="space-y-6">
           <Card className="overflow-hidden">
             <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold">{result.name}</h2>
-                  <p className="text-violet-200 mt-1">{result.category}</p>
-                  {result.domain && (
-                    <div className="flex items-center gap-1 mt-2 text-violet-200">
-                      <Globe className="w-4 h-4" />
-                      <span className="text-sm">{result.domain}</span>
-                    </div>
-                  )}
+                  <h2 className="text-2xl font-bold">{legacyResult.name}</h2>
+                  <p className="text-violet-200 mt-1">{legacyResult.category}</p>
+                  <p className="text-violet-300 text-sm mt-1">From our database of 30 evaluated brands</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-6xl font-bold">{result.score.composite}</div>
+                  <div className="text-6xl font-bold">{legacyResult.score.composite}</div>
                   <div className="text-violet-200 text-sm mt-1">AI Visibility Score</div>
                   <div className="text-2xl mt-1">
-                    Grade: <ScoreGrade score={result.score.composite ?? 0} />
+                    Grade: <ScoreGrade score={legacyResult.score.composite ?? 0} />
                   </div>
                 </div>
               </div>
             </div>
-            
-            {/* Score Dimensions */}
             <CardContent className="p-8 space-y-5">
-              <h3 className="font-semibold text-slate-900 text-lg">Score Breakdown</h3>
-              <ScoreBar label="Visibility" score={result.score.visibility ?? 0} icon={Eye} weight="35%" />
-              <ScoreBar label="Citation" score={result.score.citation ?? 0} icon={Link2} weight="25%" />
-              <ScoreBar label="Framing" score={result.score.representation ?? 0} icon={MessageSquare} weight="25%" />
-              <ScoreBar label="Intent Coverage" score={result.score.intent ?? 0} icon={Target} weight="15%" />
-              
+              <ScoreBar label="Visibility" score={legacyResult.score.visibility ?? 0} icon={Eye} weight="35%" />
+              <ScoreBar label="Citation" score={legacyResult.score.citation ?? 0} icon={Link2} weight="25%" />
+              <ScoreBar label="Framing" score={legacyResult.score.representation ?? 0} icon={MessageSquare} weight="25%" />
+              <ScoreBar label="Intent Coverage" score={legacyResult.score.intent ?? 0} icon={Target} weight="15%" />
               <div className="pt-4 border-t flex items-center justify-between text-sm text-slate-500">
                 <span>Based on 120 prompts across Gemini 2.0 Flash</span>
-                <span>{result.score.total_mentions ?? 0} total mentions</span>
+                <span>{legacyResult.score.total_mentions ?? 0} total mentions</span>
               </div>
+            </CardContent>
+          </Card>
+
+          <div className="text-center">
+            <Button
+              onClick={handleDiagnosis}
+              variant="outline"
+              className="border-violet-300 text-violet-700"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Run Live Diagnosis with Smart Prompts
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Smart Diagnosis Result */}
+      {diagnosis && (
+        <div className="space-y-6 animate-in fade-in duration-500">
+          {/* Overall Score Card */}
+          <Card className="overflow-hidden">
+            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">{diagnosis.brand.name}</h2>
+                  <p className="text-violet-200 mt-1">{diagnosis.brand.category}</p>
+                  {diagnosis.brand.domain && (
+                    <div className="flex items-center gap-1 mt-2 text-violet-200">
+                      <Globe className="w-4 h-4" />
+                      <span className="text-sm">{diagnosis.brand.domain}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1 mt-2 text-violet-300">
+                    <Clock className="w-4 h-4" />
+                    <span className="text-sm">{diagnosis.evaluation_time_seconds}s · {diagnosis.generated_prompts_count} smart prompts</span>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-6xl font-bold">{diagnosis.score.composite}</div>
+                  <div className="text-violet-200 text-sm mt-1">AI Visibility Score</div>
+                  <div className="text-2xl mt-1">
+                    Grade: <ScoreGrade score={diagnosis.score.composite} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tab Switch */}
+            <div className="border-b flex">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`flex-1 py-3 text-sm font-medium text-center transition-colors ${
+                  activeTab === 'overview' ? 'border-b-2 border-violet-600 text-violet-700' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('prompts')}
+                className={`flex-1 py-3 text-sm font-medium text-center transition-colors ${
+                  activeTab === 'prompts' ? 'border-b-2 border-violet-600 text-violet-700' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Prompt Results ({diagnosis.results.length})
+              </button>
+            </div>
+
+            {activeTab === 'overview' && (
+              <CardContent className="p-8 space-y-5">
+                <h3 className="font-semibold text-slate-900 text-lg">Score Breakdown</h3>
+                <ScoreBar label="Visibility" score={diagnosis.score.visibility} icon={Eye} weight="35%" />
+                <ScoreBar label="Citation" score={diagnosis.score.citation} icon={Link2} weight="25%" />
+                <ScoreBar label="Framing" score={diagnosis.score.representation} icon={MessageSquare} weight="25%" />
+                <ScoreBar label="Intent Coverage" score={diagnosis.score.intent} icon={Target} weight="15%" />
+                <div className="pt-4 border-t flex items-center justify-between text-sm text-slate-500">
+                  <span>{diagnosis.score.mentioned_count}/{diagnosis.score.total_prompts} prompts mentioned brand</span>
+                  <span>Powered by Gemini 2.0 Flash</span>
+                </div>
+              </CardContent>
+            )}
+
+            {activeTab === 'prompts' && (
+              <CardContent className="p-6">
+                <div className="space-y-2">
+                  {diagnosis.results.map((r, i) => (
+                    <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border ${
+                      r.mentioned ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
+                    }`}>
+                      <div className="mt-1">
+                        {r.mentioned
+                          ? <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          : <XCircle className="w-4 h-4 text-slate-400" />
+                        }
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium text-slate-800">{r.prompt}</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <IntentBadge intent={r.intent} />
+                          {r.mentioned && r.rank && (
+                            <span className="text-xs text-slate-500">Rank #{r.rank}</span>
+                          )}
+                          {r.mentioned && r.sentiment && (
+                            <SentimentIcon sentiment={r.sentiment} />
+                          )}
+                        </div>
+                        {r.snippet && (
+                          <p className="text-xs text-slate-500 mt-1 truncate">{r.snippet}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            )}
+          </Card>
+
+          {/* Brand Profile */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Globe className="w-5 h-5 text-slate-500" />
+                Detected Brand Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-slate-500">Category:</span>
+                  <span className="ml-2 font-medium">{diagnosis.brand.category}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500">Target:</span>
+                  <span className="ml-2 font-medium">{diagnosis.brand.target_audience}</span>
+                </div>
+              </div>
+              {diagnosis.brand.positioning && (
+                <p className="text-sm text-slate-600 italic">&ldquo;{diagnosis.brand.positioning}&rdquo;</p>
+              )}
+              {diagnosis.brand.key_products.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {diagnosis.brand.key_products.map((p, i) => (
+                    <span key={i} className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">{p}</span>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -312,20 +522,22 @@ export default function AuditPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {getInsights(result.score).map((insight, i) => (
-                <div key={i} className={`flex items-start gap-3 p-3 rounded-lg ${
-                  insight.type === 'success' ? 'bg-emerald-50' :
-                  insight.type === 'warning' ? 'bg-yellow-50' : 'bg-red-50'
-                }`}>
-                  {insight.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" /> :
-                   insight.type === 'warning' ? <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" /> :
-                   <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />}
-                  <span className={`text-sm ${
-                    insight.type === 'success' ? 'text-emerald-800' :
-                    insight.type === 'warning' ? 'text-yellow-800' : 'text-red-800'
-                  }`}>{insight.text}</span>
-                </div>
-              ))}
+              {diagnosis.insights.map((text, i) => {
+                const isGood = text.toLowerCase().includes('strong') || text.toLowerCase().includes('excellent');
+                const isBad = text.toLowerCase().includes('low') || text.toLowerCase().includes('zero') || text.toLowerCase().includes('limited');
+                return (
+                  <div key={i} className={`flex items-start gap-3 p-3 rounded-lg ${
+                    isGood ? 'bg-emerald-50' : isBad ? 'bg-red-50' : 'bg-yellow-50'
+                  }`}>
+                    {isGood ? <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" /> :
+                     isBad ? <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" /> :
+                     <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />}
+                    <span className={`text-sm ${
+                      isGood ? 'text-emerald-800' : isBad ? 'text-red-800' : 'text-yellow-800'
+                    }`}>{text}</span>
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
 
@@ -339,7 +551,7 @@ export default function AuditPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {getRecommendations(result.score).map((rec, i) => (
+                {diagnosis.recommendations.map((rec, i) => (
                   <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-xs font-bold text-violet-700">{i + 1}</span>
@@ -373,37 +585,23 @@ export default function AuditPage() {
         </div>
       )}
 
-      {/* No score result */}
-      {result && !result.score && (
-        <Card className="border-orange-200 bg-orange-50">
-          <CardContent className="p-6 text-center space-y-4">
-            <BarChart3 className="w-12 h-12 text-orange-500 mx-auto" />
-            <h3 className="text-lg font-semibold text-orange-900">Brand found but not yet evaluated</h3>
-            <p className="text-orange-700">{result.name} is in our database but hasn&apos;t been scored yet.</p>
-            <Button className="bg-orange-600 hover:bg-orange-700">
-              Request Evaluation <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Bottom Info - show when no results */}
-      {!showResults && (
+      {/* Bottom Info — show when no results */}
+      {!loading && !diagnosis && !legacyResult && !error && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
           <Card className="text-center p-6">
-            <Eye className="w-8 h-8 text-violet-500 mx-auto mb-3" />
-            <h3 className="font-semibold text-slate-900 mb-2">Visibility Score</h3>
-            <p className="text-sm text-slate-500">How often AI mentions your brand when users ask relevant questions</p>
+            <Globe className="w-8 h-8 text-violet-500 mx-auto mb-3" />
+            <h3 className="font-semibold text-slate-900 mb-2">Smart Crawling</h3>
+            <p className="text-sm text-slate-500">We crawl your website to understand your brand, products, and positioning</p>
           </Card>
           <Card className="text-center p-6">
-            <Link2 className="w-8 h-8 text-blue-500 mx-auto mb-3" />
-            <h3 className="font-semibold text-slate-900 mb-2">Citation Score</h3>
-            <p className="text-sm text-slate-500">Whether AI links back to your website as a source</p>
+            <Sparkles className="w-8 h-8 text-blue-500 mx-auto mb-3" />
+            <h3 className="font-semibold text-slate-900 mb-2">AI-Generated Prompts</h3>
+            <p className="text-sm text-slate-500">Tailored search prompts based on your brand&apos;s category and products</p>
           </Card>
           <Card className="text-center p-6">
-            <Target className="w-8 h-8 text-green-500 mx-auto mb-3" />
-            <h3 className="font-semibold text-slate-900 mb-2">Intent Coverage</h3>
-            <p className="text-sm text-slate-500">How many types of user questions trigger your brand mention</p>
+            <BarChart3 className="w-8 h-8 text-green-500 mx-auto mb-3" />
+            <h3 className="font-semibold text-slate-900 mb-2">Real-Time Scoring</h3>
+            <p className="text-sm text-slate-500">Live evaluation against Gemini AI with visibility, citation, and intent scores</p>
           </Card>
         </div>
       )}
