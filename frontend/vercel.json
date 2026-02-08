@@ -3,6 +3,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://geo-dashboard-api.up.railway.app"
+    "NEXT_PUBLIC_API_URL": "https://geo-insights-api-production.up.railway.app"
   }
 }
