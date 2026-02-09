@@ -30,6 +30,7 @@ interface PromptResult {
   rank: number | null;
   sentiment: string | null;
   snippet: string | null;
+  model_name: string | null;
 }
 
 interface DiagnosisScore {
@@ -40,6 +41,8 @@ interface DiagnosisScore {
   intent: number;
   total_prompts: number;
   mentioned_count: number;
+  models_used: string[];
+  per_model_scores: Record<string, number> | null;
 }
 
 interface DiagnosisResponse {
@@ -119,6 +122,26 @@ function SentimentIcon({ sentiment }: { sentiment: string | null }) {
   if (sentiment === 'positive') return <ThumbsUp className="w-3.5 h-3.5 text-emerald-500" />;
   if (sentiment === 'negative') return <ThumbsDown className="w-3.5 h-3.5 text-red-500" />;
   return <Minus className="w-3.5 h-3.5 text-slate-400" />;
+}
+
+function ModelBadge({ model }: { model: string }) {
+  const styles: Record<string, string> = {
+    gemini: 'bg-blue-100 text-blue-700 border-blue-200',
+    grok: 'bg-orange-100 text-orange-700 border-orange-200',
+    openai: 'bg-green-100 text-green-700 border-green-200',
+    perplexity: 'bg-purple-100 text-purple-700 border-purple-200',
+  };
+  const labels: Record<string, string> = {
+    gemini: 'Gemini',
+    grok: 'Grok',
+    openai: 'GPT-4o',
+    perplexity: 'Perplexity',
+  };
+  return (
+    <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${styles[model] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+      {labels[model] || model}
+    </span>
+  );
 }
 
 // ---- Progress animation messages ----
@@ -354,7 +377,7 @@ export default function AuditPage() {
             <div>
               <p className="text-lg font-semibold text-slate-900">{PROGRESS_MESSAGES[progressIdx]}</p>
               <p className="text-sm text-slate-500 mt-2">
-                Generating tailored prompts and evaluating against Gemini AI...
+                Generating tailored prompts and evaluating across multiple AI platforms...
               </p>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-2 max-w-xs mx-auto">
@@ -442,6 +465,15 @@ export default function AuditPage() {
                     <Clock className="w-4 h-4" />
                     <span className="text-sm">{diagnosis.evaluation_time_seconds}s · {diagnosis.generated_prompts_count} smart prompts</span>
                   </div>
+                  {diagnosis.score.models_used && diagnosis.score.models_used.length > 0 && (
+                    <div className="flex items-center gap-1.5 mt-3">
+                      {diagnosis.score.models_used.map((m) => (
+                        <span key={m} className="text-xs px-2 py-1 rounded-full bg-white/20 text-white font-medium">
+                          {m === 'gemini' ? 'Gemini ✓' : m === 'grok' ? 'Grok ✓' : m === 'openai' ? 'OpenAI ✓' : `${m} ✓`}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="text-center">
                   <div className="text-6xl font-bold">{diagnosis.score.composite}</div>
@@ -480,9 +512,26 @@ export default function AuditPage() {
                 <ScoreBar label="Citation" score={diagnosis.score.citation} icon={Link2} weight="25%" />
                 <ScoreBar label="Framing" score={diagnosis.score.representation} icon={MessageSquare} weight="25%" />
                 <ScoreBar label="Intent Coverage" score={diagnosis.score.intent} icon={Target} weight="15%" />
+                {diagnosis.score.per_model_scores && Object.keys(diagnosis.score.per_model_scores).length > 1 && (
+                  <div className="pt-4 border-t space-y-3">
+                    <h4 className="text-sm font-semibold text-slate-700">Per-Model Visibility</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {Object.entries(diagnosis.score.per_model_scores).map(([model, score]) => (
+                        <div key={model} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50">
+                          <ModelBadge model={model} />
+                          <span className="text-sm font-bold text-slate-900">{score}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="pt-4 border-t flex items-center justify-between text-sm text-slate-500">
                   <span>{diagnosis.score.mentioned_count}/{diagnosis.score.total_prompts} prompts mentioned brand</span>
-                  <span>Powered by Gemini 2.0 Flash</span>
+                  <span>
+                    {diagnosis.score.models_used && diagnosis.score.models_used.length > 1
+                      ? `Evaluated across ${diagnosis.score.models_used.length} AI platforms`
+                      : 'Powered by Gemini 2.0 Flash'}
+                  </span>
                 </div>
               </CardContent>
             )}
@@ -506,6 +555,7 @@ export default function AuditPage() {
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <IntentBadge intent={r.intent} />
+                          {r.model_name && <ModelBadge model={r.model_name} />}
                           {r.mentioned && r.rank && (
                             <span className="text-xs text-slate-500">Rank #{r.rank}</span>
                           )}

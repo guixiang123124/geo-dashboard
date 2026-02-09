@@ -113,7 +113,7 @@ async def call_grok(prompt: str, max_tokens: int = 512) -> Optional[str]:
                 "https://api.x.ai/v1/chat/completions",
                 headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
                 json={
-                    "model": "grok-beta",
+                    "model": "grok-3-mini-fast",
                     "messages": [{"role": "user", "content": prompt}],
                     "max_tokens": max_tokens,
                     "temperature": 0.7,
