@@ -638,24 +638,28 @@ Return ONLY valid JSON, no markdown fences."""
     # Step 5: Calculate scores
     total = len(results)
     mentioned = sum(1 for r in results if r.mentioned)
-    intents_with_mention = len(set(r.intent for r in results if r.mentioned))
-    total_intents = len(set(r.intent for r in results))
+    # Intent coverage based on generic prompts only (brand-specific always "mention" the brand)
+    intents_with_mention = len(set(r.intent for r in generic_results if r.mentioned))
+    total_intents = len(set(r.intent for r in generic_results)) if generic_results else len(set(r.intent for r in results))
 
     # True visibility = only from GENERIC prompts (no brand name)
     generic_results = [r for r in results if r.prompt_type == "generic"]
     generic_mentioned = sum(1 for r in generic_results if r.mentioned)
     generic_total = len(generic_results) if generic_results else 1
 
+    # Representation: weight generic mentions higher (they're genuine recommendations)
     sentiment_scores = []
     for r in results:
         if r.mentioned:
+            weight = 2.0 if r.prompt_type == "generic" else 1.0  # Generic mentions worth 2x
             if r.sentiment == "positive":
-                sentiment_scores.append(3)
+                sentiment_scores.append(3 * weight)
             elif r.sentiment == "neutral":
-                sentiment_scores.append(2)
+                sentiment_scores.append(2 * weight)
             else:
-                sentiment_scores.append(1)
-    avg_repr = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
+                sentiment_scores.append(1 * weight)
+    total_weight = sum(2.0 if r.prompt_type == "generic" else 1.0 for r in results if r.mentioned) if sentiment_scores else 0
+    avg_repr = sum(sentiment_scores) / total_weight if total_weight else 0
 
     # Visibility based on generic prompts only (true organic discovery)
     visibility = int((generic_mentioned / generic_total) * 100)
