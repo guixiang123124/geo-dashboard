@@ -6,29 +6,29 @@ import { NotificationProvider } from '@/contexts/NotificationContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Sidebar } from '@/components/layout/Sidebar';
-import { Header } from '@/components/layout/Header';
+import { TopBar } from '@/components/layout/TopBar';
 import { BottomTabBar } from '@/components/layout/BottomTabBar';
 
 const BARE_ROUTES = ['/', '/audit', '/pricing', '/auth/login', '/auth/register'];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthRoute = BARE_ROUTES.includes(pathname);
+  const isBarePage = BARE_ROUTES.includes(pathname);
 
   return (
     <LanguageProvider>
     <AuthProvider>
       <NotificationProvider>
         <AuthGuard>
-          {isAuthRoute ? (
-            // Auth pages render full-screen (no sidebar/header)
-            children
+          <TopBar />
+          {isBarePage ? (
+            <div className="pt-14">
+              {children}
+            </div>
           ) : (
-            // App pages render with sidebar + header
-            <div className="flex h-screen bg-slate-50">
+            <div className="flex h-screen pt-14 bg-slate-50">
               <Sidebar />
               <div className="flex-1 flex flex-col lg:ml-64">
-                <Header />
                 <main className="flex-1 overflow-y-auto p-6 md:p-8 pb-24 lg:pb-8 bg-slate-50">
                   {children}
                 </main>

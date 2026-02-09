@@ -14,6 +14,7 @@ import {
   Lightbulb,
   BookOpen,
   Settings,
+  Home,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -26,6 +27,7 @@ const primaryTabs = [
 ];
 
 const moreTabs = [
+  { nameKey: 'nav.home', href: '/', icon: Home },
   { nameKey: 'nav.brands', href: '/brands', icon: Package },
   { nameKey: 'nav.insights', href: '/insights', icon: Lightbulb },
   { nameKey: 'nav.learn', href: '/learn', icon: BookOpen },

@@ -7,7 +7,6 @@ import {
   TrendingUp,
   Package,
   Settings,
-  Sparkles,
   X,
   ChevronLeft,
   ChevronRight,
@@ -15,7 +14,6 @@ import {
   Lightbulb,
   BookOpen,
   Search,
-  Globe,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -37,13 +35,9 @@ const bottomNav = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { locale, setLocale, t } = useLanguage();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-
-  const toggleLocale = () => {
-    setLocale(locale === 'en' ? 'zh' : 'en');
-  };
 
   const renderNavItem = (item: { nameKey: string; href: string; icon: React.ComponentType<{ className?: string }> }) => {
     const isActive = pathname === item.href;
@@ -72,32 +66,14 @@ export function Sidebar() {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-40 bg-slate-900 text-white border-r border-slate-800 transform transition-all duration-300 ease-in-out',
+          'fixed top-14 bottom-0 left-0 z-40 bg-slate-900 text-white border-r border-slate-800 transform transition-all duration-300 ease-in-out',
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
           collapsed ? 'lg:w-20' : 'lg:w-64',
           'w-64'
         )}
       >
-        {/* Logo + Collapse */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-800">
-          {!collapsed && (
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-base font-bold text-white tracking-tight">Luminos</h1>
-                <p className="text-xs text-slate-400">AI Visibility Platform</p>
-              </div>
-            </Link>
-          )}
-          {collapsed && (
-            <Link href="/dashboard" className="mx-auto">
-              <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-            </Link>
-          )}
+        {/* Collapse toggle */}
+        <div className="flex items-center justify-end p-3 border-b border-slate-800">
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="hidden lg:flex p-1.5 rounded-lg hover:bg-slate-800 transition-colors text-slate-400 hover:text-white"
@@ -105,31 +81,6 @@ export function Sidebar() {
             {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
           </button>
         </div>
-
-        {/* Language Switcher */}
-        {!collapsed && (
-          <div className="px-4 py-2">
-            <button
-              onClick={toggleLocale}
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors text-sm"
-            >
-              <Globe className="w-4 h-4 text-violet-400" />
-              <span className="text-slate-300">{locale === 'en' ? 'English' : '中文'}</span>
-              <span className="ml-auto text-xs text-slate-500">{locale === 'en' ? '切换中文' : 'Switch EN'}</span>
-            </button>
-          </div>
-        )}
-        {collapsed && (
-          <div className="px-3 py-2 flex justify-center">
-            <button
-              onClick={toggleLocale}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
-              title={locale === 'en' ? '切换中文' : 'Switch to English'}
-            >
-              <Globe className="w-5 h-5 text-violet-400" />
-            </button>
-          </div>
-        )}
 
         {/* Navigation */}
         <nav className="px-3 py-4 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 220px)' }}>
