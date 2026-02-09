@@ -6,10 +6,11 @@ import { useState, useRef, useEffect } from 'react';
 import {
   Eye, ChevronDown, Menu, X, Globe,
   Crosshair, LayoutDashboard, GitCompare, TrendingUp, Search,
-  GraduationCap, Lightbulb, BookMarked,
+  GraduationCap, Lightbulb, BookMarked, User, LogOut,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const NAV_ITEMS = [
   {
@@ -72,6 +73,7 @@ function NavDropdown({ item, open, onToggle, onClose }: { item: DropdownItem; op
 export function TopBar() {
   const pathname = usePathname();
   const { locale, setLocale } = useLanguage();
+  const { user, isAuthenticated, logout } = useAuth();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
@@ -145,6 +147,36 @@ export function TopBar() {
             </Button>
           </Link>
 
+          {/* Auth buttons */}
+          {isAuthenticated ? (
+            <div className="hidden md:flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 text-sm text-slate-700">
+                <User className="w-4 h-4" />
+                <span className="max-w-[120px] truncate">{user?.full_name || user?.email}</span>
+              </div>
+              <button
+                onClick={() => logout()}
+                className="p-1.5 rounded-lg hover:bg-slate-100 transition text-slate-500 hover:text-slate-700"
+                title="Sign out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center gap-2">
+              <Link href="/auth/login">
+                <Button variant="ghost" size="sm" className="text-xs md:text-sm">
+                  Sign in
+                </Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button variant="outline" size="sm" className="text-xs md:text-sm">
+                  Register
+                </Button>
+              </Link>
+            </div>
+          )}
+
           {/* Mobile hamburger */}
           <button className="md:hidden p-1.5" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="w-5 h-5 text-slate-700" /> : <Menu className="w-5 h-5 text-slate-700" />}
@@ -192,6 +224,29 @@ export function TopBar() {
                 {item.label}
               </Link>
             )
+          )}
+          {/* Auth mobile */}
+          {isAuthenticated ? (
+            <div className="border-b border-slate-100 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-slate-700">
+                  <User className="w-4 h-4" />
+                  <span>{user?.full_name || user?.email}</span>
+                </div>
+                <button onClick={() => logout()} className="text-sm text-red-600 hover:text-red-700">
+                  Sign out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-3 border-b border-slate-100 py-3">
+              <Link href="/auth/login" className="flex-1">
+                <Button variant="outline" size="sm" className="w-full text-sm">Sign in</Button>
+              </Link>
+              <Link href="/auth/register" className="flex-1">
+                <Button size="sm" className="w-full bg-violet-600 hover:bg-violet-700 text-sm">Register</Button>
+              </Link>
+            </div>
           )}
           {/* Language toggle mobile */}
           <button
