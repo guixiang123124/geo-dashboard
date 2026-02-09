@@ -6,54 +6,29 @@ import {
   LayoutDashboard,
   TrendingUp,
   Package,
-  BarChart3,
   Settings,
   Sparkles,
   X,
   ChevronLeft,
   ChevronRight,
-  MessageSquareText,
-  LineChart,
   GitCompareArrows,
-  FileText,
   Lightbulb,
   BookOpen,
-  Wand2,
+  Search,
   Globe,
-  Shield,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const navGroups = [
-  {
-    labelKey: 'nav.group.core',
-    items: [
-      { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard },
-      { nameKey: 'nav.brands', href: '/brands', icon: Package },
-      { nameKey: 'nav.evaluations', href: '/evaluations', icon: TrendingUp },
-    ],
-  },
-  {
-    labelKey: 'nav.group.analyze',
-    items: [
-      { nameKey: 'nav.audit', href: '/audit', icon: Shield },
-      { nameKey: 'nav.compete', href: '/compete', icon: GitCompareArrows },
-      { nameKey: 'nav.prompts', href: '/prompts', icon: MessageSquareText },
-      { nameKey: 'nav.trends', href: '/trends', icon: LineChart },
-      { nameKey: 'nav.analytics', href: '/analytics', icon: BarChart3 },
-    ],
-  },
-  {
-    labelKey: 'nav.group.improve',
-    items: [
-      { nameKey: 'nav.insights', href: '/insights', icon: Lightbulb },
-      { nameKey: 'nav.optimize', href: '/optimize', icon: Wand2 },
-      { nameKey: 'nav.learn', href: '/learn', icon: BookOpen },
-      { nameKey: 'nav.reports', href: '/reports', icon: FileText },
-    ],
-  },
+const navigation = [
+  { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { nameKey: 'nav.diagnosis', href: '/audit', icon: Search },
+  { nameKey: 'nav.brands', href: '/brands', icon: Package },
+  { nameKey: 'nav.competitors', href: '/compete', icon: GitCompareArrows },
+  { nameKey: 'nav.trends', href: '/trends', icon: TrendingUp },
+  { nameKey: 'nav.insights', href: '/insights', icon: Lightbulb },
+  { nameKey: 'nav.learn', href: '/learn', icon: BookOpen },
 ];
 
 const bottomNav = [
@@ -94,16 +69,6 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile menu button — hidden on mobile since BottomTabBar replaces it */}
-      <div className="hidden fixed top-4 left-4 z-50">
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-lg bg-slate-900 text-white shadow-lg hover:bg-slate-800 transition-colors"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <X className="w-6 h-6" />}
-        </button>
-      </div>
-
       {/* Sidebar */}
       <div
         className={cn(
@@ -123,6 +88,13 @@ export function Sidebar() {
               <div>
                 <h1 className="text-base font-bold text-white tracking-tight">Luminos</h1>
                 <p className="text-xs text-slate-400">AI Visibility Platform</p>
+              </div>
+            </Link>
+          )}
+          {collapsed && (
+            <Link href="/dashboard" className="mx-auto">
+              <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
             </Link>
           )}
@@ -159,20 +131,9 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* Grouped Navigation */}
-        <nav className="px-3 py-4 space-y-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 220px)' }}>
-          {navGroups.map((group) => (
-            <div key={group.labelKey}>
-              {!collapsed && (
-                <div className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                  {t(group.labelKey)}
-                </div>
-              )}
-              <div className="space-y-1">
-                {group.items.map(renderNavItem)}
-              </div>
-            </div>
-          ))}
+        {/* Navigation */}
+        <nav className="px-3 py-4 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 220px)' }}>
+          {navigation.map(renderNavItem)}
         </nav>
 
         {/* Bottom Nav (Settings) */}

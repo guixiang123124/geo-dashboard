@@ -13,6 +13,7 @@ import {
   Building2, GraduationCap, BookMarked
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /* ── Animate on scroll ── */
 function FadeIn({ children, className = '', delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
@@ -278,6 +279,7 @@ function NavBar() {
 
 export default function LandingPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   function go(v: string) {
     router.push(v.trim() ? `/audit?q=${encodeURIComponent(v.trim())}` : '/audit');
@@ -292,17 +294,16 @@ export default function LandingPage() {
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <FadeIn>
-            <SectionTag><Zap className="w-4 h-4" /> Free Instant AI Visibility Diagnosis</SectionTag>
+            <SectionTag><Zap className="w-4 h-4" /> {t('landing.tagline')}</SectionTag>
             <h1 className="text-5xl md:text-6xl font-bold text-slate-900 leading-tight mb-6">
-              Is Your Brand Visible
+              {t('landing.hero.title1')}
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">
-                to AI Search?
+                {t('landing.hero.title2')}
               </span>
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-              40% of Gen Z use ChatGPT and Gemini for product research.
-              Get your AI visibility score in 10 seconds — completely free.
+              {t('landing.hero.desc')}
             </p>
           </FadeIn>
           <FadeIn delay={200}>
@@ -310,7 +311,7 @@ export default function LandingPage() {
           </FadeIn>
           <FadeIn delay={400}>
             <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto mt-8">
-              {[['10s', 'Diagnosis Time'], ['10+', 'AI-Generated Prompts'], ['4', 'AI Platforms']].map(([num, label]) => (
+              {[['10s', t('landing.hero.diagnosisTime')], ['10+', t('landing.hero.aiPrompts')], ['4', t('landing.hero.aiPlatforms')]].map(([num, label]) => (
                 <div key={label as string}>
                   <div className="text-3xl font-bold text-violet-600">{num}</div>
                   <div className="text-sm text-slate-500">{label}</div>
@@ -325,8 +326,8 @@ export default function LandingPage() {
       <section id="how" className="py-20 px-6 bg-slate-50">
         <div className="max-w-4xl mx-auto">
           <FadeIn>
-            <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">How It Works</h2>
-            <p className="text-center text-slate-600 mb-16">From domain to diagnosis in four simple steps</p>
+            <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">{t('landing.how.title')}</h2>
+            <p className="text-center text-slate-600 mb-16">{t('landing.how.subtitle')}</p>
           </FadeIn>
           <div className="space-y-8">
             {[
@@ -356,9 +357,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <FadeIn>
             <div className="text-center mb-12">
-              <SectionTag><BarChart3 className="w-4 h-4" /> Dashboard</SectionTag>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Your AI Visibility Command Center</h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">See how your brand stacks up against competitors with real-time SOV scores, brand rankings, and trend sparklines.</p>
+              <SectionTag><BarChart3 className="w-4 h-4" /> {t('landing.dashboard.tag')}</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('landing.dashboard.title')}</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">{t('landing.dashboard.desc')}</p>
             </div>
           </FadeIn>
           <FadeIn delay={200}>
@@ -438,9 +439,9 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <FadeIn>
             <div className="text-center mb-12">
-              <SectionTag><Sparkles className="w-4 h-4" /> Free AI Diagnosis</SectionTag>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Instant AI Brand Diagnosis</h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Enter any domain → AI crawls your site → generates smart prompts → scores you in real time. Try it free, no signup required.</p>
+              <SectionTag><Sparkles className="w-4 h-4" /> {t('landing.diagnosis.tag')}</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('landing.diagnosis.title')}</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">{t('landing.diagnosis.desc')}</p>
             </div>
           </FadeIn>
           <FadeIn delay={200}>
@@ -500,7 +501,7 @@ export default function LandingPage() {
             <div className="text-center mt-10">
               <Link href="/audit">
                 <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8 h-14 rounded-xl">
-                  Try It Free — No Signup <ArrowRight className="w-5 h-5 ml-2" />
+                  {t('landing.cta.tryFree')} <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
             </div>
@@ -513,9 +514,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <FadeIn>
             <div className="text-center mb-12">
-              <SectionTag><GitCompare className="w-4 h-4" /> Competitive Intelligence</SectionTag>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Know Exactly Where You Stand</h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Head-to-head brand comparison, category benchmarks, and citation gap analysis.</p>
+              <SectionTag><GitCompare className="w-4 h-4" /> {t('landing.compete.tag')}</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('landing.compete.title')}</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">{t('landing.compete.desc')}</p>
             </div>
           </FadeIn>
           <FadeIn delay={200}>
@@ -574,9 +575,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <FadeIn>
             <div className="text-center mb-12">
-              <SectionTag><MessageSquare className="w-4 h-4" /> Prompt Research</SectionTag>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Understand What AI Says About You</h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">AI-generated prompts tailored to your brand. Custom prompt support. Organized by intent.</p>
+              <SectionTag><MessageSquare className="w-4 h-4" /> {t('landing.prompts.tag')}</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('landing.prompts.title')}</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">{t('landing.prompts.desc')}</p>
             </div>
           </FadeIn>
           <FadeIn delay={200}>
@@ -630,9 +631,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <FadeIn>
             <div className="text-center mb-12">
-              <SectionTag><TrendingUp className="w-4 h-4" /> Trends & Analytics</SectionTag>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Track Your AI Visibility Trajectory</h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Score changes over time, industry trend monitoring, and cross-platform analytics.</p>
+              <SectionTag><TrendingUp className="w-4 h-4" /> {t('landing.trends.tag')}</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('landing.trends.title')}</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">{t('landing.trends.desc')}</p>
             </div>
           </FadeIn>
           <FadeIn delay={200}>
@@ -658,9 +659,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <FadeIn>
             <div className="text-center mb-12">
-              <SectionTag><Lightbulb className="w-4 h-4" /> Optimization & Learning</SectionTag>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Not Just Data — Actionable Insights</h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">AI-driven recommendations and a GEO knowledge base to help you improve.</p>
+              <SectionTag><Lightbulb className="w-4 h-4" /> {t('landing.optimize.tag')}</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('landing.optimize.title')}</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">{t('landing.optimize.desc')}</p>
             </div>
           </FadeIn>
           <FadeIn delay={200}>
@@ -722,9 +723,9 @@ export default function LandingPage() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <FadeIn>
-            <SectionTag><Globe className="w-4 h-4" /> Multi-Platform</SectionTag>
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">One Dashboard, All AI Platforms</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-12">Different AI models recommend different brands. Test yours across all major platforms.</p>
+            <SectionTag><Globe className="w-4 h-4" /> {t('landing.platform.tag')}</SectionTag>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('landing.platform.title')}</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-12">{t('landing.platform.desc')}</p>
           </FadeIn>
           <FadeIn delay={200}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -749,8 +750,8 @@ export default function LandingPage() {
       <section id="pricing" className="py-20 px-6 bg-slate-50">
         <div className="max-w-5xl mx-auto">
           <FadeIn>
-            <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">Simple Pricing</h2>
-            <p className="text-lg text-slate-600 text-center mb-12">Start free. Upgrade when you need more.</p>
+            <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">{t('landing.pricing.title')}</h2>
+            <p className="text-lg text-slate-600 text-center mb-12">{t('landing.pricing.subtitle')}</p>
           </FadeIn>
           <FadeIn delay={200}>
             <div className="grid md:grid-cols-3 gap-8">
@@ -789,9 +790,9 @@ export default function LandingPage() {
       <section className="py-24 px-6 bg-gradient-to-r from-violet-600 to-indigo-700">
         <div className="max-w-3xl mx-auto text-center text-white">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to See How AI Views Your Brand?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('landing.final.title')}</h2>
             <p className="text-lg text-violet-100 mb-8">
-              Get your free AI visibility diagnosis in 10 seconds. No credit card. No signup.
+              {t('landing.final.desc')}
             </p>
           </FadeIn>
           <FadeIn delay={200}>
@@ -810,16 +811,16 @@ export default function LandingPage() {
                   />
                 </div>
                 <Button type="submit" size="lg" className="bg-white text-violet-700 hover:bg-violet-50 text-lg px-8 h-auto rounded-xl font-semibold">
-                  Start Free <ArrowRight className="w-5 h-5 ml-2" />
+                  {t('landing.cta.startFree')} <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
             </form>
           </FadeIn>
           <FadeIn delay={400}>
             <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-sm text-violet-200">
-              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4" /> No credit card</span>
-              <span className="flex items-center gap-1.5"><Zap className="w-4 h-4" /> Results in 10 seconds</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> 100% free to start</span>
+              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4" /> {t('landing.footer.noCreditCard')}</span>
+              <span className="flex items-center gap-1.5"><Zap className="w-4 h-4" /> {t('landing.footer.results10s')}</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> {t('landing.footer.freeToStart')}</span>
             </div>
           </FadeIn>
         </div>
