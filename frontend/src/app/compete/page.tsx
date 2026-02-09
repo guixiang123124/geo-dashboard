@@ -1,79 +1,79 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   GitCompareArrows,
   Trophy,
   AlertTriangle,
-  ExternalLink,
   Lightbulb,
   Star,
   TrendingUp,
   Check,
-  X,
   ChevronDown,
+  Loader2,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBrands, type BrandWithScore } from '@/hooks/useBrands';
 
-// ─── Demo Data ───────────────────────────────────────────────
-interface Brand {
-  name: string;
-  visibility: number;
-  sentiment: number;
-  mentions: number;
-  citation: number;
-  representation: number;
-  recommendation: string;
-  recColor: string;
-  color: string;
-  sources: string[];
-}
-
-const BRANDS: Brand[] = [
-  { name: 'PatPat', visibility: 72, sentiment: 78, mentions: 156, citation: 65, representation: 70, recommendation: 'Budget Pick', recColor: 'bg-green-100 text-green-700', color: '#8b5cf6', sources: ['patpat.com', 'momjunction.com', 'whattoexpect.com', 'reddit.com/r/parenting'] },
-  { name: 'Carter\'s', visibility: 85, sentiment: 82, mentions: 203, citation: 78, representation: 80, recommendation: 'Top Pick', recColor: 'bg-yellow-100 text-yellow-700', color: '#6366f1', sources: ['carters.com', 'parents.com', 'whattoexpect.com', 'goodhousekeeping.com', 'babylist.com'] },
-  { name: 'H&M Kids', visibility: 68, sentiment: 65, mentions: 142, citation: 55, representation: 62, recommendation: 'Popular Choice', recColor: 'bg-blue-100 text-blue-700', color: '#0ea5e9', sources: ['hm.com', 'vogue.com', 'refinery29.com', 'buzzfeed.com'] },
-  { name: 'Primary', visibility: 55, sentiment: 88, mentions: 89, citation: 72, representation: 85, recommendation: 'Premium Pick', recColor: 'bg-purple-100 text-purple-700', color: '#d946ef', sources: ['primary.com', 'parents.com', 'motherly.com', 'babylist.com', 'theeverymom.com'] },
-  { name: 'Hanna Andersson', visibility: 48, sentiment: 90, mentions: 76, citation: 80, representation: 88, recommendation: 'Quality Pick', recColor: 'bg-indigo-100 text-indigo-700', color: '#14b8a6', sources: ['hannaandersson.com', 'parents.com', 'theeverymom.com', 'motherly.com'] },
-  { name: 'Tea Collection', visibility: 42, sentiment: 85, mentions: 62, citation: 68, representation: 75, recommendation: 'Niche Favorite', recColor: 'bg-teal-100 text-teal-700', color: '#f59e0b', sources: ['teacollection.com', 'motherly.com', 'babylist.com'] },
-  { name: 'Cat & Jack', visibility: 78, sentiment: 70, mentions: 180, citation: 60, representation: 65, recommendation: 'Best Value', recColor: 'bg-emerald-100 text-emerald-700', color: '#ef4444', sources: ['target.com', 'parents.com', 'goodhousekeeping.com', 'buzzfeed.com'] },
-  { name: 'Janie & Jack', visibility: 38, sentiment: 86, mentions: 48, citation: 70, representation: 82, recommendation: 'Luxury Pick', recColor: 'bg-rose-100 text-rose-700', color: '#ec4899', sources: ['janieandjack.com', 'vogue.com', 'harpersbazaar.com'] },
-  { name: 'Old Navy Kids', visibility: 60, sentiment: 62, mentions: 130, citation: 45, representation: 55, recommendation: 'Budget Alternative', recColor: 'bg-orange-100 text-orange-700', color: '#78716c', sources: ['oldnavy.com', 'buzzfeed.com', 'reddit.com/r/parenting'] },
-  { name: 'Zara Kids', visibility: 52, sentiment: 72, mentions: 95, citation: 50, representation: 60, recommendation: 'Trendy Pick', recColor: 'bg-pink-100 text-pink-700', color: '#a855f7', sources: ['zara.com', 'vogue.com', 'refinery29.com', 'whowhatwear.com'] },
-];
-
-const ALL_SOURCES = [...new Set(BRANDS.flatMap(b => b.sources))];
-const DIMENSIONS = ['visibility', 'sentiment', 'citation', 'representation'] as const;
-const DIM_LABEL_KEYS: Record<string, string> = {
-  visibility: 'compete.dim.visibility',
-  sentiment: 'compete.dim.sentiment',
-  citation: 'compete.dim.citation',
-  representation: 'compete.dim.representation',
+const DIMENSIONS = ['visibility', 'citation', 'representation', 'intent'] as const;
+const DIM_LABELS: Record<string, string> = {
+  visibility: 'Visibility',
+  citation: 'Citation',
+  representation: 'Framing',
+  intent: 'Intent',
 };
 
-const MY_BRAND = 'PatPat';
+const COLORS = ['#8b5cf6', '#6366f1', '#0ea5e9', '#d946ef', '#14b8a6', '#f59e0b', '#ef4444', '#ec4899', '#78716c', '#a855f7'];
 
-const ACTION_ITEMS = [
-  { priority: 'compete.priority.high', textKey: 'compete.action1', icon: ExternalLink },
-  { priority: 'compete.priority.high', textKey: 'compete.action2', icon: TrendingUp },
-  { priority: 'compete.priority.medium', textKey: 'compete.action3', icon: Trophy },
-  { priority: 'compete.priority.medium', textKey: 'compete.action4', icon: ExternalLink },
-  { priority: 'compete.priority.low', textKey: 'compete.action5', icon: AlertTriangle },
-];
+function getDimScore(brand: BrandWithScore, dim: string): number {
+  const s = brand.score;
+  if (!s) return 0;
+  switch (dim) {
+    case 'visibility': return s.visibility_score;
+    case 'citation': return s.citation_score;
+    case 'representation': return s.representation_score;
+    case 'intent': return s.intent_score;
+    default: return 0;
+  }
+}
 
 export default function CompetePage() {
   const { t } = useLanguage();
-  const [selected, setSelected] = useState<string[]>(['PatPat', 'Carter\'s', 'H&M Kids', 'Primary']);
+  const { brands, loading } = useBrands();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const selectedBrands = BRANDS.filter(b => selected.includes(b.name));
+  // Auto-select top 4 brands once loaded
+  const sortedBrands = useMemo(() => {
+    return [...brands]
+      .filter(b => b.score)
+      .sort((a, b) => (b.score?.composite_score ?? 0) - (a.score?.composite_score ?? 0));
+  }, [brands]);
 
-  const toggleBrand = (name: string) => {
-    if (selected.includes(name)) {
-      if (selected.length > 2) setSelected(selected.filter(n => n !== name));
-    } else if (selected.length < 4) {
-      setSelected([...selected, name]);
+  const effectiveSelectedIds = useMemo(() => {
+    if (selectedIds.length > 0) return selectedIds;
+    return sortedBrands.slice(0, 4).map(b => b.id);
+  }, [selectedIds, sortedBrands]);
+
+  const selectedBrands = useMemo(() => {
+    return sortedBrands.filter(b => effectiveSelectedIds.includes(b.id));
+  }, [sortedBrands, effectiveSelectedIds]);
+
+  const brandColorMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    sortedBrands.forEach((b, i) => { map[b.id] = COLORS[i % COLORS.length]; });
+    return map;
+  }, [sortedBrands]);
+
+  const toggleBrand = (id: string) => {
+    const current = effectiveSelectedIds;
+    if (current.includes(id)) {
+      if (current.length > 2) {
+        setSelectedIds(current.filter(x => x !== id));
+      }
+    } else if (current.length < 4) {
+      setSelectedIds([...current, id]);
     }
   };
 
@@ -82,20 +82,24 @@ export default function CompetePage() {
   const radarAngles = DIMENSIONS.map((_, i) => (Math.PI * 2 * i) / DIMENSIONS.length - Math.PI / 2);
 
   const getRadarPoint = (value: number, angleIdx: number) => {
-    const r = (value / 100) * radarR;
+    const maxVal = 100;
+    const r = (value / maxVal) * radarR;
     return { x: radarCx + r * Math.cos(radarAngles[angleIdx]), y: radarCy + r * Math.sin(radarAngles[angleIdx]) };
   };
 
   // Scatter plot params
   const scatterW = 500, scatterH = 350, scatterPad = 50;
 
-  // Citation gap for my brand
-  const myBrand = BRANDS.find(b => b.name === MY_BRAND)!;
-  const mySources = new Set(myBrand.sources);
-  const gaps = BRANDS.filter(b => b.name !== MY_BRAND).flatMap(b =>
-    b.sources.filter(s => !mySources.has(s)).map(s => ({ source: s, competitor: b.name }))
-  );
-  const uniqueGaps = [...new Map(gaps.map(g => [g.source, g])).values()];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-10 h-10 animate-spin text-violet-600 mx-auto" />
+          <p className="text-lg font-semibold text-slate-900">Loading competitive data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-8 space-y-8">
@@ -106,6 +110,7 @@ export default function CompetePage() {
           <h1 className="text-2xl md:text-3xl font-bold">{t('compete.title')}</h1>
         </div>
         <p className="text-indigo-200 text-sm md:text-base">{t('compete.subtitle')}</p>
+        <p className="text-indigo-300 text-xs mt-2">{sortedBrands.length} brands with real evaluation data</p>
       </div>
 
       {/* Brand Selector */}
@@ -115,16 +120,17 @@ export default function CompetePage() {
             <span className="text-sm font-medium text-slate-500">{t('compete.selectBrands')}:</span>
             <div className="relative">
               <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50">
-                {selected.join(', ')} <ChevronDown className="w-4 h-4" />
+                {selectedBrands.map(b => b.name).join(', ')} <ChevronDown className="w-4 h-4" />
               </button>
               {dropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 w-56 py-1">
-                  {BRANDS.map(b => (
-                    <button key={b.name} onClick={() => toggleBrand(b.name)} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-slate-50 text-left">
-                      <div className={`w-4 h-4 rounded border flex items-center justify-center ${selected.includes(b.name) ? 'bg-violet-600 border-violet-600' : 'border-slate-300'}`}>
-                        {selected.includes(b.name) && <Check className="w-3 h-3 text-white" />}
+                <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 w-64 py-1 max-h-72 overflow-y-auto">
+                  {sortedBrands.map(b => (
+                    <button key={b.id} onClick={() => toggleBrand(b.id)} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-slate-50 text-left">
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center ${effectiveSelectedIds.includes(b.id) ? 'bg-violet-600 border-violet-600' : 'border-slate-300'}`}>
+                        {effectiveSelectedIds.includes(b.id) && <Check className="w-3 h-3 text-white" />}
                       </div>
-                      <span style={{ color: b.color }} className="font-medium">{b.name}</span>
+                      <span style={{ color: brandColorMap[b.id] }} className="font-medium">{b.name}</span>
+                      <span className="ml-auto text-xs text-slate-400">{b.score?.composite_score ?? 0}</span>
                     </button>
                   ))}
                 </div>
@@ -142,29 +148,26 @@ export default function CompetePage() {
           </CardHeader>
           <CardContent>
             <svg viewBox="0 0 300 300" className="w-full max-w-md mx-auto">
-              {/* Grid */}
               {[20, 40, 60, 80, 100].map(v => (
                 <polygon key={v} points={radarAngles.map((_, i) => { const p = getRadarPoint(v, i); return `${p.x},${p.y}`; }).join(' ')} fill="none" stroke="#e2e8f0" strokeWidth="1" />
               ))}
-              {/* Axes */}
               {radarAngles.map((_, i) => { const p = getRadarPoint(100, i); return <line key={i} x1={radarCx} y1={radarCy} x2={p.x} y2={p.y} stroke="#e2e8f0" strokeWidth="1" />; })}
-              {/* Labels */}
               {DIMENSIONS.map((d, i) => {
                 const p = getRadarPoint(115, i);
-                return <text key={d} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill="#64748b" fontWeight="600">{t(DIM_LABEL_KEYS[d])}</text>;
+                return <text key={d} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill="#64748b" fontWeight="600">{DIM_LABELS[d]}</text>;
               })}
-              {/* Brand polygons */}
               {selectedBrands.map(brand => {
+                const color = brandColorMap[brand.id];
                 const points = DIMENSIONS.map((d, i) => {
-                  const p = getRadarPoint(brand[d], i);
+                  const p = getRadarPoint(getDimScore(brand, d), i);
                   return `${p.x},${p.y}`;
                 }).join(' ');
                 return (
-                  <g key={brand.name}>
-                    <polygon points={points} fill={brand.color} fillOpacity="0.15" stroke={brand.color} strokeWidth="2" />
+                  <g key={brand.id}>
+                    <polygon points={points} fill={color} fillOpacity="0.15" stroke={color} strokeWidth="2" />
                     {DIMENSIONS.map((d, i) => {
-                      const p = getRadarPoint(brand[d], i);
-                      return <circle key={i} cx={p.x} cy={p.y} r="3" fill={brand.color} />;
+                      const p = getRadarPoint(getDimScore(brand, d), i);
+                      return <circle key={i} cx={p.x} cy={p.y} r="3" fill={color} />;
                     })}
                   </g>
                 );
@@ -172,9 +175,10 @@ export default function CompetePage() {
             </svg>
             <div className="flex flex-wrap justify-center gap-4 mt-4">
               {selectedBrands.map(b => (
-                <div key={b.name} className="flex items-center gap-1.5 text-xs">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: b.color }} />
+                <div key={b.id} className="flex items-center gap-1.5 text-xs">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandColorMap[b.id] }} />
                   <span className="font-medium">{b.name}</span>
+                  <span className="text-slate-400">({b.score?.composite_score ?? 0})</span>
                 </div>
               ))}
             </div>
@@ -188,15 +192,13 @@ export default function CompetePage() {
           </CardHeader>
           <CardContent>
             <svg viewBox={`0 0 ${scatterW} ${scatterH}`} className="w-full">
-              {/* Axes */}
               <line x1={scatterPad} y1={scatterH - scatterPad} x2={scatterW - 20} y2={scatterH - scatterPad} stroke="#cbd5e1" strokeWidth="1" />
               <line x1={scatterPad} y1={20} x2={scatterPad} y2={scatterH - scatterPad} stroke="#cbd5e1" strokeWidth="1" />
-              <text x={scatterW / 2} y={scatterH - 10} textAnchor="middle" fontSize="11" fill="#64748b">{t('compete.xAxis.visibility')}</text>
-              <text x={15} y={scatterH / 2} textAnchor="middle" fontSize="11" fill="#64748b" transform={`rotate(-90, 15, ${scatterH / 2})`}>{t('compete.yAxis.sentiment')}</text>
-              {/* Grid lines */}
+              <text x={scatterW / 2} y={scatterH - 10} textAnchor="middle" fontSize="11" fill="#64748b">Visibility Score</text>
+              <text x={15} y={scatterH / 2} textAnchor="middle" fontSize="11" fill="#64748b" transform={`rotate(-90, 15, ${scatterH / 2})`}>Composite Score</text>
               {[25, 50, 75].map(v => {
-                const x = scatterPad + ((v) / 100) * (scatterW - scatterPad - 20);
-                const y = scatterH - scatterPad - ((v) / 100) * (scatterH - scatterPad - 20);
+                const x = scatterPad + (v / 100) * (scatterW - scatterPad - 20);
+                const y = scatterH - scatterPad - (v / 100) * (scatterH - scatterPad - 20);
                 return (
                   <g key={v}>
                     <line x1={x} y1={20} x2={x} y2={scatterH - scatterPad} stroke="#f1f5f9" strokeWidth="1" />
@@ -204,86 +206,87 @@ export default function CompetePage() {
                   </g>
                 );
               })}
-              {/* Bubbles */}
-              {BRANDS.map(b => {
-                const x = scatterPad + (b.visibility / 100) * (scatterW - scatterPad - 20);
-                const y = scatterH - scatterPad - (b.sentiment / 100) * (scatterH - scatterPad - 20);
-                const r = Math.max(8, Math.sqrt(b.mentions) * 1.8);
+              {sortedBrands.map(b => {
+                const vis = b.score?.visibility_score ?? 0;
+                const comp = b.score?.composite_score ?? 0;
+                const mentions = b.score?.total_mentions ?? 1;
+                const x = scatterPad + (vis / 100) * (scatterW - scatterPad - 20);
+                const y = scatterH - scatterPad - (comp / 100) * (scatterH - scatterPad - 20);
+                const r = Math.max(6, Math.sqrt(mentions) * 1.5);
+                const color = brandColorMap[b.id];
                 return (
-                  <g key={b.name}>
-                    <circle cx={x} cy={y} r={r} fill={b.color} fillOpacity="0.6" stroke={b.color} strokeWidth="1.5" />
-                    <text x={x} y={y - r - 4} textAnchor="middle" fontSize="9" fill="#374151" fontWeight="600">{b.name}</text>
+                  <g key={b.id}>
+                    <circle cx={x} cy={y} r={r} fill={color} fillOpacity="0.6" stroke={color} strokeWidth="1.5" />
+                    <text x={x} y={y - r - 4} textAnchor="middle" fontSize="8" fill="#374151" fontWeight="600">{b.name}</text>
                   </g>
                 );
               })}
             </svg>
-            <p className="text-xs text-slate-400 text-center mt-2">{t('compete.bubbleSize')}</p>
+            <p className="text-xs text-slate-400 text-center mt-2">Bubble size = total mentions</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* AI Recommendation Types */}
+      {/* Head-to-Head Comparison Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><Star className="w-5 h-5 text-yellow-500" />{t('compete.aiRecType')}</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base"><Trophy className="w-5 h-5 text-yellow-500" />Head-to-Head Comparison</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left py-3 px-2 text-slate-600 font-medium">Brand</th>
+                  <th className="text-center py-3 px-2 text-slate-600 font-medium">Composite</th>
+                  <th className="text-center py-3 px-2 text-slate-600 font-medium">Visibility</th>
+                  <th className="text-center py-3 px-2 text-slate-600 font-medium">Citation</th>
+                  <th className="text-center py-3 px-2 text-slate-600 font-medium">Framing</th>
+                  <th className="text-center py-3 px-2 text-slate-600 font-medium">Intent</th>
+                  <th className="text-center py-3 px-2 text-slate-600 font-medium">Mentions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedBrands.map((brand, i) => {
+                  const s = brand.score;
+                  return (
+                    <tr key={brand.id} className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="py-3 px-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandColorMap[brand.id] }} />
+                          <span className="font-semibold text-slate-900">{brand.name}</span>
+                        </div>
+                      </td>
+                      <td className="text-center py-3 px-2 font-bold text-slate-900">{s?.composite_score ?? 0}</td>
+                      <td className="text-center py-3 px-2 text-blue-700">{s?.visibility_score ?? 0}</td>
+                      <td className="text-center py-3 px-2 text-green-700">{s?.citation_score ?? 0}</td>
+                      <td className="text-center py-3 px-2 text-amber-700">{s?.representation_score ?? 0}</td>
+                      <td className="text-center py-3 px-2 text-purple-700">{s?.intent_score ?? 0}</td>
+                      <td className="text-center py-3 px-2 text-slate-600">{s?.total_mentions ?? 0}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* All Brands Ranking */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base"><Star className="w-5 h-5 text-yellow-500" />Full Industry Rankings</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {BRANDS.map(b => (
-              <div key={b.name} className="border border-slate-200 rounded-xl p-4 text-center space-y-2 hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-full mx-auto flex items-center justify-center" style={{ backgroundColor: b.color + '20' }}>
-                  <Trophy className="w-5 h-5" style={{ color: b.color }} />
-                </div>
+            {sortedBrands.slice(0, 10).map((b, i) => (
+              <div key={b.id} className="border border-slate-200 rounded-xl p-4 text-center space-y-2 hover:shadow-md transition-shadow">
+                <div className="text-2xl font-bold text-slate-400">#{i + 1}</div>
                 <p className="text-sm font-semibold text-slate-800">{b.name}</p>
-                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${b.recColor}`}>{b.recommendation}</span>
-                <div className="text-xs text-slate-400">{t('compete.composite')} {Math.round((b.visibility + b.sentiment + b.citation + b.representation) / 4)}{t('compete.score')}</div>
+                <div className="text-2xl font-bold text-violet-600">{b.score?.composite_score ?? 0}</div>
+                <div className="text-xs text-slate-400">{b.score?.total_mentions ?? 0} mentions</div>
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Citation Gap Analysis */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="w-5 h-5 text-amber-500" />{t('compete.citationGap')} — {MY_BRAND}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-slate-500 mb-4">{t('compete.citationGapDesc')} {MY_BRAND} {t('compete.notCited')}:</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {uniqueGaps.map(g => (
-              <div key={g.source} className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <ExternalLink className="w-4 h-4 text-amber-600" />
-                  <span className="text-sm font-medium text-amber-800">{g.source}</span>
-                </div>
-                <span className="text-xs text-amber-600">{t('compete.citedBy')} {g.competitor}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Action Items */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><Lightbulb className="w-5 h-5 text-violet-600" />{t('compete.actionTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {ACTION_ITEMS.map((item, i) => {
-              const Icon = item.icon;
-              const priority = t(item.priority);
-              return (
-                <div key={i} className="flex items-start gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                  <Icon className="w-5 h-5 text-violet-500 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-700">{t(item.textKey)}</p>
-                  </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${priority === t('compete.priority.high') ? 'bg-red-100 text-red-700' : priority === t('compete.priority.medium') ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>{priority}</span>
-                </div>
-              );
-            })}
           </div>
         </CardContent>
       </Card>

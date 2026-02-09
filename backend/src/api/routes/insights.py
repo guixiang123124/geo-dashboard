@@ -3,9 +3,14 @@ API routes for Public Dataset Insights.
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import BaseModel
+from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from ...core.database import get_db
+from ...models.scorecard import ScoreCard
+from ...models.brand import Brand
 from ...services.public_datasets import DatasetFetcher, BrandExtractor, InsightPreprocessor
 
 
@@ -308,6 +313,81 @@ async def list_datasets():
     
     return {
         "datasets": fetcher.get_available_datasets(),
+    }
+
+
+@router.get("/industry-stats")
+async def get_industry_stats(
+    workspace_id: str = Query("ws-demo-001", description="Workspace ID"),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get aggregated industry statistics from scored brands.
+    """
+    # Get latest score per brand via subquery
+    subquery = (
+        select(
+            ScoreCard.brand_id,
+            func.max(ScoreCard.created_at).label("max_created_at"),
+        )
+        .join(Brand, Brand.id == ScoreCard.brand_id)
+        .where(Brand.workspace_id == workspace_id)
+        .group_by(ScoreCard.brand_id)
+        .subquery()
+    )
+
+    query = (
+        select(ScoreCard, Brand.name)
+        .join(Brand, Brand.id == ScoreCard.brand_id)
+        .join(
+            subquery,
+            (ScoreCard.brand_id == subquery.c.brand_id)
+            & (ScoreCard.created_at == subquery.c.max_created_at),
+        )
+    )
+
+    result = await db.execute(query)
+    rows = result.all()
+
+    if not rows:
+        return {
+            "total_brands": 0,
+            "total_evaluations": 0,
+            "avg_composite_score": 0,
+            "top_brand": None,
+            "brands_visible_pct": 0,
+            "total_mentions": 0,
+            "dimension_averages": {"visibility": 0, "citation": 0, "framing": 0, "intent": 0},
+            "top_10": [],
+        }
+
+    total_brands = len(rows)
+    total_evaluations = sum(sc.evaluation_count for sc, _ in rows)
+    total_mentions = sum(sc.total_mentions for sc, _ in rows)
+    avg_composite = round(sum(sc.composite_score for sc, _ in rows) / total_brands)
+    visible_count = sum(1 for sc, _ in rows if sc.composite_score > 0)
+    brands_visible_pct = round((visible_count / total_brands) * 100) if total_brands else 0
+
+    dim_avg = {
+        "visibility": round(sum(sc.visibility_score for sc, _ in rows) / total_brands),
+        "citation": round(sum(sc.citation_score for sc, _ in rows) / total_brands),
+        "framing": round(sum(sc.representation_score for sc, _ in rows) / total_brands),
+        "intent": round(sum(sc.intent_score for sc, _ in rows) / total_brands),
+    }
+
+    sorted_brands = sorted(rows, key=lambda r: r[0].composite_score, reverse=True)
+    top_brand = {"name": sorted_brands[0][1], "score": sorted_brands[0][0].composite_score}
+    top_10 = [{"name": name, "score": sc.composite_score} for sc, name in sorted_brands[:10]]
+
+    return {
+        "total_brands": total_brands,
+        "total_evaluations": total_evaluations,
+        "avg_composite_score": avg_composite,
+        "top_brand": top_brand,
+        "brands_visible_pct": brands_visible_pct,
+        "total_mentions": total_mentions,
+        "dimension_averages": dim_avg,
+        "top_10": top_10,
     }
 
 

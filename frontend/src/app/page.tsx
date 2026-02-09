@@ -10,7 +10,7 @@ import {
   LineChart, Award, ArrowUpRight, ChevronRight, Play,
   FileText, Compass, ShoppingCart, Info, GitCompare,
   Menu, X, ChevronDown, LayoutDashboard, Crosshair,
-  Building2, GraduationCap, BookMarked
+  Building2, GraduationCap, BookMarked, Trophy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -372,6 +372,93 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── Industry Intelligence ─── */}
+      <section className="py-20 px-6 bg-gradient-to-b from-slate-900 to-slate-800">
+        <div className="max-w-6xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-violet-500/20 border border-violet-400/30 rounded-full px-4 py-1.5 text-sm text-violet-300 mb-4">
+                <Award className="w-4 h-4" /> Live Industry Data
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Kids Fashion AI Visibility Rankings</h2>
+              <p className="text-lg text-slate-400 max-w-2xl mx-auto">Based on 3,600 real AI evaluations across 30 brands</p>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={200}>
+            <div className="grid md:grid-cols-4 gap-4 mb-10">
+              {[
+                { label: 'Avg Visibility Score', value: '28/100', sub: 'across all brands' },
+                { label: 'Top Brand Score', value: '50/100', sub: 'Hanna Andersson' },
+                { label: 'Brands Visible in AI', value: '93%', sub: '28 of 30 brands' },
+                { label: 'Total Mentions Tracked', value: '1,609', sub: 'across 120 prompts' },
+              ].map(({ label, value, sub }) => (
+                <div key={label} className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-5 text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-white">{value}</div>
+                  <div className="text-sm font-medium text-violet-300 mt-1">{label}</div>
+                  <div className="text-xs text-slate-500 mt-1">{sub}</div>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={300}>
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+                <h3 className="font-semibold text-white flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /> Top 10 AI Visibility Leaderboard</h3>
+                <span className="text-xs text-slate-400">Updated Feb 2026</span>
+              </div>
+              <div className="p-6">
+                <div className="space-y-3">
+                  {[
+                    { rank: 1, name: 'Hanna Andersson', score: 50 },
+                    { rank: 2, name: 'Zara Kids', score: 49 },
+                    { rank: 3, name: 'H&M Kids', score: 49 },
+                    { rank: 4, name: 'Gap Kids', score: 49 },
+                    { rank: 5, name: 'Old Navy Kids', score: 47 },
+                    { rank: 6, name: 'Nike Kids', score: 45 },
+                    { rank: 7, name: 'Cat & Jack (Target)', score: 44 },
+                    { rank: 8, name: 'Carter\'s', score: 43 },
+                    { rank: 9, name: 'Primary.com', score: 40 },
+                    { rank: 10, name: 'Tea Collection', score: 38 },
+                  ].map(({ rank, name, score }) => (
+                    <div key={rank} className="flex items-center gap-4">
+                      <span className={`w-8 text-center font-bold text-lg ${rank <= 3 ? 'text-yellow-400' : 'text-slate-500'}`}>
+                        {rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : `#${rank}`}
+                      </span>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-white">{name}</span>
+                          <span className="text-sm font-bold text-violet-300">{score}/100</span>
+                        </div>
+                        <div className="w-full bg-white/10 rounded-full h-1.5">
+                          <div className="bg-gradient-to-r from-violet-500 to-indigo-500 h-1.5 rounded-full" style={{ width: `${score}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={400}>
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-10">
+              <Link href="/dashboard">
+                <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-white px-8 h-12 rounded-xl">
+                  Explore Full Rankings <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/audit">
+                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 h-12 rounded-xl">
+                  Get Your Brand Scored <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
             </div>
           </FadeIn>
         </div>

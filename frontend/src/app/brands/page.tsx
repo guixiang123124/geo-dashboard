@@ -56,6 +56,10 @@ export default function BrandsPage() {
                     return a.name.localeCompare(b.name);
                 case 'name-desc':
                     return b.name.localeCompare(a.name);
+                case 'visibility-desc':
+                    return (b.score?.visibility_score ?? 0) - (a.score?.visibility_score ?? 0);
+                case 'citation-desc':
+                    return (b.score?.citation_score ?? 0) - (a.score?.citation_score ?? 0);
                 case 'updated-desc':
                     return (b.score?.last_evaluation_date ?? '').localeCompare(
                         a.score?.last_evaluation_date ?? ''
@@ -132,9 +136,10 @@ export default function BrandsPage() {
 
                 {/* Brand Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredBrands.map((brand) => {
+                    {filteredBrands.map((brand, index) => {
                         const score = brand.score;
                         const compositeScore = score?.composite_score ?? 0;
+                        const rank = index + 1;
                         const scoreColor =
                             compositeScore >= 25
                                 ? 'text-green-700'
@@ -156,8 +161,8 @@ export default function BrandsPage() {
                                     <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex items-center justify-center w-12 h-12 bg-slate-100 text-slate-700 rounded-lg font-bold text-lg">
-                                                    {brand.name.charAt(0)}
+                                                <div className={`flex items-center justify-center w-12 h-12 rounded-lg font-bold text-lg ${rank <= 3 ? 'bg-violet-100 text-violet-700' : 'bg-slate-100 text-slate-700'}`}>
+                                                    #{rank}
                                                 </div>
                                                 <div>
                                                     <h3 className="font-semibold text-slate-900 group-hover:text-violet-600 transition-colors">
