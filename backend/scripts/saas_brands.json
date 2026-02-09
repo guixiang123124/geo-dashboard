@@ -1,0 +1,37 @@
+[
+  {"name": "Salesforce", "domain": "salesforce.com", "category": "SaaS & Technology", "sub_category": "CRM/Sales", "description": "Cloud-based CRM platform for sales, service, marketing, and analytics"},
+  {"name": "HubSpot", "domain": "hubspot.com", "category": "SaaS & Technology", "sub_category": "CRM/Sales", "description": "Inbound marketing, sales, and CRM platform for growing businesses"},
+  {"name": "Pipedrive", "domain": "pipedrive.com", "category": "SaaS & Technology", "sub_category": "CRM/Sales", "description": "Sales-focused CRM designed for small teams with visual pipeline management"},
+  {"name": "Zoho CRM", "domain": "zoho.com", "category": "SaaS & Technology", "sub_category": "CRM/Sales", "description": "Affordable CRM with AI-powered sales assistant and multichannel communication"},
+  {"name": "Monday.com", "domain": "monday.com", "category": "SaaS & Technology", "sub_category": "CRM/Sales", "description": "Work operating system with CRM, project management, and workflow automation"},
+
+  {"name": "Asana", "domain": "asana.com", "category": "SaaS & Technology", "sub_category": "Project Management", "description": "Work management platform for teams to organize, track, and manage projects"},
+  {"name": "Notion", "domain": "notion.so", "category": "SaaS & Technology", "sub_category": "Project Management", "description": "All-in-one workspace combining notes, docs, wikis, and project management"},
+  {"name": "ClickUp", "domain": "clickup.com", "category": "SaaS & Technology", "sub_category": "Project Management", "description": "Productivity platform combining tasks, docs, goals, and chat in one app"},
+  {"name": "Trello", "domain": "trello.com", "category": "SaaS & Technology", "sub_category": "Project Management", "description": "Visual Kanban-style project management tool with boards, lists, and cards"},
+  {"name": "Basecamp", "domain": "basecamp.com", "category": "SaaS & Technology", "sub_category": "Project Management", "description": "Simple project management and team communication tool with flat pricing"},
+
+  {"name": "Slack", "domain": "slack.com", "category": "SaaS & Technology", "sub_category": "Communication", "description": "Business messaging platform with channels, integrations, and workflow automation"},
+  {"name": "Zoom", "domain": "zoom.us", "category": "SaaS & Technology", "sub_category": "Communication", "description": "Video conferencing and online meeting platform for businesses and individuals"},
+  {"name": "Microsoft Teams", "domain": "microsoft.com/teams", "category": "SaaS & Technology", "sub_category": "Communication", "description": "Collaboration hub combining chat, video meetings, file storage, and Office integration"},
+  {"name": "Discord", "domain": "discord.com", "category": "SaaS & Technology", "sub_category": "Communication", "description": "Community platform with voice, video, and text chat for teams and communities"},
+  {"name": "Loom", "domain": "loom.com", "category": "SaaS & Technology", "sub_category": "Communication", "description": "Async video messaging tool for recording and sharing screen and camera videos"},
+
+  {"name": "GitHub", "domain": "github.com", "category": "SaaS & Technology", "sub_category": "Developer Tools", "description": "Code hosting platform for version control, collaboration, and CI/CD with Git"},
+  {"name": "GitLab", "domain": "gitlab.com", "category": "SaaS & Technology", "sub_category": "Developer Tools", "description": "Complete DevOps platform with source control, CI/CD, and security scanning"},
+  {"name": "Vercel", "domain": "vercel.com", "category": "SaaS & Technology", "sub_category": "Developer Tools", "description": "Frontend cloud platform for deploying web apps with serverless functions"},
+  {"name": "Netlify", "domain": "netlify.com", "category": "SaaS & Technology", "sub_category": "Developer Tools", "description": "Web development platform for building, deploying, and scaling modern websites"},
+  {"name": "Postman", "domain": "postman.com", "category": "SaaS & Technology", "sub_category": "Developer Tools", "description": "API development platform for designing, testing, and documenting APIs"},
+
+  {"name": "Mailchimp", "domain": "mailchimp.com", "category": "SaaS & Technology", "sub_category": "Marketing", "description": "Email marketing and automation platform for small and medium businesses"},
+  {"name": "Semrush", "domain": "semrush.com", "category": "SaaS & Technology", "sub_category": "Marketing", "description": "Digital marketing toolkit for SEO, PPC, content marketing, and competitive analysis"},
+  {"name": "Ahrefs", "domain": "ahrefs.com", "category": "SaaS & Technology", "sub_category": "Marketing", "description": "SEO toolset for backlink analysis, keyword research, and site auditing"},
+  {"name": "Canva", "domain": "canva.com", "category": "SaaS & Technology", "sub_category": "Marketing", "description": "Online graphic design platform with templates for social media, presentations, and more"},
+  {"name": "Buffer", "domain": "buffer.com", "category": "SaaS & Technology", "sub_category": "Marketing", "description": "Social media management tool for scheduling posts and analyzing performance"},
+
+  {"name": "Tableau", "domain": "tableau.com", "category": "SaaS & Technology", "sub_category": "Analytics/Data", "description": "Visual analytics platform for interactive dashboards and business intelligence"},
+  {"name": "Mixpanel", "domain": "mixpanel.com", "category": "SaaS & Technology", "sub_category": "Analytics/Data", "description": "Product analytics platform for tracking user behavior and engagement metrics"},
+  {"name": "Amplitude", "domain": "amplitude.com", "category": "SaaS & Technology", "sub_category": "Analytics/Data", "description": "Digital analytics platform for understanding user behavior across products"},
+  {"name": "Datadog", "domain": "datadoghq.com", "category": "SaaS & Technology", "sub_category": "Analytics/Data", "description": "Cloud monitoring and observability platform for infrastructure and applications"},
+  {"name": "Snowflake", "domain": "snowflake.com", "category": "SaaS & Technology", "sub_category": "Analytics/Data", "description": "Cloud data platform for data warehousing, data lakes, and data sharing"}
+]
