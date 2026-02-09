@@ -74,7 +74,7 @@ async def health_check():
 
 
 # Import and include routers
-from .routes import auth, brands, evaluations, scores, prompts, models, insights, diagnosis
+from .routes import auth, brands, evaluations, scores, prompts, models, insights, diagnosis, industry
 
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(brands.router, prefix=f"{settings.API_V1_PREFIX}/brands", tags=["brands"])
@@ -84,3 +84,4 @@ app.include_router(prompts.router, prefix=f"{settings.API_V1_PREFIX}/prompts", t
 app.include_router(models.router, prefix=f"{settings.API_V1_PREFIX}/models", tags=["models"])
 app.include_router(insights.router, prefix=f"{settings.API_V1_PREFIX}/insights", tags=["insights"])
 app.include_router(diagnosis.router, prefix=f"{settings.API_V1_PREFIX}/diagnosis", tags=["diagnosis"])
+app.include_router(industry.router, prefix=f"{settings.API_V1_PREFIX}/industry", tags=["industry"])
