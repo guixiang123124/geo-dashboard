@@ -161,6 +161,13 @@ def get_available_models() -> dict:
         models["grok"] = call_grok
     if settings.PERPLEXITY_API_KEY:
         models["perplexity"] = call_perplexity
+    # Debug: log which models are available
+    print(f"[diagnosis] Available models: {list(models.keys())}")
+    print(f"[diagnosis] OPENAI_API_KEY set: {bool(settings.OPENAI_API_KEY)}, XAI_API_KEY set: {bool(settings.XAI_API_KEY)}")
+    if settings.OPENAI_API_KEY:
+        print(f"[diagnosis] OPENAI key prefix: {settings.OPENAI_API_KEY[:10]}...")
+    if settings.XAI_API_KEY:
+        print(f"[diagnosis] XAI key prefix: {settings.XAI_API_KEY[:10]}...")
     return models
 
 
@@ -189,6 +196,7 @@ class DiagnosisRequest(BaseModel):
 class PromptResult(BaseModel):
     prompt: str
     intent: str
+    prompt_type: str = "generic"  # "generic" (no brand name, tests visibility) or "brand_specific" (tests sentiment/framing)
     mentioned: bool
     rank: Optional[int] = None
     sentiment: Optional[str] = None
@@ -298,8 +306,8 @@ Return ONLY valid JSON, no markdown fences."""
 
 
 async def generate_smart_prompts(profile: BrandProfile) -> list[dict]:
-    """Generate 10 tailored evaluation prompts based on brand profile."""
-    prompt = f"""You are an expert in AI visibility (GEO/AEO). Generate 10 search prompts that real consumers would ask AI assistants about this type of brand/product.
+    """Generate 10 tailored evaluation prompts: 5 generic (visibility) + 5 brand-specific (sentiment/framing)."""
+    prompt = f"""You are an expert in AI visibility (GEO/AEO). Generate exactly 10 search prompts for evaluating this brand's AI visibility.
 
 Brand: {profile.name}
 Category: {profile.category}
@@ -307,13 +315,21 @@ Positioning: {profile.positioning}
 Target audience: {profile.target_audience}
 Products: {', '.join(profile.key_products)}
 
-Generate exactly 10 prompts in 4 categories (2-3 each):
-1. "discovery" — general product discovery ("best X for Y")
-2. "comparison" — brand comparisons ("X vs Y", "is X worth it")
-3. "purchase" — buying intent ("where to buy X", "X coupon codes")
-4. "informational" — educational ("how to choose X", "what to look for in X")
+IMPORTANT: Generate TWO types of prompts:
 
-Return a JSON array of objects with keys: "text", "intent" (one of the 4 categories above).
+**Type A — Generic Discovery (5 prompts, DO NOT include the brand name "{profile.name}"):**
+These measure true visibility — whether AI mentions this brand unprompted.
+- "discovery" — general category questions ("best X for Y", "top X brands")
+- "informational" — educational queries about the category ("how to choose X")
+Examples: "What are the best organic kids clothing brands?", "How to choose sustainable baby clothes?"
+
+**Type B — Brand-Specific Analysis (5 prompts, MUST include "{profile.name}"):**
+These measure sentiment, framing, and recommendation quality.
+- "comparison" — brand vs competitors ("X vs Y", "is X worth it")
+- "sentiment" — direct brand queries ("X reviews", "what do people think of X")
+Examples: "Is {profile.name} worth the price?", "{profile.name} vs [competitor]: which is better?"
+
+Return a JSON array of 10 objects with keys: "text", "intent" (discovery/informational/comparison/sentiment), "type" ("generic" or "brand_specific").
 Return ONLY valid JSON, no markdown fences."""
 
     text = await gemini_generate(prompt, max_tokens=1024)
@@ -326,13 +342,18 @@ Return ONLY valid JSON, no markdown fences."""
     except json.JSONDecodeError:
         pass
 
-    # Fallback: generic prompts
+    # Fallback: generic + brand-specific prompts
     return [
-        {"text": f"What are the best {profile.category.lower()} brands?", "intent": "discovery"},
-        {"text": f"Is {profile.name} a good brand?", "intent": "informational"},
-        {"text": f"Where to buy {profile.name} products?", "intent": "purchase"},
-        {"text": f"{profile.name} reviews and alternatives", "intent": "comparison"},
-        {"text": f"Best {profile.key_products[0] if profile.key_products else 'products'} for kids", "intent": "discovery"},
+        {"text": f"What are the best {profile.category.lower()} brands?", "intent": "discovery", "type": "generic"},
+        {"text": f"How to choose the right {profile.category.lower()}?", "intent": "informational", "type": "generic"},
+        {"text": f"Top rated {profile.key_products[0] if profile.key_products else 'products'} recommendations", "intent": "discovery", "type": "generic"},
+        {"text": f"Best affordable {profile.category.lower()} online", "intent": "discovery", "type": "generic"},
+        {"text": f"What should I look for when buying {profile.category.lower()}?", "intent": "informational", "type": "generic"},
+        {"text": f"Is {profile.name} a good brand?", "intent": "sentiment", "type": "brand_specific"},
+        {"text": f"{profile.name} reviews and alternatives", "intent": "comparison", "type": "brand_specific"},
+        {"text": f"{profile.name} vs competitors: which is better?", "intent": "comparison", "type": "brand_specific"},
+        {"text": f"What do people think of {profile.name}?", "intent": "sentiment", "type": "brand_specific"},
+        {"text": f"Is {profile.name} worth the price?", "intent": "sentiment", "type": "brand_specific"},
     ]
 
 
@@ -478,6 +499,7 @@ Return ONLY valid JSON, no markdown fences."""
             return (PromptResult(
                 prompt=sp["text"],
                 intent=sp.get("intent", "discovery"),
+                prompt_type=sp.get("type", "generic"),
                 mentioned=eval_result["mentioned"],
                 rank=eval_result["rank"],
                 sentiment=eval_result["sentiment"],
@@ -488,6 +510,7 @@ Return ONLY valid JSON, no markdown fences."""
             return (PromptResult(
                 prompt=sp["text"],
                 intent=sp.get("intent", "discovery"),
+                prompt_type=sp.get("type", "generic"),
                 mentioned=False,
                 snippet=f"Error: {str(e)[:100]}",
                 model_name=model_name,
@@ -512,6 +535,11 @@ Return ONLY valid JSON, no markdown fences."""
     intents_with_mention = len(set(r.intent for r in results if r.mentioned))
     total_intents = len(set(r.intent for r in results))
 
+    # True visibility = only from GENERIC prompts (no brand name)
+    generic_results = [r for r in results if r.prompt_type == "generic"]
+    generic_mentioned = sum(1 for r in generic_results if r.mentioned)
+    generic_total = len(generic_results) if generic_results else 1
+
     sentiment_scores = []
     for r in results:
         if r.mentioned:
@@ -523,7 +551,8 @@ Return ONLY valid JSON, no markdown fences."""
                 sentiment_scores.append(1)
     avg_repr = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
 
-    visibility = int((mentioned / total) * 100) if total else 0
+    # Visibility based on generic prompts only (true organic discovery)
+    visibility = int((generic_mentioned / generic_total) * 100)
     citation = int((cited_count / total) * 100) if total else 0
     representation = int((avg_repr / 3) * 100) if avg_repr else 0
     intent_score = int((intents_with_mention / total_intents) * 100) if total_intents else 0
@@ -554,11 +583,18 @@ Return ONLY valid JSON, no markdown fences."""
     # Step 6: Generate insights & recommendations
     insights = []
     if visibility >= 70:
-        insights.append(f"Strong AI visibility — {profile.name} is mentioned in {mentioned}/{total} prompts")
+        insights.append(f"Strong organic AI visibility — AI mentions {profile.name} unprompted in {generic_mentioned}/{generic_total} category queries")
     elif visibility >= 30:
-        insights.append(f"Moderate visibility — mentioned in {mentioned}/{total} AI responses")
+        insights.append(f"Moderate organic visibility — mentioned in {generic_mentioned}/{generic_total} generic category queries")
     else:
-        insights.append(f"Low AI visibility — only mentioned in {mentioned}/{total} relevant prompts")
+        insights.append(f"Low organic visibility — AI only mentions {profile.name} in {generic_mentioned}/{generic_total} generic queries (brand not top-of-mind for AI)")
+
+    # Brand-specific insights
+    brand_results = [r for r in results if r.prompt_type == "brand_specific"]
+    if brand_results:
+        positive = sum(1 for r in brand_results if r.sentiment == "positive")
+        total_brand = len(brand_results)
+        insights.append(f"Brand sentiment: {positive}/{total_brand} brand-specific queries received positive framing")
 
     if citation == 0:
         insights.append("Zero citations — AI never links to your website in responses")
