@@ -17,6 +17,31 @@ from ...models.scorecard import ScoreCard
 router = APIRouter()
 
 
+@router.post("/fix-categories")
+async def fix_categories(
+    db: AsyncSession = Depends(get_db),
+):
+    """One-time migration: fix Kids Fashion brands that have descriptions as category."""
+    known = [
+        'SaaS & Technology', 'Health & Wellness', 'Fintech & Financial Services',
+        'Travel & Hospitality', 'Real Estate & Home', 'Education & EdTech',
+        'Food & Beverage', 'Kids Fashion',
+    ]
+    result = await db.execute(
+        select(Brand.id, Brand.category).where(Brand.category.notin_(known))
+    )
+    rows = result.all()
+    if not rows:
+        return {"message": "No brands to fix", "updated": 0}
+
+    for brand_id, old_cat in rows:
+        await db.execute(
+            Brand.__table__.update().where(Brand.id == brand_id).values(category='Kids Fashion')
+        )
+
+    return {"message": f"Updated {len(rows)} brands to 'Kids Fashion'", "updated": len(rows)}
+
+
 def _category_filter(category: Optional[str]):
     """Return a list of conditions for category filtering."""
     if not category:
