@@ -1,0 +1,22 @@
+[
+  {"name": "WebMD", "domain": "webmd.com", "category": "Health & Wellness", "sub_category": "Health Information", "description": "Leading health information portal with symptom checkers, drug info, and doctor reviews"},
+  {"name": "Mayo Clinic", "domain": "mayoclinic.org", "category": "Health & Wellness", "sub_category": "Health Information", "description": "Trusted nonprofit medical resource from one of the world's top hospitals"},
+  {"name": "Healthline", "domain": "healthline.com", "category": "Health & Wellness", "sub_category": "Health Information", "description": "Evidence-based health and wellness content with expert-reviewed articles"},
+  {"name": "CVS", "domain": "cvs.com", "category": "Health & Wellness", "sub_category": "Pharmacy & Retail", "description": "National pharmacy chain offering prescriptions, health services, and wellness products"},
+  {"name": "Walgreens", "domain": "walgreens.com", "category": "Health & Wellness", "sub_category": "Pharmacy & Retail", "description": "Major pharmacy retailer with healthcare clinics and online prescription management"},
+  {"name": "Peloton", "domain": "onepeloton.com", "category": "Health & Wellness", "sub_category": "Fitness Equipment", "description": "Connected fitness platform with bikes, treadmills, and live streaming classes"},
+  {"name": "Noom", "domain": "noom.com", "category": "Health & Wellness", "sub_category": "Weight Management", "description": "Psychology-based weight loss app with personalized coaching and behavior change programs"},
+  {"name": "Hims", "domain": "forhims.com", "category": "Health & Wellness", "sub_category": "Telehealth", "description": "Telehealth platform for men offering treatments for hair loss, ED, skincare, and mental health"},
+  {"name": "Hers", "domain": "forhers.com", "category": "Health & Wellness", "sub_category": "Telehealth", "description": "Women's telehealth platform for skincare, hair care, sexual health, and mental wellness"},
+  {"name": "Calm", "domain": "calm.com", "category": "Health & Wellness", "sub_category": "Mental Health", "description": "Meditation and sleep app with guided sessions, sleep stories, and relaxation music"},
+  {"name": "Headspace", "domain": "headspace.com", "category": "Health & Wellness", "sub_category": "Mental Health", "description": "Mindfulness and meditation app with guided exercises and mental health resources"},
+  {"name": "Whoop", "domain": "whoop.com", "category": "Health & Wellness", "sub_category": "Wearables", "description": "Performance optimization wearable tracking strain, recovery, and sleep metrics"},
+  {"name": "Oura", "domain": "ouraring.com", "category": "Health & Wellness", "sub_category": "Wearables", "description": "Smart ring for health tracking with sleep, readiness, and activity monitoring"},
+  {"name": "GNC", "domain": "gnc.com", "category": "Health & Wellness", "sub_category": "Supplements", "description": "Specialty retailer of vitamins, supplements, and sports nutrition products"},
+  {"name": "Vitamin Shoppe", "domain": "vitaminshoppe.com", "category": "Health & Wellness", "sub_category": "Supplements", "description": "Health and wellness retailer specializing in vitamins, supplements, and superfoods"},
+  {"name": "Ritual", "domain": "ritual.com", "category": "Health & Wellness", "sub_category": "Supplements", "description": "Clean-label vitamin brand with traceable ingredients and subscription delivery"},
+  {"name": "Athletic Greens", "domain": "athleticgreens.com", "category": "Health & Wellness", "sub_category": "Supplements", "description": "All-in-one daily greens supplement powder with 75+ vitamins and minerals"},
+  {"name": "Tonal", "domain": "tonal.com", "category": "Health & Wellness", "sub_category": "Fitness Equipment", "description": "AI-powered strength training system with digital weights and personalized workouts"},
+  {"name": "MyFitnessPal", "domain": "myfitnesspal.com", "category": "Health & Wellness", "sub_category": "Fitness Apps", "description": "Calorie counting and nutrition tracking app with massive food database"},
+  {"name": "Ro", "domain": "ro.co", "category": "Health & Wellness", "sub_category": "Telehealth", "description": "Direct-to-patient telehealth company offering online diagnoses and medication delivery"}
+]

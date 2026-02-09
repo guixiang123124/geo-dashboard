@@ -1,0 +1,22 @@
+[
+  {"text": "Best hotel booking sites for cheap rates", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Top travel apps everyone should have", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best flight search engines to find cheap flights", "intent_category": "general_discovery", "weight": 1},
+  {"text": "What are the best vacation rental platforms?", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best travel planning apps for trip itineraries", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Airbnb vs Booking.com which is better for hotels?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Kayak vs Skyscanner vs Google Flights comparison", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Airbnb vs Vrbo for family vacation rentals", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "GetYourGuide vs Viator for booking tours and activities", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Marriott vs Hilton loyalty program which is better?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Is Hopper actually good for finding cheap flights?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Airbnb reviews is it still worth using in 2026?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Are Scott's Cheap Flights alerts actually good deals?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Expedia reviews can you trust their prices?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Is Kiwi.com reliable for booking flights?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Best apps for finding last-minute hotel deals", "intent_category": "use_case", "weight": 1},
+  {"text": "How to find the cheapest flights to Europe", "intent_category": "use_case", "weight": 1},
+  {"text": "Best platforms for booking group travel", "intent_category": "use_case", "weight": 1},
+  {"text": "Top budget travel tips and booking sites for backpackers", "intent_category": "use_case", "weight": 1},
+  {"text": "Best way to get flight price drop alerts", "intent_category": "use_case", "weight": 1}
+]

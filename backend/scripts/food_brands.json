@@ -1,0 +1,22 @@
+[
+  {"name": "HelloFresh", "domain": "hellofresh.com", "category": "Food & Beverage", "sub_category": "Meal Kits", "description": "Leading meal kit delivery service with pre-portioned ingredients and easy recipes"},
+  {"name": "Blue Apron", "domain": "blueapron.com", "category": "Food & Beverage", "sub_category": "Meal Kits", "description": "Meal kit service delivering fresh ingredients and chef-designed recipes weekly"},
+  {"name": "DoorDash", "domain": "doordash.com", "category": "Food & Beverage", "sub_category": "Food Delivery", "description": "On-demand food delivery platform connecting consumers with local restaurants"},
+  {"name": "Uber Eats", "domain": "ubereats.com", "category": "Food & Beverage", "sub_category": "Food Delivery", "description": "Food delivery service by Uber offering restaurant meals and grocery delivery"},
+  {"name": "Instacart", "domain": "instacart.com", "category": "Food & Beverage", "sub_category": "Grocery Delivery", "description": "Grocery delivery and pickup service from local stores with same-day delivery"},
+  {"name": "Grubhub", "domain": "grubhub.com", "category": "Food & Beverage", "sub_category": "Food Delivery", "description": "Online food ordering and delivery platform partnering with local restaurants"},
+  {"name": "Impossible Foods", "domain": "impossiblefoods.com", "category": "Food & Beverage", "sub_category": "Plant-Based", "description": "Plant-based meat company making burgers and products that taste like animal meat"},
+  {"name": "Beyond Meat", "domain": "beyondmeat.com", "category": "Food & Beverage", "sub_category": "Plant-Based", "description": "Plant-based meat brand with burgers, sausages, and chicken made from plants"},
+  {"name": "Oatly", "domain": "oatly.com", "category": "Food & Beverage", "sub_category": "Plant-Based", "description": "Swedish oat milk brand known for sustainability-focused dairy alternatives"},
+  {"name": "Athletic Brewing", "domain": "athleticbrewing.com", "category": "Food & Beverage", "sub_category": "Non-Alcoholic", "description": "Craft non-alcoholic beer company making full-flavored brews without alcohol"},
+  {"name": "Liquid Death", "domain": "liquiddeath.com", "category": "Food & Beverage", "sub_category": "Beverages", "description": "Canned water and iced tea brand with punk rock marketing and sustainability focus"},
+  {"name": "Olipop", "domain": "drinkolipop.com", "category": "Food & Beverage", "sub_category": "Beverages", "description": "Healthy prebiotic soda brand with plant fiber and botanicals as soda alternative"},
+  {"name": "Soylent", "domain": "soylent.com", "category": "Food & Beverage", "sub_category": "Meal Replacement", "description": "Complete nutrition meal replacement drinks and bars for convenient balanced meals"},
+  {"name": "Daily Harvest", "domain": "dailyharvest.com", "category": "Food & Beverage", "sub_category": "Frozen Meals", "description": "Frozen plant-based meal delivery with smoothies, bowls, and soups"},
+  {"name": "Factor", "domain": "factor75.com", "category": "Food & Beverage", "sub_category": "Prepared Meals", "description": "Fresh prepared meal delivery service with dietitian-designed, ready-to-eat meals"},
+  {"name": "Hungryroot", "domain": "hungryroot.com", "category": "Food & Beverage", "sub_category": "Grocery & Meals", "description": "AI-powered grocery and recipe delivery service with healthy food personalization"},
+  {"name": "Thrive Market", "domain": "thrivemarket.com", "category": "Food & Beverage", "sub_category": "Online Grocery", "description": "Membership-based online grocery store for organic and natural products at wholesale prices"},
+  {"name": "Imperfect Foods", "domain": "imperfectfoods.com", "category": "Food & Beverage", "sub_category": "Grocery Delivery", "description": "Grocery delivery service reducing food waste by selling surplus and imperfect produce"},
+  {"name": "Sunbasket", "domain": "sunbasket.com", "category": "Food & Beverage", "sub_category": "Meal Kits", "description": "Organic meal kit and prepared meal delivery with clean ingredient focus"},
+  {"name": "Sakara Life", "domain": "sakara.com", "category": "Food & Beverage", "sub_category": "Prepared Meals", "description": "Plant-based luxury meal delivery program focused on nutrition and wellness"}
+]

@@ -1,0 +1,22 @@
+[
+  {"name": "Booking.com", "domain": "booking.com", "category": "Travel & Hospitality", "sub_category": "Hotel Booking", "description": "World's largest online travel agency for hotels, apartments, and accommodation bookings"},
+  {"name": "Airbnb", "domain": "airbnb.com", "category": "Travel & Hospitality", "sub_category": "Vacation Rentals", "description": "Marketplace for short-term home rentals, experiences, and unique stays worldwide"},
+  {"name": "Expedia", "domain": "expedia.com", "category": "Travel & Hospitality", "sub_category": "Online Travel Agency", "description": "Full-service travel booking platform for flights, hotels, car rentals, and vacation packages"},
+  {"name": "Marriott", "domain": "marriott.com", "category": "Travel & Hospitality", "sub_category": "Hotel Chain", "description": "World's largest hotel company with 30+ brands across luxury, premium, and select categories"},
+  {"name": "Hilton", "domain": "hilton.com", "category": "Travel & Hospitality", "sub_category": "Hotel Chain", "description": "Global hospitality company with 18 brands spanning luxury to extended-stay properties"},
+  {"name": "Tripadvisor", "domain": "tripadvisor.com", "category": "Travel & Hospitality", "sub_category": "Travel Reviews", "description": "Travel platform with user reviews, price comparison, and booking for hotels and restaurants"},
+  {"name": "Kayak", "domain": "kayak.com", "category": "Travel & Hospitality", "sub_category": "Meta-Search", "description": "Travel search engine comparing prices for flights, hotels, and rental cars across sites"},
+  {"name": "Hopper", "domain": "hopper.com", "category": "Travel & Hospitality", "sub_category": "Price Prediction", "description": "Travel app using AI to predict and monitor flight and hotel prices for best deals"},
+  {"name": "Google Flights", "domain": "google.com/flights", "category": "Travel & Hospitality", "sub_category": "Flight Search", "description": "Google's flight search tool with price tracking, flexible date search, and fare alerts"},
+  {"name": "Skyscanner", "domain": "skyscanner.com", "category": "Travel & Hospitality", "sub_category": "Flight Search", "description": "Global flight comparison site searching across airlines and travel agents for cheapest fares"},
+  {"name": "Vrbo", "domain": "vrbo.com", "category": "Travel & Hospitality", "sub_category": "Vacation Rentals", "description": "Vacation rental marketplace focused on whole-home rentals for families and groups"},
+  {"name": "Hotels.com", "domain": "hotels.com", "category": "Travel & Hospitality", "sub_category": "Hotel Booking", "description": "Hotel booking site with rewards program offering a free night for every 10 stays"},
+  {"name": "Hostelworld", "domain": "hostelworld.com", "category": "Travel & Hospitality", "sub_category": "Budget Travel", "description": "Booking platform specializing in hostels and budget accommodation for backpackers"},
+  {"name": "GetYourGuide", "domain": "getyourguide.com", "category": "Travel & Hospitality", "sub_category": "Tours & Activities", "description": "Marketplace for booking tours, attractions, and activities at destinations worldwide"},
+  {"name": "Viator", "domain": "viator.com", "category": "Travel & Hospitality", "sub_category": "Tours & Activities", "description": "Tripadvisor-owned platform for booking sightseeing tours and travel experiences"},
+  {"name": "Lonely Planet", "domain": "lonelyplanet.com", "category": "Travel & Hospitality", "sub_category": "Travel Guides", "description": "Travel media company with destination guides, tips, and travel inspiration content"},
+  {"name": "Rome2Rio", "domain": "rome2rio.com", "category": "Travel & Hospitality", "sub_category": "Trip Planning", "description": "Multi-modal travel search engine showing how to get anywhere by plane, train, bus, or car"},
+  {"name": "Kiwi.com", "domain": "kiwi.com", "category": "Travel & Hospitality", "sub_category": "Flight Search", "description": "Flight booking platform combining airlines for unique itineraries with virtual interlining"},
+  {"name": "Scott's Cheap Flights", "domain": "going.com", "category": "Travel & Hospitality", "sub_category": "Deal Alerts", "description": "Flight deal alert service that finds and notifies members of cheap flight deals"},
+  {"name": "Wanderlog", "domain": "wanderlog.com", "category": "Travel & Hospitality", "sub_category": "Trip Planning", "description": "Free trip planner app for organizing itineraries, maps, and travel documents"}
+]

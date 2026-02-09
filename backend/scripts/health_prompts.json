@@ -1,0 +1,22 @@
+[
+  {"text": "Best fitness trackers and wearables 2026", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Top meditation and mindfulness apps", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best telehealth services for online doctor visits", "intent_category": "general_discovery", "weight": 1},
+  {"text": "What are the best supplements for energy and focus?", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best weight loss apps that actually work", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Calm vs Headspace which meditation app is better?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Whoop vs Oura Ring which health tracker should I get?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Peloton vs Tonal for home workouts", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Hims vs Ro for men's telehealth services", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "GNC vs Vitamin Shoppe which has better supplements?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Is Peloton worth the subscription price?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Noom reviews does it really help you lose weight?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Are Athletic Greens worth the money?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Honest review of Oura Ring for sleep tracking", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Is Ritual vitamins actually better than regular supplements?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Best app for tracking calories and macros", "intent_category": "use_case", "weight": 1},
+  {"text": "Top telehealth services for men's health and hair loss", "intent_category": "use_case", "weight": 1},
+  {"text": "Best home gym equipment for small apartments", "intent_category": "use_case", "weight": 1},
+  {"text": "What health apps help with anxiety and stress?", "intent_category": "use_case", "weight": 1},
+  {"text": "Best online pharmacy for prescription delivery", "intent_category": "use_case", "weight": 1}
+]

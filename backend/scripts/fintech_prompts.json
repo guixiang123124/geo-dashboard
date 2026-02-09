@@ -1,0 +1,22 @@
+[
+  {"text": "Best savings accounts with high APY 2026", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Top budgeting apps for managing money", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best investing apps for beginners", "intent_category": "general_discovery", "weight": 1},
+  {"text": "What are the best digital banks with no fees?", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best cryptocurrency exchanges to use right now", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Robinhood vs SoFi which is better for investing?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Wealthfront vs Betterment for automated investing", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "YNAB vs Mint which budgeting app should I use?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Venmo vs Cash App vs PayPal for sending money", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Ally Bank vs Marcus by Goldman Sachs savings account comparison", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Is Robinhood safe and reliable for investing?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Chime bank reviews is it actually good?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Is YNAB worth the subscription cost?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Lemonade insurance reviews from real customers", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Are robo-advisors like Wealthfront actually worth it?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Best app for sending money internationally with low fees", "intent_category": "use_case", "weight": 1},
+  {"text": "How to start investing with small amounts of money", "intent_category": "use_case", "weight": 1},
+  {"text": "Best insurance for renters in 2026", "intent_category": "use_case", "weight": 1},
+  {"text": "Top insurance startups disrupting traditional insurance", "intent_category": "use_case", "weight": 1},
+  {"text": "Best free credit score monitoring services", "intent_category": "use_case", "weight": 1}
+]

@@ -1,0 +1,22 @@
+[
+  {"name": "NerdWallet", "domain": "nerdwallet.com", "category": "Fintech & Financial Services", "sub_category": "Financial Advice", "description": "Personal finance website offering tools and advice for credit cards, loans, and investing"},
+  {"name": "Robinhood", "domain": "robinhood.com", "category": "Fintech & Financial Services", "sub_category": "Investing", "description": "Commission-free stock, ETF, and crypto trading app for retail investors"},
+  {"name": "SoFi", "domain": "sofi.com", "category": "Fintech & Financial Services", "sub_category": "Banking & Investing", "description": "All-in-one fintech platform for banking, investing, student loans, and personal finance"},
+  {"name": "Chime", "domain": "chime.com", "category": "Fintech & Financial Services", "sub_category": "Digital Banking", "description": "Fee-free mobile banking with early direct deposit and automatic savings"},
+  {"name": "Wealthfront", "domain": "wealthfront.com", "category": "Fintech & Financial Services", "sub_category": "Robo-Advisor", "description": "Automated investment management with tax-loss harvesting and financial planning"},
+  {"name": "Betterment", "domain": "betterment.com", "category": "Fintech & Financial Services", "sub_category": "Robo-Advisor", "description": "Robo-advisor offering automated investing, retirement planning, and cash management"},
+  {"name": "Credit Karma", "domain": "creditkarma.com", "category": "Fintech & Financial Services", "sub_category": "Credit Monitoring", "description": "Free credit scores, reports, and monitoring with personalized financial recommendations"},
+  {"name": "Mint", "domain": "mint.intuit.com", "category": "Fintech & Financial Services", "sub_category": "Budgeting", "description": "Free budgeting app that tracks spending, bills, and credit scores in one place"},
+  {"name": "YNAB", "domain": "ynab.com", "category": "Fintech & Financial Services", "sub_category": "Budgeting", "description": "Zero-based budgeting app that helps users give every dollar a job"},
+  {"name": "Wise", "domain": "wise.com", "category": "Fintech & Financial Services", "sub_category": "Money Transfer", "description": "International money transfer service with low fees and real exchange rates"},
+  {"name": "PayPal", "domain": "paypal.com", "category": "Fintech & Financial Services", "sub_category": "Payments", "description": "Global online payments platform for sending, receiving, and merchant transactions"},
+  {"name": "Venmo", "domain": "venmo.com", "category": "Fintech & Financial Services", "sub_category": "Payments", "description": "Social payments app for splitting bills and sending money between friends"},
+  {"name": "Cash App", "domain": "cash.app", "category": "Fintech & Financial Services", "sub_category": "Payments", "description": "Mobile payment service with investing, Bitcoin trading, and direct deposit features"},
+  {"name": "Ally Bank", "domain": "ally.com", "category": "Fintech & Financial Services", "sub_category": "Digital Banking", "description": "Online-only bank with high-yield savings accounts and no monthly fees"},
+  {"name": "Marcus by Goldman Sachs", "domain": "marcus.com", "category": "Fintech & Financial Services", "sub_category": "Digital Banking", "description": "Consumer banking brand from Goldman Sachs offering savings, CDs, and personal loans"},
+  {"name": "Lemonade", "domain": "lemonade.com", "category": "Fintech & Financial Services", "sub_category": "Insurance", "description": "AI-powered insurance company offering renters, homeowners, pet, and life insurance"},
+  {"name": "Root Insurance", "domain": "rootinsurance.com", "category": "Fintech & Financial Services", "sub_category": "Insurance", "description": "Usage-based car insurance using smartphone data to personalize rates"},
+  {"name": "Acorns", "domain": "acorns.com", "category": "Fintech & Financial Services", "sub_category": "Micro-Investing", "description": "Micro-investing app that rounds up purchases and invests the spare change"},
+  {"name": "Coinbase", "domain": "coinbase.com", "category": "Fintech & Financial Services", "sub_category": "Cryptocurrency", "description": "Major cryptocurrency exchange for buying, selling, and storing digital assets"},
+  {"name": "Stripe", "domain": "stripe.com", "category": "Fintech & Financial Services", "sub_category": "Payment Infrastructure", "description": "Payment processing platform for internet businesses with developer-friendly APIs"}
+]

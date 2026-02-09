@@ -1,0 +1,22 @@
+[
+  {"name": "Zillow", "domain": "zillow.com", "category": "Real Estate & Home", "sub_category": "Real Estate Marketplace", "description": "Largest real estate marketplace with listings, Zestimates, and home buying tools"},
+  {"name": "Redfin", "domain": "redfin.com", "category": "Real Estate & Home", "sub_category": "Real Estate Brokerage", "description": "Technology-powered real estate brokerage with lower fees and online home buying tools"},
+  {"name": "Realtor.com", "domain": "realtor.com", "category": "Real Estate & Home", "sub_category": "Real Estate Marketplace", "description": "Official real estate listings site operated by the National Association of Realtors"},
+  {"name": "Trulia", "domain": "trulia.com", "category": "Real Estate & Home", "sub_category": "Real Estate Marketplace", "description": "Real estate search platform with neighborhood insights, crime maps, and school ratings"},
+  {"name": "Compass", "domain": "compass.com", "category": "Real Estate & Home", "sub_category": "Real Estate Brokerage", "description": "Tech-driven real estate brokerage with AI tools for agents and luxury listings"},
+  {"name": "Opendoor", "domain": "opendoor.com", "category": "Real Estate & Home", "sub_category": "iBuyer", "description": "iBuyer platform that makes instant cash offers to buy and sell homes online"},
+  {"name": "Offerpad", "domain": "offerpad.com", "category": "Real Estate & Home", "sub_category": "iBuyer", "description": "Real estate technology company offering instant home sale offers and flexible closing"},
+  {"name": "Wayfair", "domain": "wayfair.com", "category": "Real Estate & Home", "sub_category": "Online Furniture", "description": "E-commerce giant for furniture, home decor, and housewares with millions of products"},
+  {"name": "IKEA", "domain": "ikea.com", "category": "Real Estate & Home", "sub_category": "Furniture Retail", "description": "Swedish furniture retailer known for affordable, flat-pack, modern home furnishings"},
+  {"name": "West Elm", "domain": "westelm.com", "category": "Real Estate & Home", "sub_category": "Furniture Retail", "description": "Modern furniture and home decor brand with mid-century and contemporary designs"},
+  {"name": "Houzz", "domain": "houzz.com", "category": "Real Estate & Home", "sub_category": "Home Design", "description": "Home design and renovation platform connecting homeowners with professionals and products"},
+  {"name": "HomeAdvisor", "domain": "homeadvisor.com", "category": "Real Estate & Home", "sub_category": "Home Services", "description": "Platform connecting homeowners with pre-screened local home service professionals"},
+  {"name": "Angi", "domain": "angi.com", "category": "Real Estate & Home", "sub_category": "Home Services", "description": "Home services marketplace for finding and booking local contractors and handymen"},
+  {"name": "TaskRabbit", "domain": "taskrabbit.com", "category": "Real Estate & Home", "sub_category": "Home Services", "description": "On-demand platform for hiring local taskers for furniture assembly, moving, and odd jobs"},
+  {"name": "Thumbtack", "domain": "thumbtack.com", "category": "Real Estate & Home", "sub_category": "Home Services", "description": "Local services marketplace matching homeowners with pros for any home project"},
+  {"name": "Article", "domain": "article.com", "category": "Real Estate & Home", "sub_category": "Online Furniture", "description": "Direct-to-consumer modern furniture brand with mid-century and Scandinavian designs"},
+  {"name": "Castlery", "domain": "castlery.com", "category": "Real Estate & Home", "sub_category": "Online Furniture", "description": "Online furniture brand offering designer-quality pieces at accessible price points"},
+  {"name": "Crate & Barrel", "domain": "crateandbarrel.com", "category": "Real Estate & Home", "sub_category": "Furniture Retail", "description": "Home furnishings retailer with contemporary furniture, housewares, and wedding registry"},
+  {"name": "Pottery Barn", "domain": "potterybarn.com", "category": "Real Estate & Home", "sub_category": "Furniture Retail", "description": "Premium home furnishings brand with classic American style furniture and decor"},
+  {"name": "CB2", "domain": "cb2.com", "category": "Real Estate & Home", "sub_category": "Furniture Retail", "description": "Modern furniture brand from Crate & Barrel targeting younger urban consumers"}
+]

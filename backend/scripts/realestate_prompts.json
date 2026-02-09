@@ -1,0 +1,22 @@
+[
+  {"text": "Best real estate apps for home buying 2026", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Top online furniture stores with fast delivery", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best home service apps for finding contractors", "intent_category": "general_discovery", "weight": 1},
+  {"text": "What are the best interior design platforms and apps?", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best websites for selling your home online", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Zillow vs Redfin which is better for house hunting?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Wayfair vs IKEA for affordable furniture", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Angi vs Thumbtack for hiring home contractors", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Opendoor vs Offerpad for selling your home fast", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Article vs West Elm modern furniture comparison", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Is Zillow's Zestimate accurate for home values?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Wayfair furniture quality honest reviews", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Is Opendoor a good way to sell your home?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "TaskRabbit reviews is it reliable for furniture assembly?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Are Article furniture pieces worth the price?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Best apps for first-time home buyers", "intent_category": "use_case", "weight": 1},
+  {"text": "How to furnish an apartment on a budget", "intent_category": "use_case", "weight": 1},
+  {"text": "Best platforms for finding a handyman near me", "intent_category": "use_case", "weight": 1},
+  {"text": "Top home renovation planning tools and apps", "intent_category": "use_case", "weight": 1},
+  {"text": "Best mid-century modern furniture stores online", "intent_category": "use_case", "weight": 1}
+]

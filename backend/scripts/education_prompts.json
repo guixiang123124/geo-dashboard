@@ -1,0 +1,22 @@
+[
+  {"text": "Best online learning platforms 2026", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Top apps to learn programming and coding", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best language learning apps ranked", "intent_category": "general_discovery", "weight": 1},
+  {"text": "What are the best free education websites?", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best study tools and apps for college students", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Coursera vs Udemy which has better courses?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Codecademy vs DataCamp for learning data science", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Duolingo vs other language learning apps comparison", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Skillshare vs MasterClass which is worth subscribing to?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "LinkedIn Learning vs Pluralsight for tech professionals", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Is Coursera worth it for career advancement?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Duolingo reviews does it actually teach you a language?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Is MasterClass worth the subscription price?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Grammarly Premium reviews is the upgrade worth it?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Is Brilliant good for learning math and science?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Best platforms for getting an online certificate or degree", "intent_category": "use_case", "weight": 1},
+  {"text": "How to learn Python from scratch for free", "intent_category": "use_case", "weight": 1},
+  {"text": "Best tools for teachers to create engaging lessons", "intent_category": "use_case", "weight": 1},
+  {"text": "Top platforms for professional development and upskilling", "intent_category": "use_case", "weight": 1},
+  {"text": "Best flashcard apps for studying and memorization", "intent_category": "use_case", "weight": 1}
+]

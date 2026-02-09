@@ -1,0 +1,22 @@
+[
+  {"text": "Best meal delivery services 2026", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Top food delivery apps ranked", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best plant-based food brands and products", "intent_category": "general_discovery", "weight": 1},
+  {"text": "What are the best healthy snack subscription boxes?", "intent_category": "general_discovery", "weight": 1},
+  {"text": "Best grocery delivery services for organic food", "intent_category": "general_discovery", "weight": 1},
+  {"text": "HelloFresh vs Blue Apron which meal kit is better?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "DoorDash vs Uber Eats which food delivery app is best?", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Impossible Burger vs Beyond Burger taste comparison", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Factor vs Daily Harvest for healthy prepared meals", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Instacart vs Thrive Market for grocery shopping", "intent_category": "feature_comparison", "weight": 1},
+  {"text": "Is HelloFresh worth the price for meal kits?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Olipop reviews is it actually healthy soda?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Is Thrive Market membership worth it?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Athletic Brewing reviews best non-alcoholic beer?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Hungryroot reviews is the food actually good?", "intent_category": "review_sentiment", "weight": 1},
+  {"text": "Best meal kits for families with picky eaters", "intent_category": "use_case", "weight": 1},
+  {"text": "Cheapest food delivery apps with free delivery", "intent_category": "use_case", "weight": 1},
+  {"text": "Best vegan and plant-based meal delivery services", "intent_category": "use_case", "weight": 1},
+  {"text": "Top non-alcoholic beer and drinks brands", "intent_category": "use_case", "weight": 1},
+  {"text": "Best ready-to-eat meals delivered to your door", "intent_category": "use_case", "weight": 1}
+]

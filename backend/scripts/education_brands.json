@@ -1,0 +1,22 @@
+[
+  {"name": "Coursera", "domain": "coursera.org", "category": "Education & EdTech", "sub_category": "Online Courses", "description": "Online learning platform partnering with universities to offer courses, certificates, and degrees"},
+  {"name": "Udemy", "domain": "udemy.com", "category": "Education & EdTech", "sub_category": "Online Courses", "description": "Marketplace for online courses on any topic with instructor-created content"},
+  {"name": "Khan Academy", "domain": "khanacademy.org", "category": "Education & EdTech", "sub_category": "Free Education", "description": "Free online education platform with lessons in math, science, and humanities"},
+  {"name": "Duolingo", "domain": "duolingo.com", "category": "Education & EdTech", "sub_category": "Language Learning", "description": "Gamified language learning app with bite-sized lessons in 40+ languages"},
+  {"name": "Chegg", "domain": "chegg.com", "category": "Education & EdTech", "sub_category": "Student Services", "description": "Student learning platform with textbook rentals, homework help, and tutoring"},
+  {"name": "Skillshare", "domain": "skillshare.com", "category": "Education & EdTech", "sub_category": "Creative Learning", "description": "Online learning community for creative skills like design, illustration, and photography"},
+  {"name": "edX", "domain": "edx.org", "category": "Education & EdTech", "sub_category": "Online Courses", "description": "Online learning platform with university-level courses from Harvard, MIT, and more"},
+  {"name": "LinkedIn Learning", "domain": "linkedin.com/learning", "category": "Education & EdTech", "sub_category": "Professional Development", "description": "Professional development platform with courses in business, tech, and creative skills"},
+  {"name": "Pluralsight", "domain": "pluralsight.com", "category": "Education & EdTech", "sub_category": "Tech Skills", "description": "Technology skills platform for IT and software development training and assessment"},
+  {"name": "Codecademy", "domain": "codecademy.com", "category": "Education & EdTech", "sub_category": "Coding Education", "description": "Interactive coding education platform teaching programming through hands-on exercises"},
+  {"name": "DataCamp", "domain": "datacamp.com", "category": "Education & EdTech", "sub_category": "Data Skills", "description": "Online learning platform for data science, analytics, and AI skills"},
+  {"name": "Brilliant", "domain": "brilliant.org", "category": "Education & EdTech", "sub_category": "STEM Learning", "description": "Interactive STEM learning platform with visual, problem-solving-based lessons"},
+  {"name": "MasterClass", "domain": "masterclass.com", "category": "Education & EdTech", "sub_category": "Expert-Led Learning", "description": "Online classes taught by world-famous experts and celebrities in various fields"},
+  {"name": "Quizlet", "domain": "quizlet.com", "category": "Education & EdTech", "sub_category": "Study Tools", "description": "Digital flashcard and study tool platform used by students worldwide"},
+  {"name": "Notion", "domain": "notion.so", "category": "Education & EdTech", "sub_category": "Productivity", "description": "All-in-one workspace used by students for notes, wikis, and project organization"},
+  {"name": "Grammarly", "domain": "grammarly.com", "category": "Education & EdTech", "sub_category": "Writing Tools", "description": "AI-powered writing assistant for grammar, spelling, tone, and clarity checking"},
+  {"name": "Turnitin", "domain": "turnitin.com", "category": "Education & EdTech", "sub_category": "Academic Integrity", "description": "Plagiarism detection and academic integrity platform used by educational institutions"},
+  {"name": "Kahoot", "domain": "kahoot.com", "category": "Education & EdTech", "sub_category": "Game-Based Learning", "description": "Game-based learning platform for creating and playing educational quizzes"},
+  {"name": "Canva for Education", "domain": "canva.com/education", "category": "Education & EdTech", "sub_category": "Design Tools", "description": "Free design tool for schools and educators with templates for presentations and projects"},
+  {"name": "Google Classroom", "domain": "classroom.google.com", "category": "Education & EdTech", "sub_category": "Learning Management", "description": "Free learning management system by Google for schools to distribute and grade assignments"}
+]
