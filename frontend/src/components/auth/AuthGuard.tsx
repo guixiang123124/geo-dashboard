@@ -17,7 +17,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // If already logged in and on auth page, redirect to home
     if (!loading && isAuthenticated && isAuthRoute) {
-      router.replace('/');
+      router.replace('/dashboard');
     }
   }, [isAuthenticated, loading, isAuthRoute, router]);
 

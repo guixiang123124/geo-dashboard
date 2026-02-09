@@ -1,664 +1,675 @@
 'use client';
 
 import Link from 'next/link';
-import { useBrands } from '@/hooks/useBrands';
-import ScoreCard from '@/components/geo/ScoreCard';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import {
-  BarChart3,
-  TrendingUp,
-  Target,
-  AlertCircle,
-  Loader2,
-  Eye,
-  Link2,
-  MessageSquare,
-  Users,
-  Activity,
-  Info,
-  PlayCircle,
-  Plus,
-  Clock,
-  FileText,
-  PieChart,
-  ArrowRight,
-  Search,
+  ArrowRight, BarChart3, Eye, Globe, Zap, Shield, TrendingUp,
+  Star, CheckCircle2, Users, Search, Clock, Sparkles, Target,
+  MessageSquare, Link2, BookOpen, Lightbulb, Layers, Brain,
+  LineChart, Award, ArrowUpRight, ChevronRight, Play,
+  FileText, Compass, ShoppingCart, Info, GitCompare
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-export default function Home() {
-  const { brands, loading, error } = useBrands();
+/* ── Animate on scroll ── */
+function FadeIn({ children, className = '', delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-10 h-10 animate-spin text-violet-600 mx-auto" />
-          <div>
-            <p className="text-lg font-semibold text-slate-900">Loading Luminos</p>
-            <p className="text-sm text-slate-500 mt-1">Fetching brand performance data...</p>
-          </div>
-        </div>
-      </div>
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.15 }
     );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <AlertCircle className="w-5 h-5" />
-              Error Loading Data
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-slate-700 mb-4">{error}</p>
-            <p className="text-sm text-slate-500">
-              Make sure the backend API is running at{' '}
-              <code className="bg-slate-100 px-2 py-1 rounded text-slate-700">the backend API</code>
-            </p>
-            <Button onClick={() => window.location.reload()} className="mt-4">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Calculate stats from real data
-  const brandsWithScores = brands.filter((b) => b.score);
-  const totalBrands = brands.length;
-  const scoredCount = brandsWithScores.length;
-  const visibleBrands = brandsWithScores.filter((b) => (b.score?.composite_score ?? 0) > 0);
-
-  const avgComposite =
-    scoredCount > 0
-      ? Math.round(
-          brandsWithScores.reduce((sum, b) => sum + (b.score?.composite_score ?? 0), 0) /
-            scoredCount
-        )
-      : 0;
-
-  // Total mentions and mention rate
-  const totalMentions = brandsWithScores.reduce(
-    (sum, b) => sum + (b.score?.total_mentions ?? 0),
-    0
-  );
-  const totalEvaluations = brandsWithScores.reduce(
-    (sum, b) => sum + (b.score?.evaluation_count ?? 0),
-    0
-  );
-  // Mention rate: brands mentioned at least once / total evaluated brands
-  const mentionRate =
-    scoredCount > 0 ? Math.round((visibleBrands.length / scoredCount) * 100) : 0;
-
-  // Average citation rate
-  const avgCitationRate =
-    scoredCount > 0
-      ? Math.round(
-          (brandsWithScores.reduce((sum, b) => sum + (b.score?.citation_rate ?? 0), 0) /
-            scoredCount) *
-            100
-        )
-      : 0;
-
-  // Dimension averages
-  const dimAvg = (key: 'visibility_score' | 'citation_score' | 'representation_score' | 'intent_score') =>
-    scoredCount > 0
-      ? Math.round(
-          brandsWithScores.reduce((sum, b) => sum + (b.score?.[key] ?? 0), 0) / scoredCount
-        )
-      : 0;
-
-  const dimensionData = [
-    { label: 'Visibility', avg: dimAvg('visibility_score'), weight: '35%', icon: Eye, color: 'blue' },
-    { label: 'Citation', avg: dimAvg('citation_score'), weight: '25%', icon: Link2, color: 'green' },
-    { label: 'Framing', avg: dimAvg('representation_score'), weight: '25%', icon: MessageSquare, color: 'amber' },
-    { label: 'Intent', avg: dimAvg('intent_score'), weight: '15%', icon: Target, color: 'purple' },
-  ];
-
-  // Top performers (non-zero only) and brands needing attention
-  const sortedByScore = [...brandsWithScores].sort(
-    (a, b) => (b.score?.composite_score ?? 0) - (a.score?.composite_score ?? 0)
-  );
-  const top5 = sortedByScore.filter((b) => (b.score?.composite_score ?? 0) > 0).slice(0, 5);
-  const notVisible = brandsWithScores.filter((b) => (b.score?.composite_score ?? 0) === 0);
-  const lowPerformers = sortedByScore
-    .filter((b) => {
-      const s = b.score?.composite_score ?? 0;
-      return s > 0 && s < 15;
-    })
-    .slice(-5)
-    .reverse();
-
-  const maxComposite = top5[0]?.score?.composite_score ?? 1;
-
-  // Last evaluation timestamp
-  const lastEvaluationDate = brandsWithScores.reduce<string | null>((latest, b) => {
-    const d = b.score?.last_evaluation_date ?? b.score?.updated_at;
-    if (!d) return latest;
-    if (!latest) return d;
-    return d > latest ? d : latest;
-  }, null);
-
-  const formatLastEvaluated = (dateStr: string | null): string => {
-    if (!dateStr) return 'No evaluations yet';
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffHours < 1) return 'Less than an hour ago';
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   return (
-    <div className="space-y-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-2xl bg-slate-900 p-8 md:p-12 text-white">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-          <div className="relative">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
-              AI Visibility Dashboard
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function ScoreBar({ label, score, color }: { label: string; score: number; color: string }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-sm">
+        <span className="text-slate-600">{label}</span>
+        <span className="font-semibold text-slate-900">{score}/100</span>
+      </div>
+      <div className="w-full bg-slate-100 rounded-full h-2">
+        <div className={`${color} h-2 rounded-full transition-all duration-1000`} style={{ width: `${score}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function SectionTag({ children }: { children: ReactNode }) {
+  return (
+    <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-full px-4 py-1.5 text-sm text-violet-700 mb-4">
+      {children}
+    </div>
+  );
+}
+
+function BrandInput({ onSubmit }: { onSubmit: (v: string) => void }) {
+  const [v, setV] = useState('');
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); onSubmit(v); }} className="max-w-xl mx-auto">
+      <div className="flex gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <input
+            type="text"
+            value={v}
+            onChange={(e) => setV(e.target.value)}
+            placeholder="Enter your brand or domain (e.g., carters.com)"
+            className="w-full pl-12 pr-4 py-4 text-lg rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
+          />
+        </div>
+        <Button type="submit" size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8 h-auto rounded-xl">
+          Diagnose Free <ArrowRight className="w-5 h-5 ml-2" />
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+export default function LandingPage() {
+  const router = useRouter();
+
+  function go(v: string) {
+    router.push(v.trim() ? `/audit?q=${encodeURIComponent(v.trim())}` : '/audit');
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* ─── Nav ─── */}
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
+              <Eye className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-slate-900">Luminos</span>
+          </div>
+          <div className="hidden md:flex items-center gap-8 text-sm text-slate-600">
+            <a href="#how" className="hover:text-violet-600 transition">Features</a>
+            <a href="#pricing" className="hover:text-violet-600 transition">Pricing</a>
+            <Link href="/about" className="hover:text-violet-600 transition">About</Link>
+            <Link href="/dashboard" className="hover:text-violet-600 transition">Dashboard</Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/audit"><Button size="sm" className="bg-violet-600 hover:bg-violet-700">Free Brand Audit</Button></Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* ─── S1: Hero ─── */}
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <FadeIn>
+            <SectionTag><Zap className="w-4 h-4" /> Free Instant AI Visibility Diagnosis</SectionTag>
+            <h1 className="text-5xl md:text-6xl font-bold text-slate-900 leading-tight mb-6">
+              Is Your Brand Visible
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">
+                to AI Search?
+              </span>
             </h1>
-            <p className="text-lg text-slate-300 mb-6 max-w-2xl">
-              Generative Engine Optimization — measuring how AI platforms represent your brands
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
+              40% of Gen Z use ChatGPT and Gemini for product research.
+              Get your AI visibility score in 10 seconds — completely free.
             </p>
-
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              <Link href="/evaluations/new">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium text-sm transition-colors">
-                  <PlayCircle className="w-4 h-4" />
-                  Run Evaluation
-                </button>
-              </Link>
-              <Link href="/brands">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white rounded-lg font-medium text-sm transition-colors">
-                  <Plus className="w-4 h-4" />
-                  Add Brand
-                </button>
-              </Link>
-              <Link href="/analytics">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white rounded-lg font-medium text-sm transition-colors">
-                  <FileText className="w-4 h-4" />
-                  View Reports
-                </button>
-              </Link>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <BrandInput onSubmit={go} />
+          </FadeIn>
+          <FadeIn delay={400}>
+            <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto mt-8">
+              {[['10s', 'Diagnosis Time'], ['10+', 'AI-Generated Prompts'], ['4', 'AI Platforms']].map(([num, label]) => (
+                <div key={label as string}>
+                  <div className="text-3xl font-bold text-violet-600">{num}</div>
+                  <div className="text-sm text-slate-500">{label}</div>
+                </div>
+              ))}
             </div>
-
-            {/* Last Evaluated + AI Model Status */}
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                <Clock className="w-4 h-4 text-slate-300" />
-                <span className="text-sm text-slate-300">Last evaluated: <span className="text-white font-medium">{formatLastEvaluated(lastEvaluationDate)}</span></span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/15 px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-white">Gemini 2.0 Flash</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
-                <span className="text-sm font-medium text-slate-400">ChatGPT (planned)</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
-                <span className="text-sm font-medium text-slate-400">Claude (planned)</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
-                <span className="text-sm font-medium text-slate-400">Perplexity (planned)</span>
-              </div>
-            </div>
-          </div>
+          </FadeIn>
         </div>
+      </section>
 
-        {/* Key Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Users className="w-4 h-4 text-purple-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Brands</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{totalBrands}</p>
-            <p className="text-xs text-slate-500 mt-1">{scoredCount} evaluated</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-4 h-4 text-blue-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Avg Score</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{avgComposite}<span className="text-sm font-normal text-slate-500">/100</span></p>
-            <p className="text-xs text-slate-500 mt-1">composite GEO</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Eye className="w-4 h-4 text-green-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Visible</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{visibleBrands.length}<span className="text-sm font-normal text-slate-500">/{scoredCount}</span></p>
-            <p className="text-xs text-slate-500 mt-1">{mentionRate}% mentioned by AI</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Activity className="w-4 h-4 text-indigo-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Mentions</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{totalMentions}</p>
-            <p className="text-xs text-slate-500 mt-1">across all prompts</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Link2 className="w-4 h-4 text-emerald-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Citation</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{avgCitationRate}%</p>
-            <p className="text-xs text-slate-500 mt-1">avg citation rate</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="w-4 h-4 text-amber-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Top Score</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{maxComposite}</p>
-            <p className="text-xs text-slate-500 mt-1">{top5[0]?.name ?? 'N/A'}</p>
-          </div>
-        </div>
-
-        {/* Dimension Breakdown */}
-        <Card className="border-slate-200">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">GEO Score Dimensions</CardTitle>
-            <p className="text-sm text-slate-500">
-              The composite GEO score (0-100) is calculated from four dimensions
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {dimensionData.map((dim) => {
-                const Icon = dim.icon;
-                const colorMap: Record<string, { bg: string; icon: string; bar: string; text: string }> = {
-                  blue: { bg: 'bg-blue-50', icon: 'text-blue-600', bar: 'bg-blue-500', text: 'text-blue-700' },
-                  green: { bg: 'bg-green-50', icon: 'text-green-600', bar: 'bg-green-500', text: 'text-green-700' },
-                  amber: { bg: 'bg-amber-50', icon: 'text-amber-600', bar: 'bg-amber-500', text: 'text-amber-700' },
-                  purple: { bg: 'bg-purple-50', icon: 'text-purple-600', bar: 'bg-purple-500', text: 'text-purple-700' },
-                };
-                const c = colorMap[dim.color];
-                return (
-                  <div key={dim.label} className={`p-4 rounded-lg ${c.bg} border border-slate-100`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Icon className={`w-4 h-4 ${c.icon}`} />
-                      <span className="text-sm font-medium text-slate-700">{dim.label}</span>
-                      <span className="text-xs text-slate-500 ml-auto">{dim.weight}</span>
-                    </div>
-                    <div className={`text-2xl font-bold ${c.text}`}>{dim.avg}</div>
-                    <div className="w-full bg-white/60 rounded-full h-1.5 mt-2">
-                      <div
-                        className={`${c.bar} h-1.5 rounded-full transition-all`}
-                        style={{ width: `${Math.min(100, dim.avg * 2)}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1">avg across {scoredCount} brands</p>
+      {/* ─── S2: How It Works ─── */}
+      <section id="how" className="py-20 px-6 bg-slate-50">
+        <div className="max-w-4xl mx-auto">
+          <FadeIn>
+            <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">How It Works</h2>
+            <p className="text-center text-slate-600 mb-16">From domain to diagnosis in four simple steps</p>
+          </FadeIn>
+          <div className="space-y-8">
+            {[
+              { step: '1', icon: Globe, title: 'Enter Your Domain or Brand', desc: 'Type your website URL or brand name. We auto-detect your industry, products, and positioning.' },
+              { step: '2', icon: Brain, title: 'AI Crawls & Generates Smart Prompts', desc: 'We crawl your site and use AI to generate 10+ tailored search prompts that real consumers would ask.' },
+              { step: '3', icon: Layers, title: 'Real-Time Evaluation Across AI Platforms', desc: 'Each prompt is tested against multiple AI platforms — Gemini, ChatGPT, Grok, and Perplexity.' },
+              { step: '4', icon: BarChart3, title: 'Get Score + Recommendations in 10 Seconds', desc: 'Receive a comprehensive GEO Score with visibility, citation, framing, and intent metrics — plus actionable next steps.' },
+            ].map(({ step, icon: Icon, title, desc }, i) => (
+              <FadeIn key={step} delay={i * 100}>
+                <div className="flex gap-6 items-start">
+                  <div className="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                    {step}
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Brand ScoreCards */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900">Brand Performance</h2>
-              <p className="text-sm text-slate-600 mt-1">
-                {visibleBrands.length} brands visible to AI out of {scoredCount} evaluated
-              </p>
-            </div>
-            <Link href="/analytics">
-              <Button className="bg-violet-600 hover:bg-violet-700 text-white transition-colors">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                View Analytics
-              </Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {brandsWithScores.map((brand) => (
-              <ScoreCard
-                key={brand.id}
-                brandName={brand.name}
-                category={brand.category}
-                score={{
-                  brandId: brand.id,
-                  brandName: brand.name,
-                  scores: {
-                    composite: brand.score!.composite_score,
-                    visibility: brand.score!.visibility_score,
-                    citation: brand.score!.citation_score,
-                    representation: brand.score!.representation_score,
-                    intent: brand.score!.intent_score,
-                  },
-                  totalMentions: brand.score!.total_mentions,
-                  avgRank: brand.score!.avg_rank || undefined,
-                  citationRate: brand.score!.citation_rate,
-                  intentCoverage: brand.score!.intent_coverage,
-                  lastUpdated: brand.score!.last_evaluation_date || brand.score!.updated_at,
-                }}
-              />
+                  <div>
+                    <h3 className="text-xl font-semibold text-slate-900 mb-1">{title}</h3>
+                    <p className="text-slate-600">{desc}</p>
+                  </div>
+                </div>
+              </FadeIn>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Quick Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-green-100">
-              <h3 className="text-lg font-bold text-slate-900">Top Performers</h3>
-              <p className="text-sm text-slate-600 mt-1">Highest GEO composite scores</p>
+      {/* ─── S3: Dashboard Overview ─── */}
+      <section id="dashboard" className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <SectionTag><BarChart3 className="w-4 h-4" /> Dashboard</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Your AI Visibility Command Center</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">See how your brand stacks up against competitors with real-time SOV scores, brand rankings, and trend sparklines.</p>
             </div>
-            <div className="p-6 space-y-3">
-              {top5.map((brand, index) => {
-                const score = brand.score?.composite_score ?? 0;
-                const barPct = maxComposite > 0 ? (score / maxComposite) * 100 : 0;
-                return (
-                  <Link key={brand.id} href={`/brands/${brand.id}`}>
-                    <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                      <span className="text-sm font-bold text-slate-500 w-6 text-right">#{index + 1}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-semibold text-slate-900 truncate">{brand.name}</span>
-                          <span className="text-lg font-bold text-green-600 ml-2">{score}</span>
-                        </div>
-                        <div className="w-full bg-green-100 rounded-full h-1.5">
-                          <div
-                            className="bg-gradient-to-r from-green-500 to-emerald-500 h-1.5 rounded-full"
-                            style={{ width: `${barPct}%` }}
-                          />
-                        </div>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden">
+              {/* Mock dashboard header */}
+              <div className="bg-slate-900 px-6 py-3 flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                <div className="w-3 h-3 rounded-full bg-green-400" />
+                <span className="ml-4 text-sm text-slate-400">luminos.app/dashboard</span>
+              </div>
+              <div className="p-8">
+                {/* Stat cards row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  {[
+                    { label: 'Brands Tracked', value: '12', icon: Users, change: '+3 this month' },
+                    { label: 'Avg GEO Score', value: '67', icon: BarChart3, change: '+5 pts' },
+                    { label: 'AI Mentions', value: '148', icon: MessageSquare, change: '↑ 23%' },
+                    { label: 'Citation Rate', value: '34%', icon: Link2, change: '↑ 8%' },
+                  ].map(({ label, value, icon: Icon, change }) => (
+                    <div key={label} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <Icon className="w-4 h-4 text-slate-400" />
+                        <span className="text-xs text-emerald-600 font-medium">{change}</span>
                       </div>
+                      <div className="text-2xl font-bold text-slate-900">{value}</div>
+                      <div className="text-xs text-slate-500">{label}</div>
                     </div>
-                  </Link>
-                );
-              })}
-              {top5.length === 0 && (
-                <p className="text-sm text-slate-500 py-4 text-center">No brands with scores yet</p>
-              )}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-orange-50 to-red-50 px-6 py-4 border-b border-orange-100">
-              <h3 className="text-lg font-bold text-slate-900">Needs Attention</h3>
-              <p className="text-sm text-slate-600 mt-1">
-                {notVisible.length} brand{notVisible.length !== 1 ? 's' : ''} not mentioned by AI
-              </p>
-            </div>
-            <div className="p-6 space-y-3">
-              {lowPerformers.length > 0 && (
-                <div className="mb-2">
-                  <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Low scoring brands</p>
-                  {lowPerformers.map((brand) => (
-                    <Link key={brand.id} href={`/brands/${brand.id}`}>
-                      <div className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                        <span className="text-sm font-medium text-slate-900">{brand.name}</span>
-                        <span className="text-sm font-bold text-amber-600">{brand.score?.composite_score}</span>
-                      </div>
-                    </Link>
                   ))}
                 </div>
-              )}
-              {notVisible.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Not visible (score 0)</p>
-                  <div className="flex flex-wrap gap-2">
-                    {notVisible.slice(0, 8).map((brand) => (
-                      <Link key={brand.id} href={`/brands/${brand.id}`}>
-                        <span className="inline-block px-3 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 cursor-pointer transition-colors">
-                          {brand.name}
-                        </span>
-                      </Link>
-                    ))}
-                    {notVisible.length > 8 && (
-                      <span className="inline-block px-3 py-1 text-xs text-slate-500 font-medium">
-                        +{notVisible.length - 8} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-              {lowPerformers.length === 0 && notVisible.length === 0 && (
-                <p className="text-sm text-slate-500 py-4 text-center">All brands performing well</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Share of Voice + Weekly Trend (Demo) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Mini SOV */}
-          <Card className="border-slate-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <PieChart className="w-5 h-5 text-violet-600" />
-                Share of Voice
-              </CardTitle>
-              <p className="text-sm text-slate-500">品牌在 AI 回答中的市场占有率</p>
-            </CardHeader>
-            <CardContent>
-              {(() => {
-                const sovData = [
-                  { name: "Carter's", pct: 28, color: '#8b5cf6' },
-                  { name: 'Primary.com', pct: 16, color: '#3b82f6' },
-                  { name: 'Hanna Andersson', pct: 14, color: '#10b981' },
-                  { name: 'Tea Collection', pct: 12, color: '#f59e0b' },
-                  { name: 'Janie and Jack', pct: 10, color: '#ec4899' },
-                  { name: 'Others', pct: 20, color: '#94a3b8' },
-                ];
-                let cum = 0;
-                const segs = sovData.map(d => {
-                  const start = cum * 3.6;
-                  cum += d.pct;
-                  return { ...d, start, end: cum * 3.6 };
-                });
-                const slice = (s: number, e: number, c: string, i: number) => {
-                  const r = 70, cx = 85, cy = 85;
-                  const sr = (s - 90) * Math.PI / 180, er = (e - 90) * Math.PI / 180;
-                  const x1 = cx + r * Math.cos(sr), y1 = cy + r * Math.sin(sr);
-                  const x2 = cx + r * Math.cos(er), y2 = cy + r * Math.sin(er);
-                  const la = e - s > 180 ? 1 : 0;
-                  return <path key={i} d={`M${cx} ${cy}L${x1} ${y1}A${r} ${r} 0 ${la} 1 ${x2} ${y2}Z`} fill={c} stroke="white" strokeWidth="2" />;
-                };
-                return (
-                  <div className="flex items-center gap-6">
-                    <svg viewBox="0 0 170 170" className="w-36 h-36 flex-shrink-0">
-                      {segs.map((s, i) => slice(s.start, s.end, s.color, i))}
-                      <circle cx="85" cy="85" r="38" fill="white" />
-                      <text x="85" y="82" textAnchor="middle" className="text-lg font-bold" fill="#1e293b">28%</text>
-                      <text x="85" y="97" textAnchor="middle" className="text-[10px]" fill="#64748b">Top Brand</text>
-                    </svg>
-                    <div className="flex-1 space-y-1.5">
-                      {sovData.map((d, i) => (
-                        <div key={i} className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                            <span className="text-slate-700 truncate">{d.name}</span>
+                {/* SOV bar chart mockup */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                    <h4 className="font-semibold text-slate-900 text-sm mb-4">📊 Share of Voice</h4>
+                    <div className="space-y-3">
+                      {[
+                        { brand: 'Your Brand', pct: 32, color: 'bg-violet-500' },
+                        { brand: 'Competitor A', pct: 28, color: 'bg-indigo-400' },
+                        { brand: 'Competitor B', pct: 22, color: 'bg-blue-400' },
+                        { brand: 'Competitor C', pct: 18, color: 'bg-slate-300' },
+                      ].map(({ brand, pct, color }) => (
+                        <div key={brand} className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-slate-600">{brand}</span>
+                            <span className="font-medium text-slate-900">{pct}%</span>
                           </div>
-                          <span className="font-semibold text-slate-900">{d.pct}%</span>
+                          <div className="w-full bg-slate-200 rounded-full h-2">
+                            <div className={`${color} h-2 rounded-full`} style={{ width: `${pct}%` }} />
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                );
-              })()}
-              <Link href="/compete" className="mt-4 flex items-center gap-1 text-sm text-violet-600 hover:text-violet-700 font-medium">
-                查看竞品详细对标 <ArrowRight className="w-4 h-4" />
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Weekly Trend Sparklines */}
-          <Card className="border-slate-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
-                可见性趋势
-              </CardTitle>
-              <p className="text-sm text-slate-500">近 8 周品牌 AI 可见性变化 (Demo)</p>
-            </CardHeader>
-            <CardContent>
-              {(() => {
-                const trendBrands = [
-                  { name: "Carter's", data: [22, 24, 23, 26, 25, 28, 30, 32], color: '#8b5cf6', change: +4 },
-                  { name: 'Primary.com', data: [12, 14, 15, 16, 18, 17, 19, 21], color: '#3b82f6', change: +5 },
-                  { name: 'Hanna Andersson', data: [18, 17, 16, 15, 16, 15, 14, 14], color: '#10b981', change: -2 },
-                  { name: 'Tea Collection', data: [8, 9, 10, 11, 12, 13, 12, 14], color: '#f59e0b', change: +3 },
-                  { name: 'Janie and Jack', data: [10, 10, 11, 9, 10, 11, 10, 11], color: '#ec4899', change: 0 },
-                ];
-                const weeks = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'];
-                return (
-                  <div className="space-y-3">
-                    {trendBrands.map((brand, bi) => {
-                      const max = Math.max(...brand.data);
-                      const min = Math.min(...brand.data);
-                      const range = max - min || 1;
-                      const points = brand.data.map((v, i) => {
-                        const x = 10 + (i / 7) * 120;
-                        const y = 28 - ((v - min) / range) * 22;
-                        return `${x},${y}`;
-                      }).join(' ');
-                      return (
-                        <div key={bi} className="flex items-center gap-3">
-                          <span className="text-xs font-medium text-slate-600 w-28 truncate">{brand.name}</span>
-                          <svg viewBox="0 0 140 32" className="flex-1 h-8">
-                            <polyline points={points} fill="none" stroke={brand.color} strokeWidth="2" strokeLinejoin="round" />
-                          </svg>
-                          <span className="text-xs font-bold w-8 text-right" style={{ color: brand.change > 0 ? '#10b981' : brand.change < 0 ? '#ef4444' : '#64748b' }}>
-                            {brand.change > 0 ? '+' : ''}{brand.change}
-                          </span>
+                  <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                    <h4 className="font-semibold text-slate-900 text-sm mb-4">📈 Trend (8 Weeks)</h4>
+                    <div className="flex items-end gap-2 h-32">
+                      {[42, 45, 48, 52, 55, 60, 63, 67].map((v, i) => (
+                        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-full bg-violet-400 rounded-t" style={{ height: `${v * 1.5}px` }} />
+                          <span className="text-[10px] text-slate-400">W{i + 1}</span>
                         </div>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
-                );
-              })()}
-              <Link href="/trends" className="mt-4 flex items-center gap-1 text-sm text-violet-600 hover:text-violet-700 font-medium">
-                查看完整趋势分析 <ArrowRight className="w-4 h-4" />
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Access: New Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link href="/prompts">
-            <Card className="border-slate-200 hover:border-violet-300 hover:shadow-md transition-all cursor-pointer group">
-              <CardContent className="p-6">
-                <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-violet-200 transition-colors">
-                  <Search className="w-5 h-5 text-violet-600" />
                 </div>
-                <h3 className="font-semibold text-slate-900 mb-1">Prompt 研究</h3>
-                <p className="text-sm text-slate-500">分析用户在 AI 中的真实提问，发现品牌曝光机会</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/compete">
-            <Card className="border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer group">
-              <CardContent className="p-6">
-                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-indigo-200 transition-colors">
+              </div>
+              <div className="bg-violet-50 border-t border-violet-100 p-4 text-center">
+                <span className="text-sm text-slate-600">Real-time data • Auto-refreshing • Multi-brand support</span>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── S4: AI Brand Diagnosis (Free) ─── */}
+      <section id="diagnosis" className="py-20 px-6 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <SectionTag><Sparkles className="w-4 h-4" /> Free AI Diagnosis</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Instant AI Brand Diagnosis</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Enter any domain → AI crawls your site → generates smart prompts → scores you in real time. Try it free, no signup required.</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="grid md:grid-cols-2 gap-8 items-start">
+              {/* Process flow */}
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-slate-900">What happens under the hood</h3>
+                {[
+                  { icon: Globe, label: 'AI crawls your website', desc: 'Extracts brand positioning, products, and key differentiators' },
+                  { icon: Brain, label: 'Smart prompt generation', desc: '10+ consumer-intent prompts tailored to your industry' },
+                  { icon: Zap, label: 'Real-time AI evaluation', desc: 'Tests each prompt against live AI models' },
+                  { icon: Target, label: 'Four-dimensional scoring', desc: 'Visibility · Citation · Framing · Intent Coverage' },
+                ].map(({ icon: Icon, label, desc }) => (
+                  <div key={label} className="flex gap-4 items-start">
+                    <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-5 h-5 text-violet-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-slate-900">{label}</div>
+                      <div className="text-sm text-slate-500">{desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Carter's demo card */}
+              <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-6 text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold">Carter&apos;s</h3>
+                      <p className="text-violet-200 text-sm mt-1">Kids &amp; Baby Clothing · carters.com</p>
+                      <div className="flex items-center gap-1 mt-2 text-violet-300 text-sm">
+                        <Clock className="w-3.5 h-3.5" /> 8.2s · 10 smart prompts
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-5xl font-bold">55</div>
+                      <div className="text-violet-200 text-xs mt-1">GEO Score</div>
+                      <div className="text-lg mt-0.5">Grade: <span className="text-yellow-300 font-bold">C</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 space-y-3">
+                  <ScoreBar label="Visibility" score={70} color="bg-emerald-500" />
+                  <ScoreBar label="Citation" score={20} color="bg-orange-500" />
+                  <ScoreBar label="Framing" score={65} color="bg-emerald-500" />
+                  <ScoreBar label="Intent Coverage" score={75} color="bg-emerald-500" />
+                  <div className="pt-3 border-t text-xs text-slate-400 flex justify-between">
+                    <span>7/10 prompts mentioned brand</span>
+                    <span>Gemini 2.0 Flash</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+          <FadeIn delay={400}>
+            <div className="text-center mt-10">
+              <Link href="/audit">
+                <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8 h-14 rounded-xl">
+                  Try It Free — No Signup <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── S5: Competitive Intelligence ─── */}
+      <section id="compete" className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <SectionTag><GitCompare className="w-4 h-4" /> Competitive Intelligence</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Know Exactly Where You Stand</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Head-to-head brand comparison, category benchmarks, and citation gap analysis.</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-xl p-6 border border-slate-200 hover:border-violet-300 hover:shadow-lg transition-all">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <GitCompare className="w-5 h-5 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Head-to-Head Compare</h3>
+                <p className="text-sm text-slate-600">Pick any two brands and see exactly how AI ranks them side by side across every dimension.</p>
+              </div>
+              <div className="bg-white rounded-xl p-6 border border-slate-200 hover:border-violet-300 hover:shadow-lg transition-all">
+                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                   <Users className="w-5 h-5 text-indigo-600" />
                 </div>
-                <h3 className="font-semibold text-slate-900 mb-1">竞品对标</h3>
-                <p className="text-sm text-slate-500">Head-to-head 品牌对比，发现 Citation Gap</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/trends">
-            <Card className="border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group">
-              <CardContent className="p-6">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-colors">
-                  <TrendingUp className="w-5 h-5 text-emerald-600" />
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Category Benchmarks</h3>
+                <p className="text-sm text-slate-600">See how your brand performs relative to the entire category. Radar charts, SOV analysis, and more.</p>
+              </div>
+              <div className="bg-white rounded-xl p-6 border border-slate-200 hover:border-violet-300 hover:shadow-lg transition-all">
+                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                  <Search className="w-5 h-5 text-amber-600" />
                 </div>
-                <h3 className="font-semibold text-slate-900 mb-1">趋势追踪</h3>
-                <p className="text-sm text-slate-500">追踪品牌可见性变化，季节性趋势和 AI 平台差异</p>
-              </CardContent>
-            </Card>
-          </Link>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Citation Gap Analysis</h3>
+                <p className="text-sm text-slate-600">Discover sources cited for competitors but not for you — then close the gaps with targeted content.</p>
+              </div>
+            </div>
+          </FadeIn>
+          {/* Mini mockup */}
+          <FadeIn delay={300}>
+            <div className="mt-10 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-md">
+              <div className="bg-slate-50 border-b px-6 py-3 text-sm font-medium text-slate-700">🏆 Competitive Landscape — Kids Clothing</div>
+              <div className="p-6">
+                <div className="grid grid-cols-4 gap-4 text-center text-sm">
+                  {[
+                    { name: "Carter's", score: 55, badge: '🥈' },
+                    { name: 'Nike Kids', score: 72, badge: '🥇' },
+                    { name: 'H&M Kids', score: 48, badge: '🥉' },
+                    { name: 'Gap Kids', score: 35, badge: '' },
+                  ].map(({ name, score, badge }) => (
+                    <div key={name} className="space-y-2">
+                      <div className="text-2xl">{badge || '—'}</div>
+                      <div className="font-semibold text-slate-900">{name}</div>
+                      <div className={`text-2xl font-bold ${score >= 60 ? 'text-emerald-600' : score >= 40 ? 'text-amber-600' : 'text-red-500'}`}>{score}</div>
+                      <div className="text-xs text-slate-400">GEO Score</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </FadeIn>
         </div>
+      </section>
 
-        {/* GEO Methodology */}
-        <Card className="border-slate-200">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Info className="w-5 h-5 text-slate-600" />
-              <CardTitle className="text-lg">How GEO Scoring Works</CardTitle>
+      {/* ─── S6: Smart Prompt Research ─── */}
+      <section className="py-20 px-6 bg-slate-50">
+        <div className="max-w-6xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <SectionTag><MessageSquare className="w-4 h-4" /> Prompt Research</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Understand What AI Says About You</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">AI-generated prompts tailored to your brand. Custom prompt support. Organized by intent.</p>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  GEO (Generative Engine Optimization) measures how AI models represent your brand
-                  when users ask relevant questions. Each brand is evaluated across 20+ prompts
-                  covering product discovery, comparisons, purchase intent, and more.
-                </p>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Eye className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                    <span className="text-slate-700"><strong>Visibility (35%)</strong> — Is the brand mentioned in AI responses?</span>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Intent categories */}
+              <div className="space-y-4">
+                {[
+                  { icon: Compass, label: 'Discovery', desc: '"What are the best kids clothing brands?"', color: 'bg-blue-100 text-blue-600', count: 4 },
+                  { icon: GitCompare, label: 'Comparison', desc: '"Carter\'s vs OshKosh vs Nike Kids"', color: 'bg-purple-100 text-purple-600', count: 3 },
+                  { icon: ShoppingCart, label: 'Purchase', desc: '"Where to buy affordable baby clothes?"', color: 'bg-emerald-100 text-emerald-600', count: 2 },
+                  { icon: Info, label: 'Informational', desc: '"Are Carter\'s clothes good quality?"', color: 'bg-amber-100 text-amber-600', count: 1 },
+                ].map(({ icon: Icon, label, desc, color, count }) => (
+                  <div key={label} className="bg-white rounded-xl p-5 border border-slate-200 flex gap-4 items-start hover:shadow-md transition-shadow">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${color}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-slate-900">{label}</span>
+                        <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{count} prompts</span>
+                      </div>
+                      <p className="text-sm text-slate-500 mt-1 italic">{desc}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Link2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    <span className="text-slate-700"><strong>Citation (25%)</strong> — Does AI link to or cite the brand?</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <MessageSquare className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                    <span className="text-slate-700"><strong>Framing (25%)</strong> — How positively is the brand described?</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Target className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                    <span className="text-slate-700"><strong>Intent (15%)</strong> — Does AI recommend the brand for the right queries?</span>
-                  </div>
-                </div>
+                ))}
               </div>
-              <div className="space-y-3">
-                <p className="text-sm font-medium text-slate-700">Score interpretation</p>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span className="text-sm text-slate-600"><strong>25+</strong> — Strong AI presence, frequently mentioned and recommended</span>
+              {/* Feature highlights */}
+              <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-6">
+                <h3 className="font-semibold text-slate-900 text-lg">🔬 Prompt Research Tool</h3>
+                {[
+                  'AI auto-generates 10+ prompts from your domain',
+                  'Add your own custom prompts to test',
+                  'See which brands AI mentions for each prompt',
+                  'Intent funnel: Discovery → Consideration → Decision',
+                  'Brand-Prompt coverage matrix',
+                  'Trending prompts in your category',
+                ].map((text) => (
+                  <div key={text} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-slate-700">{text}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                    <span className="text-sm text-slate-600"><strong>10-24</strong> — Moderate presence, mentioned in some contexts</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                    <span className="text-sm text-slate-600"><strong>1-9</strong> — Low visibility, rarely mentioned by AI</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-                    <span className="text-sm text-slate-600"><strong>0</strong> — Not mentioned in any AI responses</span>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  Scores are based on evaluation against Gemini 2.0 Flash. Multi-model support coming soon.
-                </p>
+                ))}
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── S7: Trend Tracking & Analytics ─── */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <SectionTag><TrendingUp className="w-4 h-4" /> Trends & Analytics</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Track Your AI Visibility Trajectory</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Score changes over time, industry trend monitoring, and cross-platform analytics.</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { icon: LineChart, title: 'Weekly Score Trends', desc: 'Track how your GEO score evolves week over week. Spot improvements and drops instantly.', emoji: '📈' },
+                { icon: TrendingUp, title: 'Movers & Shakers', desc: 'See which brands are gaining or losing AI visibility in your category. Stay ahead of shifts.', emoji: '🔥' },
+                { icon: BarChart3, title: 'Deep Analytics', desc: 'Prompt-level breakdowns, model comparison charts, and exportable reports for your team.', emoji: '📊' },
+              ].map(({ icon: Icon, title, desc, emoji }) => (
+                <div key={title} className="bg-white rounded-xl p-6 border border-slate-200 hover:border-violet-300 hover:shadow-lg transition-all">
+                  <div className="text-3xl mb-3">{emoji}</div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
+                  <p className="text-sm text-slate-600">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── S8: Optimization & Learning ─── */}
+      <section className="py-20 px-6 bg-slate-50">
+        <div className="max-w-6xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <SectionTag><Lightbulb className="w-4 h-4" /> Optimization & Learning</SectionTag>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Not Just Data — Actionable Insights</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">AI-driven recommendations and a GEO knowledge base to help you improve.</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white rounded-xl p-8 border border-slate-200">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                    <Target className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900">Optimization Engine</h3>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    { priority: 'High', text: 'Add Schema.org markup for Product and Organization', color: 'text-red-600 bg-red-50' },
+                    { priority: 'High', text: 'Create FAQ page targeting top AI prompts', color: 'text-red-600 bg-red-50' },
+                    { priority: 'Med', text: 'Improve E-E-A-T signals with author bios', color: 'text-amber-600 bg-amber-50' },
+                    { priority: 'Low', text: 'Add comparison page vs competitors', color: 'text-blue-600 bg-blue-50' },
+                  ].map(({ priority, text, color }) => (
+                    <div key={text} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded ${color}`}>{priority}</span>
+                      <span className="text-sm text-slate-700">{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-white rounded-xl p-8 border border-slate-200">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900">GEO Learning Center</h3>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    { title: 'What is GEO?', desc: 'Understand generative engine optimization from scratch', tag: 'Beginner' },
+                    { title: 'Schema Markup for AI', desc: 'Structured data that AI models can parse', tag: 'Technical' },
+                    { title: 'E-E-A-T for AI Search', desc: 'Build authority signals that LLMs trust', tag: 'Strategy' },
+                    { title: 'Content Optimization', desc: 'Write content that AI recommends', tag: 'Content' },
+                  ].map(({ title, desc, tag }) => (
+                    <div key={title} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg hover:bg-violet-50 transition-colors cursor-pointer">
+                      <FileText className="w-4 h-4 text-violet-500 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-slate-900">{title}</span>
+                          <span className="text-xs text-violet-500 bg-violet-50 px-2 py-0.5 rounded">{tag}</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── S9: Multi-Platform Coverage ─── */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <FadeIn>
+            <SectionTag><Globe className="w-4 h-4" /> Multi-Platform</SectionTag>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">One Dashboard, All AI Platforms</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-12">Different AI models recommend different brands. Test yours across all major platforms.</p>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { name: 'Gemini', emoji: '✨', status: 'Live', color: 'border-emerald-200 bg-emerald-50' },
+                { name: 'ChatGPT', emoji: '🤖', status: 'Live', color: 'border-emerald-200 bg-emerald-50' },
+                { name: 'Grok', emoji: '⚡', status: 'Live', color: 'border-emerald-200 bg-emerald-50' },
+                { name: 'Perplexity', emoji: '🔍', status: 'Live', color: 'border-emerald-200 bg-emerald-50' },
+              ].map(({ name, emoji, status, color }) => (
+                <div key={name} className={`rounded-xl p-6 border-2 ${color} transition-all hover:shadow-md`}>
+                  <div className="text-4xl mb-3">{emoji}</div>
+                  <div className="font-semibold text-slate-900 text-lg">{name}</div>
+                  <div className="text-xs text-emerald-600 font-medium mt-1">● {status}</div>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── S10: Pricing ─── */}
+      <section id="pricing" className="py-20 px-6 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <FadeIn>
+            <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">Simple Pricing</h2>
+            <p className="text-lg text-slate-600 text-center mb-12">Start free. Upgrade when you need more.</p>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { name: 'Free', price: '$0', period: 'forever', features: ['3 brands', '1 AI model (Gemini)', 'Basic GEO Score', 'Monthly reports', 'Community support'], cta: 'Get Started', highlight: false },
+                { name: 'Pro', price: '$49', period: '/month', features: ['20 brands', '3 AI models', 'Full GEO Score + trends', 'Prompt research', 'Competitive benchmark', 'Priority support'], cta: 'Start Pro Trial', highlight: true },
+                { name: 'Business', price: '$299', period: '/month', features: ['Unlimited brands', 'All AI models', 'API access', 'White-label reports', 'Content audit', 'Dedicated manager'], cta: 'Contact Sales', highlight: false },
+              ].map(({ name, price, period, features, cta, highlight }) => (
+                <div key={name} className={`rounded-xl p-8 border-2 bg-white ${highlight ? 'border-violet-500 ring-2 ring-violet-100 scale-105' : 'border-slate-200'}`}>
+                  {highlight && <div className="text-xs font-semibold text-violet-600 uppercase mb-2">Most Popular</div>}
+                  <h3 className="text-xl font-bold text-slate-900">{name}</h3>
+                  <div className="mt-2 mb-6">
+                    <span className="text-4xl font-bold text-slate-900">{price}</span>
+                    <span className="text-slate-500">{period}</span>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {features.map(f => (
+                      <li key={f} className="flex items-center gap-2 text-sm text-slate-600">
+                        <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/audit">
+                    <Button className={`w-full ${highlight ? 'bg-violet-600 hover:bg-violet-700' : ''}`} variant={highlight ? 'default' : 'outline'}>
+                      {cta}
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── S11: Final CTA ─── */}
+      <section className="py-24 px-6 bg-gradient-to-r from-violet-600 to-indigo-700">
+        <div className="max-w-3xl mx-auto text-center text-white">
+          <FadeIn>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to See How AI Views Your Brand?</h2>
+            <p className="text-lg text-violet-100 mb-8">
+              Get your free AI visibility diagnosis in 10 seconds. No credit card. No signup.
+            </p>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <form
+              onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); go(fd.get('q') as string || ''); }}
+              className="max-w-xl mx-auto"
+            >
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    name="q"
+                    type="text"
+                    placeholder="Enter your brand or domain..."
+                    className="w-full pl-12 pr-4 py-4 text-lg rounded-xl border-0 outline-none text-slate-900"
+                  />
+                </div>
+                <Button type="submit" size="lg" className="bg-white text-violet-700 hover:bg-violet-50 text-lg px-8 h-auto rounded-xl font-semibold">
+                  Start Free <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </div>
+            </form>
+          </FadeIn>
+          <FadeIn delay={400}>
+            <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-sm text-violet-200">
+              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4" /> No credit card</span>
+              <span className="flex items-center gap-1.5"><Zap className="w-4 h-4" /> Results in 10 seconds</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> 100% free to start</span>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ─── Footer ─── */}
+      <footer className="py-12 px-6 bg-slate-900 text-slate-400">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-violet-600 rounded flex items-center justify-center">
+              <Eye className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-white font-semibold">Luminos</span>
+          </div>
+          <div className="flex gap-6 text-sm">
+            <Link href="/about" className="hover:text-white transition">About</Link>
+            <Link href="/dashboard" className="hover:text-white transition">Dashboard</Link>
+            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
+            <Link href="/audit" className="hover:text-white transition">Free Brand Audit</Link>
+            <a href="https://github.com/guixiang123124/geo-dashboard" className="hover:text-white transition">GitHub</a>
+          </div>
+          <div className="text-sm">© 2026 Luminos. Built with ❤️</div>
+        </div>
+      </footer>
     </div>
   );
 }

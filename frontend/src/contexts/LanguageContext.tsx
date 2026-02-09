@@ -32,6 +32,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.about': 'About',
     'nav.settings': 'Settings',
 
+    // Nav groups
+    'nav.group.core': 'Core',
+    'nav.group.analyze': 'Analyze',
+    'nav.group.improve': 'Improve',
+
     // Header
     'header.welcome': 'Welcome back',
     'header.subtitle': 'Track your brand performance in the AI era',
@@ -186,6 +191,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.pricing': '定价',
     'nav.about': '关于',
     'nav.settings': '设置',
+
+    // Nav groups
+    'nav.group.core': '核心',
+    'nav.group.analyze': '分析工具',
+    'nav.group.improve': '提升',
 
     // Header
     'header.welcome': '欢迎回来',

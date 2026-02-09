@@ -53,7 +53,7 @@ export default function RegisterPage() {
 
       // Auto-login after registration
       await login({ email, password });
-      router.replace('/');
+      router.replace('/dashboard');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       setError(message);

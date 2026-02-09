@@ -9,7 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 
 const routeNames: Record<string, string> = {
-    '/': 'Dashboard',
+    '/dashboard': 'Dashboard',
     '/analytics': 'Analytics',
     '/trends': 'Trends',
     '/compare': 'Compare',
@@ -42,7 +42,7 @@ export function Header() {
     // Generate breadcrumbs
     const pathSegments = pathname.split('/').filter(Boolean);
     const breadcrumbs = [
-        { name: 'Home', href: '/' },
+        { name: 'Home', href: '/dashboard' },
         ...pathSegments.map((segment, index) => {
             const href = '/' + pathSegments.slice(0, index + 1).join('/');
             const name = routeNames[href] || segment.charAt(0).toUpperCase() + segment.slice(1);
@@ -51,7 +51,7 @@ export function Header() {
     ];
 
     // Don't show breadcrumbs on homepage
-    const showBreadcrumbs = pathname !== '/';
+    const showBreadcrumbs = pathname !== '/dashboard';
 
     const displayName = user?.full_name || user?.email?.split('@')[0] || 'User';
     const initials = displayName
