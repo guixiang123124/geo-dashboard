@@ -202,6 +202,7 @@ class PromptResult(BaseModel):
     sentiment: Optional[str] = None
     snippet: Optional[str] = None
     model_name: Optional[str] = None
+    response_text: Optional[str] = None  # Full AI response for verification
 
 
 class CompetitorInfo(BaseModel):
@@ -321,23 +322,26 @@ async def generate_smart_prompts(profile: BrandProfile) -> list[dict]:
 
 Brand: {profile.name}
 Category: {profile.category}
-Positioning: {profile.positioning}
-Target audience: {profile.target_audience}
 Products: {', '.join(profile.key_products)}
+Target audience: {profile.target_audience}
+
+CRITICAL CONTEXT: This brand sells to END CONSUMERS (parents, shoppers). Generate prompts that CONSUMERS would search — NOT wholesale/B2B queries. Focus on the product category from the consumer perspective.
 
 IMPORTANT: Generate TWO types of prompts:
 
 **Type A — Generic Discovery (5 prompts, DO NOT include the brand name "{profile.name}"):**
-These measure true visibility — whether AI mentions this brand unprompted.
-- "discovery" — general category questions ("best X for Y", "top X brands")
-- "informational" — educational queries about the category ("how to choose X")
-Examples: "What are the best organic kids clothing brands?", "How to choose sustainable baby clothes?"
+These test whether AI recommends this brand when consumers search for the category.
+- "discovery" — what consumers actually search: "best [category] brands", "top [products] for [audience]"
+- "informational" — educational queries: "how to choose [products]", "what to look for in [category]"
+CRITICAL: Prompts MUST be about {profile.category} from a consumer perspective!
+Good examples: "What are the best kids clothing brands?", "Best affordable children's dresses", "How to choose quality kids clothes"
+BAD examples (avoid): wholesale, B2B, supplier, dropshipping queries
 
 **Type B — Brand-Specific Analysis (5 prompts, MUST include "{profile.name}"):**
-These measure sentiment, framing, and recommendation quality.
-- "comparison" — brand vs competitors ("X vs Y", "is X worth it")
-- "sentiment" — direct brand queries ("X reviews", "what do people think of X")
-Examples: "Is {profile.name} worth the price?", "{profile.name} vs [competitor]: which is better?"
+These measure how AI talks about the brand when asked directly.
+- "comparison" — brand vs specific competitors: "{profile.name} vs [real competitor in same category]"
+- "sentiment" — direct questions: "Is {profile.name} good?", "{profile.name} reviews"
+CRITICAL: Compare against REAL brands in the same consumer category, not random brands.
 
 Return a JSON array of 10 objects with keys: "text", "intent" (discovery/informational/comparison/sentiment), "type" ("generic" or "brand_specific").
 Return ONLY valid JSON, no markdown fences."""
@@ -425,7 +429,7 @@ Return ONLY valid JSON array, no markdown fences."""
         return []
 
 
-async def evaluate_prompt(brand_name: str, prompt_text: str, model_name: str, model_fn) -> dict:
+async def evaluate_prompt(brand_name: str, prompt_text: str, model_name: str, model_fn, prompt_type: str = "generic") -> dict:
     """Evaluate a single prompt against a specific AI model and analyze the response."""
     response_text = await model_fn(prompt_text)
     if response_text is None:
@@ -445,6 +449,32 @@ async def evaluate_prompt(brand_name: str, prompt_text: str, model_name: str, mo
 
     is_mentioned = brand_lower in text_lower or brand_simple in re.sub(r"['\-\s]", "", text_lower)
 
+    # For brand-specific prompts, the brand name is IN the question,
+    # so AI will naturally echo it. We need to check if AI actually
+    # KNOWS about / RECOMMENDS the brand, not just echoes it.
+    if is_mentioned and prompt_type == "brand_specific":
+        # Check for "I don't have info" / "I can't verify" patterns
+        negative_patterns = [
+            "i don't have", "i do not have", "i cannot", "i can't",
+            "no specific information", "not able to verify", "not familiar with",
+            "i'm not sure", "i am not sure", "no data", "unable to find",
+            "don't have real-time", "don't have specific", "as of my last",
+            "i couldn't find", "limited information", "not enough information",
+            "i apologize", "might be a slight ambiguity",
+        ]
+        has_negative = any(p in text_lower for p in negative_patterns)
+        
+        # Check if AI actually provides substantive info about the brand
+        positive_knowledge = [
+            "known for", "specializes in", "offers", "founded", "popular for",
+            "well-known", "established", "headquartered", "their products",
+        ]
+        has_knowledge = any(p in text_lower for p in positive_knowledge)
+        
+        # If AI doesn't know the brand, mark as not genuinely mentioned
+        if has_negative and not has_knowledge:
+            is_mentioned = False
+
     rank = None
     snippet = None
     if is_mentioned:
@@ -459,8 +489,8 @@ async def evaluate_prompt(brand_name: str, prompt_text: str, model_name: str, mo
 
     sentiment = None
     if is_mentioned:
-        positive_words = ["best", "top", "excellent", "quality", "premium", "trusted", "popular", "recommended", "great", "love"]
-        negative_words = ["cheap", "poor", "bad", "worst", "avoid", "overpriced", "disappointing"]
+        positive_words = ["best", "top", "excellent", "quality", "premium", "trusted", "popular", "recommended", "great", "love", "known for"]
+        negative_words = ["cheap", "poor", "bad", "worst", "avoid", "overpriced", "disappointing", "unreliable"]
         if any(w in text_lower for w in positive_words):
             sentiment = "positive"
         elif any(w in text_lower for w in negative_words):
@@ -563,7 +593,8 @@ Return ONLY valid JSON, no markdown fences."""
 
     async def eval_one(sp: dict, model_name: str, model_fn) -> tuple:
         try:
-            eval_result = await evaluate_prompt(profile.name, sp["text"], model_name, model_fn)
+            eval_result = await evaluate_prompt(profile.name, sp["text"], model_name, model_fn, sp.get("type", "generic"))
+            resp_text = eval_result.get("response_text", "")
             return (PromptResult(
                 prompt=sp["text"],
                 intent=sp.get("intent", "discovery"),
@@ -573,8 +604,9 @@ Return ONLY valid JSON, no markdown fences."""
                 sentiment=eval_result["sentiment"],
                 snippet=eval_result["snippet"],
                 model_name=model_name,
+                response_text=resp_text[:2000] if resp_text else None,
             ), eval_result.get("has_citation", False), model_name, 
-            eval_result.get("response_text", ""), sp)
+            resp_text, sp)
         except Exception as e:
             return (PromptResult(
                 prompt=sp["text"],
@@ -583,6 +615,7 @@ Return ONLY valid JSON, no markdown fences."""
                 mentioned=False,
                 snippet=f"Error: {str(e)[:100]}",
                 model_name=model_name,
+                response_text=None,
             ), False, model_name, "", sp)
 
     # Build tasks for all prompts x all models

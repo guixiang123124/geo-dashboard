@@ -26,11 +26,13 @@ interface BrandProfile {
 interface PromptResult {
   prompt: string;
   intent: string;
+  prompt_type: string;
   mentioned: boolean;
   rank: number | null;
   sentiment: string | null;
   snippet: string | null;
   model_name: string | null;
+  response_text: string | null;
 }
 
 interface DiagnosisScore {
@@ -173,6 +175,7 @@ export default function AuditPage() {
   const [legacyResult, setLegacyResult] = useState<LegacySearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'prompts' | 'competitors'>('overview');
+  const [expandedResults, setExpandedResults] = useState<Set<number>>(new Set());
 
   const [showCustomPrompts, setShowCustomPrompts] = useState(false);
   const [customPromptsText, setCustomPromptsText] = useState('');
@@ -558,38 +561,115 @@ export default function AuditPage() {
             )}
 
             {activeTab === 'prompts' && (
-              <CardContent className="p-6">
-                <div className="space-y-2">
-                  {diagnosis.results.map((r, i) => (
-                    <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border ${
-                      r.mentioned ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
-                    }`}>
-                      <div className="mt-1">
-                        {r.mentioned
-                          ? <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          : <XCircle className="w-4 h-4 text-slate-400" />
-                        }
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-slate-800">{r.prompt}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <IntentBadge intent={r.intent} />
-                          {r.model_name && <ModelBadge model={r.model_name} />}
-                          {r.mentioned && r.rank && (
-                            <span className="text-xs text-slate-500">Rank #{r.rank}</span>
+              <CardContent className="p-6 space-y-6">
+                {/* Generic Prompts Section */}
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    Generic Discovery Prompts
+                    <span className="text-xs text-slate-400 font-normal">(no brand name — tests true visibility)</span>
+                  </h4>
+                  <div className="space-y-2">
+                    {diagnosis.results.filter(r => r.prompt_type === 'generic').map((r, i) => {
+                      const globalIdx = diagnosis.results.indexOf(r);
+                      const isExpanded = expandedResults.has(globalIdx);
+                      return (
+                        <div key={globalIdx} className={`rounded-lg border ${
+                          r.mentioned ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
+                        }`}>
+                          <div 
+                            className="flex items-start gap-3 p-3 cursor-pointer"
+                            onClick={() => {
+                              const next = new Set(expandedResults);
+                              isExpanded ? next.delete(globalIdx) : next.add(globalIdx);
+                              setExpandedResults(next);
+                            }}
+                          >
+                            <div className="mt-1">
+                              {r.mentioned
+                                ? <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                : <XCircle className="w-4 h-4 text-slate-400" />
+                              }
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-sm font-medium text-slate-800">{r.prompt}</span>
+                                <ChevronRight className={`w-3 h-3 text-slate-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <IntentBadge intent={r.intent} />
+                                {r.model_name && <ModelBadge model={r.model_name} />}
+                                {r.mentioned && r.rank && <span className="text-xs text-slate-500">Rank #{r.rank}</span>}
+                                {r.mentioned && r.sentiment && <SentimentIcon sentiment={r.sentiment} />}
+                              </div>
+                            </div>
+                          </div>
+                          {isExpanded && r.response_text && (
+                            <div className="px-10 pb-3">
+                              <div className="bg-white rounded border p-3 text-xs text-slate-600 whitespace-pre-wrap max-h-60 overflow-y-auto">
+                                {r.response_text}
+                              </div>
+                            </div>
                           )}
-                          {r.mentioned && r.sentiment && (
-                            <SentimentIcon sentiment={r.sentiment} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Brand-Specific Prompts Section */}
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4" />
+                    Brand-Specific Prompts
+                    <span className="text-xs text-slate-400 font-normal">(contains brand name — tests sentiment &amp; framing)</span>
+                  </h4>
+                  <div className="space-y-2">
+                    {diagnosis.results.filter(r => r.prompt_type === 'brand_specific').map((r, i) => {
+                      const globalIdx = diagnosis.results.indexOf(r);
+                      const isExpanded = expandedResults.has(globalIdx);
+                      return (
+                        <div key={globalIdx} className={`rounded-lg border ${
+                          r.mentioned ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-200'
+                        }`}>
+                          <div 
+                            className="flex items-start gap-3 p-3 cursor-pointer"
+                            onClick={() => {
+                              const next = new Set(expandedResults);
+                              isExpanded ? next.delete(globalIdx) : next.add(globalIdx);
+                              setExpandedResults(next);
+                            }}
+                          >
+                            <div className="mt-1">
+                              {r.mentioned
+                                ? <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                                : <XCircle className="w-4 h-4 text-slate-400" />
+                              }
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-sm font-medium text-slate-800">{r.prompt}</span>
+                                <ChevronRight className={`w-3 h-3 text-slate-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <IntentBadge intent={r.intent} />
+                                {r.model_name && <ModelBadge model={r.model_name} />}
+                                {r.mentioned && r.rank && <span className="text-xs text-slate-500">Rank #{r.rank}</span>}
+                                {r.mentioned && r.sentiment && <SentimentIcon sentiment={r.sentiment} />}
+                              </div>
+                            </div>
+                          </div>
+                          {isExpanded && r.response_text && (
+                            <div className="px-10 pb-3">
+                              <div className="bg-white rounded border p-3 text-xs text-slate-600 whitespace-pre-wrap max-h-60 overflow-y-auto">
+                                {r.response_text}
+                              </div>
+                            </div>
                           )}
                         </div>
-                        {r.snippet && (
-                          <p className="text-xs text-slate-500 mt-1 truncate">{r.snippet}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
+                  </div>
                 </div>
               </CardContent>
             )}
