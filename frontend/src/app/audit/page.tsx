@@ -7,7 +7,7 @@ import {
   Search, Eye, Link2, MessageSquare, Target, TrendingUp,
   AlertTriangle, CheckCircle2, XCircle, ArrowRight, Zap, BarChart3,
   Globe, Loader2, ChevronRight, Star, Award, Sparkles, Clock,
-  ThumbsUp, ThumbsDown, Minus
+  ThumbsUp, ThumbsDown, Minus, Users, Trophy, Crown
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -45,6 +45,15 @@ interface DiagnosisScore {
   per_model_scores: Record<string, number> | null;
 }
 
+interface CompetitorInfo {
+  name: string;
+  mention_count: number;
+  avg_rank: number | null;
+  sentiment: string | null;
+  appeared_in_prompts: string[];
+  why_mentioned: string | null;
+}
+
 interface DiagnosisResponse {
   id: string;
   brand: BrandProfile;
@@ -52,6 +61,7 @@ interface DiagnosisResponse {
   results: PromptResult[];
   insights: string[];
   recommendations: string[];
+  competitors: CompetitorInfo[];
   generated_prompts_count: number;
   evaluation_time_seconds: number;
 }
@@ -162,7 +172,7 @@ export default function AuditPage() {
   const [diagnosis, setDiagnosis] = useState<DiagnosisResponse | null>(null);
   const [legacyResult, setLegacyResult] = useState<LegacySearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'prompts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'prompts' | 'competitors'>('overview');
 
   const [showCustomPrompts, setShowCustomPrompts] = useState(false);
   const [customPromptsText, setCustomPromptsText] = useState('');
@@ -503,6 +513,17 @@ export default function AuditPage() {
               >
                 Prompt Results ({diagnosis.results.length})
               </button>
+              {diagnosis.competitors && diagnosis.competitors.length > 0 && (
+                <button
+                  onClick={() => setActiveTab('competitors')}
+                  className={`flex-1 py-3 text-sm font-medium text-center transition-colors ${
+                    activeTab === 'competitors' ? 'border-b-2 border-orange-500 text-orange-700' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <Users className="w-4 h-4 inline mr-1" />
+                  Competitors ({diagnosis.competitors.length})
+                </button>
+              )}
             </div>
 
             {activeTab === 'overview' && (
@@ -569,6 +590,70 @@ export default function AuditPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            )}
+
+            {activeTab === 'competitors' && diagnosis.competitors && (
+              <CardContent className="p-6 space-y-4">
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <Trophy className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-orange-900 text-sm">Competitor Discovery</h4>
+                      <p className="text-xs text-orange-700 mt-1">
+                        These brands were mentioned by AI when users search for your category.
+                        They occupy the visibility space you&apos;re competing for.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {diagnosis.competitors.map((comp, i) => (
+                    <div key={i} className="flex items-start gap-4 p-4 rounded-lg border border-slate-200 hover:border-orange-200 transition-colors">
+                      {/* Rank badge */}
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        i === 0 ? 'bg-yellow-100 text-yellow-700' :
+                        i === 1 ? 'bg-slate-100 text-slate-600' :
+                        i === 2 ? 'bg-orange-100 text-orange-700' :
+                        'bg-slate-50 text-slate-500'
+                      }`}>
+                        {i === 0 ? <Crown className="w-4 h-4" /> :
+                         <span className="text-xs font-bold">{i + 1}</span>}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3">
+                          <span className="font-semibold text-slate-900">{comp.name}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            comp.sentiment === 'positive' ? 'bg-emerald-100 text-emerald-700' :
+                            comp.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
+                            'bg-slate-100 text-slate-600'
+                          }`}>
+                            {comp.sentiment || 'neutral'}
+                          </span>
+                        </div>
+
+                        {comp.why_mentioned && (
+                          <p className="text-sm text-slate-600 mt-1">{comp.why_mentioned}</p>
+                        )}
+
+                        <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                          <span>Mentioned {comp.mention_count}x</span>
+                          {comp.avg_rank && <span>Avg rank #{Math.round(comp.avg_rank)}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-violet-50 border border-violet-200 rounded-lg p-4 mt-4">
+                  <h4 className="font-semibold text-violet-900 text-sm mb-2">💡 What This Means</h4>
+                  <p className="text-xs text-violet-700">
+                    When potential customers ask AI about your category, these are the brands AI recommends instead of you.
+                    Study their content strategy, structured data, and online presence to understand why AI favors them — then optimize your brand to compete.
+                  </p>
                 </div>
               </CardContent>
             )}

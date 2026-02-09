@@ -204,6 +204,15 @@ class PromptResult(BaseModel):
     model_name: Optional[str] = None
 
 
+class CompetitorInfo(BaseModel):
+    name: str
+    mention_count: int
+    avg_rank: Optional[float] = None
+    sentiment: Optional[str] = None  # positive/neutral/negative
+    appeared_in_prompts: list[str] = []  # which prompts mentioned them
+    why_mentioned: Optional[str] = None  # brief reason
+
+
 class DiagnosisScore(BaseModel):
     composite: int
     visibility: int
@@ -232,6 +241,7 @@ class DiagnosisResponse(BaseModel):
     results: list[PromptResult]
     insights: list[str]
     recommendations: list[str]
+    competitors: list[CompetitorInfo] = []
     generated_prompts_count: int
     evaluation_time_seconds: float
 
@@ -355,6 +365,64 @@ Return ONLY valid JSON, no markdown fences."""
         {"text": f"What do people think of {profile.name}?", "intent": "sentiment", "type": "brand_specific"},
         {"text": f"Is {profile.name} worth the price?", "intent": "sentiment", "type": "brand_specific"},
     ]
+
+
+async def extract_competitors(brand_name: str, responses: list[dict], category: str) -> list[CompetitorInfo]:
+    """Extract competitor brands from AI responses using Gemini.
+    
+    Takes the raw AI responses from generic prompts and identifies
+    which brands were mentioned, how often, and in what context.
+    """
+    if not responses:
+        return []
+
+    # Combine response texts (limit to avoid token overflow)
+    combined = ""
+    for r in responses:
+        if r.get("response_text"):
+            combined += f"\n---\nPrompt: {r['prompt']}\nResponse:\n{r['response_text'][:1500]}\n"
+    
+    if not combined.strip():
+        return []
+
+    prompt = f"""Analyze these AI responses about "{category}" and extract ALL brand names mentioned (EXCLUDING "{brand_name}" itself).
+
+{combined[:6000]}
+
+For each brand found, return:
+- name: exact brand name
+- count: how many responses mentioned it
+- avg_rank: average position if in numbered lists (null if not ranked)
+- sentiment: "positive", "neutral", or "negative" based on context
+- why: one brief sentence on why AI recommends/mentions this brand
+
+Return a JSON array sorted by count (highest first), max 15 brands.
+Example: [{{"name":"Nike","count":3,"avg_rank":2,"sentiment":"positive","why":"Frequently recommended for quality and durability"}}]
+Return ONLY valid JSON array, no markdown fences."""
+
+    try:
+        text = await call_gemini(prompt, max_tokens=1024)
+        if not text:
+            return []
+        text = re.sub(r'^```json?\s*', '', text.strip())
+        text = re.sub(r'\s*```$', '', text.strip())
+        data = json.loads(text)
+        if not isinstance(data, list):
+            return []
+        
+        competitors = []
+        for item in data[:15]:
+            competitors.append(CompetitorInfo(
+                name=item.get("name", ""),
+                mention_count=item.get("count", 1),
+                avg_rank=item.get("avg_rank"),
+                sentiment=item.get("sentiment", "neutral"),
+                why_mentioned=item.get("why"),
+            ))
+        return competitors
+    except Exception as e:
+        print(f"[diagnosis] Competitor extraction error: {e}")
+        return []
 
 
 async def evaluate_prompt(brand_name: str, prompt_text: str, model_name: str, model_fn) -> dict:
@@ -505,7 +573,8 @@ Return ONLY valid JSON, no markdown fences."""
                 sentiment=eval_result["sentiment"],
                 snippet=eval_result["snippet"],
                 model_name=model_name,
-            ), eval_result.get("has_citation", False), model_name)
+            ), eval_result.get("has_citation", False), model_name, 
+            eval_result.get("response_text", ""), sp)
         except Exception as e:
             return (PromptResult(
                 prompt=sp["text"],
@@ -514,7 +583,7 @@ Return ONLY valid JSON, no markdown fences."""
                 mentioned=False,
                 snippet=f"Error: {str(e)[:100]}",
                 model_name=model_name,
-            ), False, model_name)
+            ), False, model_name, "", sp)
 
     # Build tasks for all prompts x all models
     tasks = []
@@ -522,12 +591,16 @@ Return ONLY valid JSON, no markdown fences."""
         for model_name, model_fn in available_models.items():
             tasks.append(eval_one(sp, model_name, model_fn))
 
+    generic_responses = []  # Collect for competitor discovery
     all_results = await asyncio.gather(*tasks)
-    for pr, has_cite, mn in all_results:
+    for pr, has_cite, mn, resp_text, sp in all_results:
         results.append(pr)
         if has_cite:
             cited_count += 1
         per_model_results[mn].append({"mentioned": pr.mentioned, "sentiment": pr.sentiment})
+        # Collect generic prompt responses for competitor extraction
+        if sp.get("type", "generic") == "generic" and resp_text:
+            generic_responses.append({"prompt": sp["text"], "response_text": resp_text})
 
     # Step 5: Calculate scores
     total = len(results)
@@ -580,6 +653,13 @@ Return ONLY valid JSON, no markdown fences."""
         per_model_scores=per_model_scores,
     )
 
+    # Step 5.5: Competitor Discovery — extract brands mentioned in generic responses
+    competitors = []
+    if generic_responses:
+        print(f"[diagnosis] Extracting competitors from {len(generic_responses)} generic responses...")
+        competitors = await extract_competitors(profile.name, generic_responses, profile.category)
+        print(f"[diagnosis] Found {len(competitors)} competitors")
+
     # Step 6: Generate insights & recommendations
     insights = []
     if visibility >= 70:
@@ -607,6 +687,10 @@ Return ONLY valid JSON, no markdown fences."""
     if mentioned > 0:
         insights.append(f"Sentiment: {int(positive_count/mentioned*100)}% positive when mentioned")
 
+    if competitors:
+        top3 = [c.name for c in competitors[:3]]
+        insights.append(f"Competitor Discovery: AI recommends {', '.join(top3)} in your category — these brands occupy the visibility you're missing")
+
     if len(models_used) > 1:
         insights.append(f"Evaluated across {len(models_used)} AI platforms: {', '.join(models_used)}")
 
@@ -621,6 +705,9 @@ Return ONLY valid JSON, no markdown fences."""
         recommendations.append("Strengthen your brand narrative — ensure mission, unique value, and differentiators are clearly stated online")
     if intent_score < 60:
         recommendations.append("Diversify content to cover all user intents: discovery, comparison, purchase decisions, and education")
+    if competitors and visibility < 70:
+        top_comp = competitors[0]
+        recommendations.append(f"Study {top_comp.name}'s content strategy — they rank #{int(top_comp.avg_rank) if top_comp.avg_rank else '?'} in your category. Analyze why AI favors them")
     if not recommendations:
         recommendations.append("Maintain high-quality content and monitor AI visibility trends regularly")
         recommendations.append("Consider expanding evaluation to additional AI platforms for cross-platform insights")
@@ -635,6 +722,7 @@ Return ONLY valid JSON, no markdown fences."""
         results=results,
         insights=insights,
         recommendations=recommendations[:5],
+        competitors=competitors,
         generated_prompts_count=len(smart_prompts),
         evaluation_time_seconds=elapsed,
     )
@@ -657,6 +745,7 @@ Return ONLY valid JSON, no markdown fences."""
             results_json=[r.model_dump() for r in results],
             insights=insights,
             recommendations=recommendations[:5],
+            competitors_json=[c.model_dump() for c in competitors],
             created_at=datetime.utcnow(),
         )
         db.add(record)
