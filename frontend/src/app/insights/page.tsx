@@ -165,7 +165,7 @@ function OverviewTab() {
     { label: 'Total Evaluations', value: stats.total_evaluations.toLocaleString() },
     { label: 'Brands Tracked', value: stats.total_brands },
     { label: 'Avg Composite', value: stats.score_averages.composite.toFixed(1) },
-    { label: 'Mention Rate', value: `${(stats.mention_rate * 100).toFixed(1)}%` },
+    { label: 'Mention Rate', value: `${stats.mention_rate.toFixed(1)}%` },
   ];
 
   const dims = [
@@ -194,10 +194,10 @@ function OverviewTab() {
               <div key={ib.intent} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="text-zinc-300 truncate mr-2">{ib.intent}</span>
-                  <span className="text-zinc-400 shrink-0">{(ib.rate * 100).toFixed(0)}%</span>
+                  <span className="text-zinc-400 shrink-0">{ib.rate.toFixed(1)}%</span>
                 </div>
                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-violet-600 to-indigo-500 rounded-full transition-all" style={{ width: `${ib.rate * 100}%` }} />
+                  <div className="h-full bg-gradient-to-r from-violet-600 to-indigo-500 rounded-full transition-all" style={{ width: `${Math.min(ib.rate, 100)}%` }} />
                 </div>
               </div>
             ))}
@@ -211,7 +211,7 @@ function OverviewTab() {
               <div key={d.label} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="text-zinc-300">{d.label}</span>
-                  <span className={scoreColor(d.value)}>{d.value.toFixed(1)}</span>
+                  <span className={scoreColor(d.value)}>{d.value}/100</span>
                 </div>
                 <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
                   <div className={`h-full rounded-full transition-all ${d.value >= 60 ? 'bg-emerald-500' : d.value >= 30 ? 'bg-yellow-500' : 'bg-red-500'}`} style={{ width: `${d.value}%` }} />
