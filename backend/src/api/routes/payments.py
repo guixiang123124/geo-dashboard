@@ -23,7 +23,7 @@ class CheckoutResponse(BaseModel):
 @router.post("/create-checkout-session", response_model=CheckoutResponse)
 async def create_checkout_session(req: CheckoutRequest):
     """Create a Stripe Checkout Session for a subscription."""
-    from ....core.config import settings
+    from ...core.config import settings
 
     if not settings.STRIPE_SECRET_KEY:
         raise HTTPException(status_code=500, detail="Stripe is not configured")
@@ -56,7 +56,7 @@ async def create_checkout_session(req: CheckoutRequest):
 @router.post("/webhook")
 async def stripe_webhook(request: Request):
     """Handle Stripe webhook events. Requires raw body for signature verification."""
-    from ....core.config import settings
+    from ...core.config import settings
 
     import stripe
     stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -97,7 +97,7 @@ async def stripe_webhook(request: Request):
 @router.get("/subscription-status")
 async def subscription_status(customer_id: Optional[str] = None, email: Optional[str] = None):
     """Check subscription status by customer ID or email."""
-    from ....core.config import settings
+    from ...core.config import settings
 
     if not settings.STRIPE_SECRET_KEY:
         raise HTTPException(status_code=500, detail="Stripe is not configured")
