@@ -51,6 +51,12 @@ class Settings(BaseSettings):
     MAX_RETRIES: int = 3
     RETRY_DELAY: int = 2  # seconds
 
+    # Stripe
+    STRIPE_SECRET_KEY: Optional[str] = None
+    STRIPE_WEBHOOK_SECRET: Optional[str] = None
+    STRIPE_PRICE_PRO: Optional[str] = None  # price_xxx for $49/mo
+    STRIPE_PRICE_ENTERPRISE: Optional[str] = None  # price_xxx for $299/mo
+
     # Security
     SECRET_KEY: str = "your-secret-key-here-change-in-production"
     ALGORITHM: str = "HS256"

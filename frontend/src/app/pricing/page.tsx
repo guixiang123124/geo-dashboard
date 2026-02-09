@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useState } from 'react';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://geo-insights-api-production.up.railway.app';
+
 const tiers = [
   {
     name: 'Free',
@@ -17,6 +19,7 @@ const tiers = [
     ctaLink: '/audit',
     highlight: false,
     comingSoon: false,
+    stripePlan: null,
   },
   {
     name: 'Pro',
@@ -24,10 +27,11 @@ const tiers = [
     period: '/month',
     description: 'For marketers who need deeper AI visibility insights.',
     features: ['Unlimited diagnoses', '3 AI models', 'Full GEO Score + trends', 'Custom prompt testing', 'Prompt research tools', 'Competitive benchmark', 'Priority support'],
-    cta: 'Coming Soon',
+    cta: 'Upgrade to Pro',
     ctaLink: '#',
     highlight: true,
-    comingSoon: true,
+    comingSoon: false,
+    stripePlan: 'pro',
   },
   {
     name: 'Business',
@@ -35,10 +39,11 @@ const tiers = [
     period: '/month',
     description: 'For teams managing multiple brands at scale.',
     features: ['Everything in Pro', 'Unlimited brands', 'All AI models (4+)', 'API access', 'White-label reports', 'Content audit tools', 'Dedicated account manager'],
-    cta: 'Coming Soon',
+    cta: 'Upgrade to Business',
     ctaLink: '#',
     highlight: false,
-    comingSoon: true,
+    comingSoon: false,
+    stripePlan: 'enterprise',
   },
   {
     name: 'Enterprise',
@@ -49,7 +54,8 @@ const tiers = [
     cta: 'Contact Us',
     ctaLink: 'mailto:hello@luminos.ai',
     highlight: false,
-    comingSoon: true,
+    comingSoon: false,
+    stripePlan: null,
   },
 ];
 
@@ -112,6 +118,31 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+async function handleCheckout(plan: 'pro' | 'enterprise') {
+  const origin = window.location.origin;
+  const priceIdParam = plan; // backend resolves to actual Stripe price ID
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/payments/create-checkout-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        price_id: priceIdParam,
+        success_url: `${origin}/pricing/success`,
+        cancel_url: `${origin}/pricing/cancel`,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.detail || 'Failed to start checkout. Please try again.');
+      return;
+    }
+    const data = await res.json();
+    window.location.href = data.checkout_url;
+  } catch {
+    alert('Network error. Please try again.');
+  }
+}
+
 export default function PricingPage() {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-16">
@@ -149,8 +180,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            {tier.comingSoon ? (
-              <Button className="w-full" variant="outline" disabled={tier.cta === 'Coming Soon'}>
+            {tier.stripePlan ? (
+              <Button
+                className={`w-full ${tier.highlight ? 'bg-violet-600 hover:bg-violet-700' : ''}`}
+                variant={tier.highlight ? 'default' : 'outline'}
+                onClick={() => handleCheckout(tier.stripePlan as 'pro' | 'enterprise')}
+              >
                 {tier.cta}
               </Button>
             ) : (
