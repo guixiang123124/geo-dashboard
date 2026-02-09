@@ -14,6 +14,7 @@ import {
   X,
   ChevronDown,
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // ─── Demo Data ───────────────────────────────────────────────
 interface Brand {
@@ -44,19 +45,25 @@ const BRANDS: Brand[] = [
 
 const ALL_SOURCES = [...new Set(BRANDS.flatMap(b => b.sources))];
 const DIMENSIONS = ['visibility', 'sentiment', 'citation', 'representation'] as const;
-const DIM_LABELS: Record<string, string> = { visibility: '可见度', sentiment: '情感', citation: '引用', representation: '代表性' };
+const DIM_LABEL_KEYS: Record<string, string> = {
+  visibility: 'compete.dim.visibility',
+  sentiment: 'compete.dim.sentiment',
+  citation: 'compete.dim.citation',
+  representation: 'compete.dim.representation',
+};
 
 const MY_BRAND = 'PatPat';
 
 const ACTION_ITEMS = [
-  { priority: '高', text: '提升在 goodhousekeeping.com 和 babylist.com 的品牌引用，竞品 Carter\'s 在这些来源有强力覆盖', icon: ExternalLink },
-  { priority: '高', text: '优化品牌代表性评分 (当前 70)，Primary 和 Hanna Andersson 均在 85+ 以上', icon: TrendingUp },
-  { priority: '中', text: '争取 "Top Pick" 推荐标签，当前仅获得 "Budget Pick"，需提升质量感知', icon: Trophy },
-  { priority: '中', text: '增加在 parents.com 和 theeverymom.com 的内容露出', icon: ExternalLink },
-  { priority: '低', text: '监控 Cat & Jack 的高可见度策略 (78分)，分析其 Target 渠道优势', icon: AlertTriangle },
+  { priority: 'compete.priority.high', textKey: 'compete.action1', icon: ExternalLink },
+  { priority: 'compete.priority.high', textKey: 'compete.action2', icon: TrendingUp },
+  { priority: 'compete.priority.medium', textKey: 'compete.action3', icon: Trophy },
+  { priority: 'compete.priority.medium', textKey: 'compete.action4', icon: ExternalLink },
+  { priority: 'compete.priority.low', textKey: 'compete.action5', icon: AlertTriangle },
 ];
 
 export default function CompetePage() {
+  const { t } = useLanguage();
   const [selected, setSelected] = useState<string[]>(['PatPat', 'Carter\'s', 'H&M Kids', 'Primary']);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -96,16 +103,16 @@ export default function CompetePage() {
       <div className="bg-gradient-to-r from-indigo-700 via-violet-700 to-purple-700 rounded-2xl p-6 md:p-8 text-white">
         <div className="flex items-center gap-3 mb-2">
           <GitCompareArrows className="w-8 h-8" />
-          <h1 className="text-2xl md:text-3xl font-bold">竞品对标分析</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t('compete.title')}</h1>
         </div>
-        <p className="text-indigo-200 text-sm md:text-base">品牌间多维度对比，发现引用差距与竞争机会</p>
+        <p className="text-indigo-200 text-sm md:text-base">{t('compete.subtitle')}</p>
       </div>
 
       {/* Brand Selector */}
       <Card>
         <CardContent className="py-4">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm font-medium text-slate-500">选择品牌 (2-4):</span>
+            <span className="text-sm font-medium text-slate-500">{t('compete.selectBrands')}:</span>
             <div className="relative">
               <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50">
                 {selected.join(', ')} <ChevronDown className="w-4 h-4" />
@@ -131,7 +138,7 @@ export default function CompetePage() {
         {/* Radar Chart */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">多维雷达对比</CardTitle>
+            <CardTitle className="text-base">{t('compete.radarTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             <svg viewBox="0 0 300 300" className="w-full max-w-md mx-auto">
@@ -144,7 +151,7 @@ export default function CompetePage() {
               {/* Labels */}
               {DIMENSIONS.map((d, i) => {
                 const p = getRadarPoint(115, i);
-                return <text key={d} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill="#64748b" fontWeight="600">{DIM_LABELS[d]}</text>;
+                return <text key={d} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="11" fill="#64748b" fontWeight="600">{t(DIM_LABEL_KEYS[d])}</text>;
               })}
               {/* Brand polygons */}
               {selectedBrands.map(brand => {
@@ -177,15 +184,15 @@ export default function CompetePage() {
         {/* Competitive Landscape Scatter */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">竞争格局地图</CardTitle>
+            <CardTitle className="text-base">{t('compete.landscapeTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             <svg viewBox={`0 0 ${scatterW} ${scatterH}`} className="w-full">
               {/* Axes */}
               <line x1={scatterPad} y1={scatterH - scatterPad} x2={scatterW - 20} y2={scatterH - scatterPad} stroke="#cbd5e1" strokeWidth="1" />
               <line x1={scatterPad} y1={20} x2={scatterPad} y2={scatterH - scatterPad} stroke="#cbd5e1" strokeWidth="1" />
-              <text x={scatterW / 2} y={scatterH - 10} textAnchor="middle" fontSize="11" fill="#64748b">可见度 →</text>
-              <text x={15} y={scatterH / 2} textAnchor="middle" fontSize="11" fill="#64748b" transform={`rotate(-90, 15, ${scatterH / 2})`}>情感 →</text>
+              <text x={scatterW / 2} y={scatterH - 10} textAnchor="middle" fontSize="11" fill="#64748b">{t('compete.xAxis.visibility')}</text>
+              <text x={15} y={scatterH / 2} textAnchor="middle" fontSize="11" fill="#64748b" transform={`rotate(-90, 15, ${scatterH / 2})`}>{t('compete.yAxis.sentiment')}</text>
               {/* Grid lines */}
               {[25, 50, 75].map(v => {
                 const x = scatterPad + ((v) / 100) * (scatterW - scatterPad - 20);
@@ -210,7 +217,7 @@ export default function CompetePage() {
                 );
               })}
             </svg>
-            <p className="text-xs text-slate-400 text-center mt-2">气泡大小 = 提及次数</p>
+            <p className="text-xs text-slate-400 text-center mt-2">{t('compete.bubbleSize')}</p>
           </CardContent>
         </Card>
       </div>
@@ -218,7 +225,7 @@ export default function CompetePage() {
       {/* AI Recommendation Types */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><Star className="w-5 h-5 text-yellow-500" />AI 推荐类型</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base"><Star className="w-5 h-5 text-yellow-500" />{t('compete.aiRecType')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -229,7 +236,7 @@ export default function CompetePage() {
                 </div>
                 <p className="text-sm font-semibold text-slate-800">{b.name}</p>
                 <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${b.recColor}`}>{b.recommendation}</span>
-                <div className="text-xs text-slate-400">综合 {Math.round((b.visibility + b.sentiment + b.citation + b.representation) / 4)}分</div>
+                <div className="text-xs text-slate-400">{t('compete.composite')} {Math.round((b.visibility + b.sentiment + b.citation + b.representation) / 4)}{t('compete.score')}</div>
               </div>
             ))}
           </div>
@@ -239,10 +246,10 @@ export default function CompetePage() {
       {/* Citation Gap Analysis */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="w-5 h-5 text-amber-500" />引用差距分析 — {MY_BRAND}</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="w-5 h-5 text-amber-500" />{t('compete.citationGap')} — {MY_BRAND}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-slate-500 mb-4">以下信息来源被竞品引用，但 {MY_BRAND} 尚未被引用:</p>
+          <p className="text-sm text-slate-500 mb-4">{t('compete.citationGapDesc')} {MY_BRAND} {t('compete.notCited')}:</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {uniqueGaps.map(g => (
               <div key={g.source} className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-lg">
@@ -250,7 +257,7 @@ export default function CompetePage() {
                   <ExternalLink className="w-4 h-4 text-amber-600" />
                   <span className="text-sm font-medium text-amber-800">{g.source}</span>
                 </div>
-                <span className="text-xs text-amber-600">被 {g.competitor} 引用</span>
+                <span className="text-xs text-amber-600">{t('compete.citedBy')} {g.competitor}</span>
               </div>
             ))}
           </div>
@@ -260,19 +267,20 @@ export default function CompetePage() {
       {/* Action Items */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><Lightbulb className="w-5 h-5 text-violet-600" />优化行动建议</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base"><Lightbulb className="w-5 h-5 text-violet-600" />{t('compete.actionTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {ACTION_ITEMS.map((item, i) => {
               const Icon = item.icon;
+              const priority = t(item.priority);
               return (
                 <div key={i} className="flex items-start gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                   <Icon className="w-5 h-5 text-violet-500 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-sm text-slate-700">{item.text}</p>
+                    <p className="text-sm text-slate-700">{t(item.textKey)}</p>
                   </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${item.priority === '高' ? 'bg-red-100 text-red-700' : item.priority === '中' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>{item.priority}</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${priority === t('compete.priority.high') ? 'bg-red-100 text-red-700' : priority === t('compete.priority.medium') ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>{priority}</span>
                 </div>
               );
             })}

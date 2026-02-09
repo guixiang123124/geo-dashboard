@@ -22,103 +22,134 @@ import {
   Clock,
   Users,
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // GEO Best Practices Data
 const geoStrategies = [
   {
     id: 1,
-    title: '添加权威引用和统计数据',
-    description: '在内容中加入来自权威来源的引用和具体统计数据，可提升 AI 引用可能性高达 40%',
+    title: 'Add Authoritative Citations and Statistics',
+    titleZh: '添加权威引用和统计数据',
+    description: 'Including citations from authoritative sources and specific statistics in your content can increase AI citation likelihood by up to 40%',
+    descriptionZh: '在内容中加入来自权威来源的引用和具体统计数据，可提升 AI 引用可能性高达 40%',
     impact: 'high',
     difficulty: 'medium',
-    example: '例如："根据 Forrester 研究，89% 的 B2B 买家已采用 AI 作为购买决策的关键信息来源"',
+    example: 'e.g., "According to Forrester research, 89% of B2B buyers have adopted AI as a key information source for purchasing decisions"',
+    exampleZh: '例如："根据 Forrester 研究，89% 的 B2B 买家已采用 AI 作为购买决策的关键信息来源"',
   },
   {
     id: 2,
-    title: '结构化内容布局',
-    description: '使用清晰的 H2/H3 标题、项目符号列表、表格等，让 AI 更容易提取和引用信息',
+    title: 'Structured Content Layout',
+    titleZh: '结构化内容布局',
+    description: 'Use clear H2/H3 headings, bullet lists, tables, etc., making it easier for AI to extract and cite information',
+    descriptionZh: '使用清晰的 H2/H3 标题、项目符号列表、表格等，让 AI 更容易提取和引用信息',
     impact: 'high',
     difficulty: 'low',
-    example: '在每个页面顶部放置 40-80 字的"快速回答"摘要',
+    example: 'Place a 40-80 word "quick answer" summary at the top of each page',
+    exampleZh: '在每个页面顶部放置 40-80 字的"快速回答"摘要',
   },
   {
     id: 3,
-    title: 'Schema Markup 结构化数据',
-    description: '添加 FAQPage、HowTo、Product 等 Schema 标记，帮助 AI 理解内容结构',
+    title: 'Schema Markup Structured Data',
+    titleZh: 'Schema Markup 结构化数据',
+    description: 'Add FAQPage, HowTo, Product and other Schema markup to help AI understand content structure',
+    descriptionZh: '添加 FAQPage、HowTo、Product 等 Schema 标记，帮助 AI 理解内容结构',
     impact: 'high',
     difficulty: 'high',
-    example: '为产品页添加 Product schema，包含价格、评分、库存等信息',
+    example: 'Add Product schema to product pages, including price, rating, and inventory info',
+    exampleZh: '为产品页添加 Product schema，包含价格、评分、库存等信息',
   },
   {
     id: 4,
-    title: 'E-E-A-T 信号强化',
-    description: '展示专业性、权威性、可信度：作者简介、资质认证、第三方评价',
+    title: 'E-E-A-T Signal Enhancement',
+    titleZh: 'E-E-A-T 信号强化',
+    description: 'Demonstrate expertise, authority, and trustworthiness: author bios, certifications, third-party reviews',
+    descriptionZh: '展示专业性、权威性、可信度：作者简介、资质认证、第三方评价',
     impact: 'medium',
     difficulty: 'medium',
-    example: '文章署名真实作者，附带 LinkedIn 链接和专业资质',
+    example: 'Attribute articles to real authors with LinkedIn profiles and professional credentials',
+    exampleZh: '文章署名真实作者，附带 LinkedIn 链接和专业资质',
   },
   {
     id: 5,
-    title: '定期内容更新',
-    description: 'AI 偏好新鲜内容，定期更新高价值页面可维持可见性',
+    title: 'Regular Content Updates',
+    titleZh: '定期内容更新',
+    description: 'AI favors fresh content — regularly updating high-value pages helps maintain visibility',
+    descriptionZh: 'AI 偏好新鲜内容，定期更新高价值页面可维持可见性',
     impact: 'medium',
     difficulty: 'low',
-    example: '每季度审查和更新 Tier-1 收入相关页面',
+    example: 'Review and update Tier-1 revenue-related pages quarterly',
+    exampleZh: '每季度审查和更新 Tier-1 收入相关页面',
   },
   {
     id: 6,
-    title: '实体关系映射',
-    description: '明确定义页面主题实体，并与相关概念建立链接关系',
+    title: 'Entity Relationship Mapping',
+    titleZh: '实体关系映射',
+    description: 'Clearly define page topic entities and establish linking relationships with related concepts',
+    descriptionZh: '明确定义页面主题实体，并与相关概念建立链接关系',
     impact: 'medium',
     difficulty: 'high',
-    example: '将品牌页面与 Wikipedia、行业标准、权威媒体建立引用关系',
+    example: 'Link brand pages to Wikipedia, industry standards, and authoritative media citations',
+    exampleZh: '将品牌页面与 Wikipedia、行业标准、权威媒体建立引用关系',
   },
 ];
 
 const keyMetrics = [
   {
-    name: 'AI 可见性分数',
-    description: '品牌在 AI 回答中被提及的频率',
+    name: 'AI Visibility Score',
+    nameZh: 'AI 可见性分数',
+    description: 'How frequently the brand is mentioned in AI responses',
+    descriptionZh: '品牌在 AI 回答中被提及的频率',
     icon: TrendingUp,
     color: 'text-violet-600',
   },
   {
-    name: '引用率 (Citation Rate)',
-    description: 'AI 回答中直接引用品牌链接的比例',
+    name: 'Citation Rate',
+    nameZh: '引用率 (Citation Rate)',
+    description: 'Percentage of AI responses that directly cite brand links',
+    descriptionZh: 'AI 回答中直接引用品牌链接的比例',
     icon: FileText,
     color: 'text-blue-600',
   },
   {
     name: 'Share of Voice',
-    description: '相对竞争对手的 AI 提及占比',
+    nameZh: 'Share of Voice',
+    description: 'AI mention share relative to competitors',
+    descriptionZh: '相对竞争对手的 AI 提及占比',
     icon: BarChart3,
     color: 'text-emerald-600',
   },
   {
-    name: '情感分数',
-    description: 'AI 描述品牌时的正面/负面/中性比例',
+    name: 'Sentiment Score',
+    nameZh: '情感分数',
+    description: 'Positive/negative/neutral ratio when AI describes the brand',
+    descriptionZh: 'AI 描述品牌时的正面/负面/中性比例',
     icon: Star,
     color: 'text-amber-600',
   },
   {
-    name: '意图覆盖率',
-    description: '品牌在不同用户意图查询中的覆盖程度',
+    name: 'Intent Coverage',
+    nameZh: '意图覆盖率',
+    description: 'Brand coverage across different user intent queries',
+    descriptionZh: '品牌在不同用户意图查询中的覆盖程度',
     icon: Target,
     color: 'text-rose-600',
   },
   {
-    name: '排名位置',
-    description: '在 AI 列表式回答中的平均排名',
+    name: 'Ranking Position',
+    nameZh: '排名位置',
+    description: 'Average ranking in AI list-style responses',
+    descriptionZh: '在 AI 列表式回答中的平均排名',
     icon: Zap,
     color: 'text-cyan-600',
   },
 ];
 
 const industryStats = [
-  { stat: '1B+', label: '每日 ChatGPT 查询量', source: 'OpenAI 2025' },
-  { stat: '89%', label: 'B2B 买家使用 AI 辅助决策', source: 'Forrester' },
-  { stat: '60%+', label: '消费者用 AI 做购物研究', source: 'Bloomreach' },
-  { stat: '40%', label: 'GEO 优化可提升的可见性', source: 'Princeton GEO 研究' },
+  { stat: '1B+', label: 'Daily ChatGPT Queries', labelZh: '每日 ChatGPT 查询量', source: 'OpenAI 2025' },
+  { stat: '89%', label: 'B2B Buyers Use AI for Decisions', labelZh: 'B2B 买家使用 AI 辅助决策', source: 'Forrester' },
+  { stat: '60%+', label: 'Consumers Use AI for Shopping Research', labelZh: '消费者用 AI 做购物研究', source: 'Bloomreach' },
+  { stat: '40%', label: 'Visibility Boost from GEO Optimization', labelZh: 'GEO 优化可提升的可见性', source: 'Princeton GEO Research' },
 ];
 
 const resources = [
@@ -127,56 +158,68 @@ const resources = [
     source: 'Princeton University / KDD 2024',
     url: 'https://arxiv.org/abs/2311.09735',
     type: 'research',
-    description: '首篇 GEO 学术论文，提出优化框架和 GEO-bench 基准',
+    description: 'First academic GEO paper, proposing optimization framework and GEO-bench benchmark',
+    descriptionZh: '首篇 GEO 学术论文，提出优化框架和 GEO-bench 基准',
   },
   {
     title: '10-Step GEO Framework',
     source: 'Profound',
     url: 'https://www.tryprofound.com/resources/articles/generative-engine-optimization-geo-guide-2025',
     type: 'guide',
-    description: '企业级 GEO 实施的 10 步框架，包含基准和指标',
+    description: 'Enterprise-level 10-step GEO implementation framework with benchmarks and metrics',
+    descriptionZh: '企业级 GEO 实施的 10 步框架，包含基准和指标',
   },
   {
     title: 'GEO Best Practices Checklist',
     source: 'Directive Consulting',
     url: 'https://directiveconsulting.com/blog/a-guide-to-generative-engine-optimization-geo-best-practices/',
     type: 'guide',
-    description: '可操作的内容结构、技术实施和权威信号清单',
+    description: 'Actionable content structure, technical implementation, and authority signal checklist',
+    descriptionZh: '可操作的内容结构、技术实施和权威信号清单',
   },
   {
     title: 'Complete GEO Guide',
     source: 'Backlinko',
     url: 'https://backlinko.com/generative-engine-optimization-geo',
     type: 'guide',
-    description: 'SEO 专家 Brian Dean 的 GEO 完整指南',
+    description: 'Complete GEO guide by SEO expert Brian Dean',
+    descriptionZh: 'SEO 专家 Brian Dean 的 GEO 完整指南',
   },
   {
     title: 'What is GEO?',
     source: 'Search Engine Land',
     url: 'https://searchengineland.com/guide/what-is-geo',
     type: 'education',
-    description: 'AI 时代搜索可见性的完整入门指南',
+    description: 'Complete beginner\'s guide to search visibility in the AI era',
+    descriptionZh: 'AI 时代搜索可见性的完整入门指南',
   },
   {
     title: 'GEO-bench Dataset',
     source: 'HuggingFace',
     url: 'https://huggingface.co/datasets/GEO-Optim/geo-bench',
     type: 'data',
-    description: '10,000 个 GEO 评估查询的公开数据集',
+    description: 'Public dataset of 10,000 GEO evaluation queries',
+    descriptionZh: '10,000 个 GEO 评估查询的公开数据集',
   },
 ];
 
 const geoVsSeo = [
-  { dimension: '主要目标', seo: '搜索结果页排名', geo: 'AI 回答中被引用' },
-  { dimension: '信任信号', seo: '反向链接、域名权重', geo: '引用权威、结构化数据' },
-  { dimension: '用户输入', seo: '关键词', geo: '自然语言对话' },
-  { dimension: '成功指标', seo: '流量、排名', geo: 'AI 引用率、Share of Voice' },
-  { dimension: '内容格式', seo: '长篇 SEO 文章', geo: '结构化、易提取的信息块' },
-  { dimension: '更新频率', seo: '定期优化', geo: '持续更新以保持新鲜度' },
+  { dimension: 'Primary Goal', dimensionZh: '主要目标', seo: 'Search result page ranking', seoZh: '搜索结果页排名', geo: 'Get cited in AI responses', geoZh: 'AI 回答中被引用' },
+  { dimension: 'Trust Signals', dimensionZh: '信任信号', seo: 'Backlinks, domain authority', seoZh: '反向链接、域名权重', geo: 'Authoritative citations, structured data', geoZh: '引用权威、结构化数据' },
+  { dimension: 'User Input', dimensionZh: '用户输入', seo: 'Keywords', seoZh: '关键词', geo: 'Natural language conversation', geoZh: '自然语言对话' },
+  { dimension: 'Success Metrics', dimensionZh: '成功指标', seo: 'Traffic, rankings', seoZh: '流量、排名', geo: 'AI citation rate, Share of Voice', geoZh: 'AI 引用率、Share of Voice' },
+  { dimension: 'Content Format', dimensionZh: '内容格式', seo: 'Long-form SEO articles', seoZh: '长篇 SEO 文章', geo: 'Structured, easily extractable info blocks', geoZh: '结构化、易提取的信息块' },
+  { dimension: 'Update Frequency', dimensionZh: '更新频率', seo: 'Periodic optimization', seoZh: '定期优化', geo: 'Continuous updates for freshness', geoZh: '持续更新以保持新鲜度' },
 ];
 
 export default function LearnPage() {
+  const { t, locale } = useLanguage();
   const [activeTab, setActiveTab] = useState('overview');
+
+  const checklistItems = [
+    t('learn.check1'), t('learn.check2'), t('learn.check3'), t('learn.check4'),
+    t('learn.check5'), t('learn.check6'), t('learn.check7'), t('learn.check8'),
+  ];
 
   return (
     <div className="space-y-6 pb-8">
@@ -187,16 +230,11 @@ export default function LearnPage() {
             <BookOpen className="w-8 h-8" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">GEO 学习中心</h1>
-            <p className="text-violet-100 mt-1">
-              掌握 AI 时代的品牌可见性优化
-            </p>
+            <h1 className="text-3xl font-bold">{t('learn.title')}</h1>
+            <p className="text-violet-100 mt-1">{t('learn.subtitle')}</p>
           </div>
         </div>
-        <p className="text-violet-100 max-w-2xl">
-          Generative Engine Optimization (GEO) 是优化内容以在 ChatGPT、Gemini、Claude 等 AI 
-          平台的回答中获得引用和推荐的实践。这里汇集了最新的研究、最佳实践和行业洞察。
-        </p>
+        <p className="text-violet-100 max-w-2xl">{t('learn.heroDesc')}</p>
       </div>
 
       {/* Industry Stats */}
@@ -205,7 +243,7 @@ export default function LearnPage() {
           <Card key={i} className="text-center">
             <CardContent className="pt-6">
               <p className="text-3xl font-bold text-violet-600">{item.stat}</p>
-              <p className="text-sm text-slate-600 mt-1">{item.label}</p>
+              <p className="text-sm text-slate-600 mt-1">{locale === 'zh' ? item.labelZh : item.label}</p>
               <p className="text-xs text-slate-400 mt-2">{item.source}</p>
             </CardContent>
           </Card>
@@ -217,19 +255,19 @@ export default function LearnPage() {
         <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
           <TabsTrigger value="overview" className="gap-2">
             <Lightbulb className="w-4 h-4" />
-            概述
+            {t('learn.tab.overview')}
           </TabsTrigger>
           <TabsTrigger value="strategies" className="gap-2">
             <Target className="w-4 h-4" />
-            优化策略
+            {t('learn.tab.strategies')}
           </TabsTrigger>
           <TabsTrigger value="metrics" className="gap-2">
             <BarChart3 className="w-4 h-4" />
-            关键指标
+            {t('learn.tab.metrics')}
           </TabsTrigger>
           <TabsTrigger value="resources" className="gap-2">
             <BookOpen className="w-4 h-4" />
-            学习资源
+            {t('learn.tab.resources')}
           </TabsTrigger>
         </TabsList>
 
@@ -240,22 +278,17 @@ export default function LearnPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-violet-600" />
-                什么是 GEO？
+                {t('learn.whatIsGeo')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-slate-600">
-                <strong>Generative Engine Optimization (GEO)</strong> 是一种新兴的内容优化方法，
-                旨在帮助品牌在 AI 驱动的搜索引擎（如 ChatGPT、Google Gemini、Perplexity、Claude）
-                生成的回答中获得更高的可见性和引用率。
+                <strong>Generative Engine Optimization (GEO)</strong> — {t('learn.whatIsGeoDesc')}
               </p>
               <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
                 <p className="text-violet-800 flex items-start gap-2">
                   <Quote className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>
-                    "在 GEO 时代，成功不再只是搜索排名第一，而是成为 AI 在回答用户问题时
-                    首先想到并推荐的品牌。"
-                  </span>
+                  <span>{t('learn.geoQuote')}</span>
                 </p>
               </div>
             </CardContent>
@@ -264,25 +297,25 @@ export default function LearnPage() {
           {/* GEO vs SEO */}
           <Card>
             <CardHeader>
-              <CardTitle>GEO vs 传统 SEO</CardTitle>
-              <CardDescription>理解两种优化方法的关键差异</CardDescription>
+              <CardTitle>{t('learn.geoVsSeo')}</CardTitle>
+              <CardDescription>{t('learn.geoVsSeoDesc')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-3 px-4 font-medium text-slate-500">维度</th>
-                      <th className="text-left py-3 px-4 font-medium text-slate-500">传统 SEO</th>
-                      <th className="text-left py-3 px-4 font-medium text-violet-600">GEO</th>
+                      <th className="text-left py-3 px-4 font-medium text-slate-500">{t('learn.dim.dimension')}</th>
+                      <th className="text-left py-3 px-4 font-medium text-slate-500">{t('learn.dim.seo')}</th>
+                      <th className="text-left py-3 px-4 font-medium text-violet-600">{t('learn.dim.geo')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {geoVsSeo.map((row, i) => (
                       <tr key={i} className="border-b last:border-0">
-                        <td className="py-3 px-4 font-medium">{row.dimension}</td>
-                        <td className="py-3 px-4 text-slate-600">{row.seo}</td>
-                        <td className="py-3 px-4 text-violet-700 bg-violet-50/50">{row.geo}</td>
+                        <td className="py-3 px-4 font-medium">{locale === 'zh' ? row.dimensionZh : row.dimension}</td>
+                        <td className="py-3 px-4 text-slate-600">{locale === 'zh' ? row.seoZh : row.seo}</td>
+                        <td className="py-3 px-4 text-violet-700 bg-violet-50/50">{locale === 'zh' ? row.geoZh : row.geo}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -296,7 +329,7 @@ export default function LearnPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-amber-500" />
-                为什么现在必须关注 GEO？
+                {t('learn.whyGeo')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -304,29 +337,23 @@ export default function LearnPage() {
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center gap-2 mb-2">
                     <Users className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-semibold">用户行为转变</h4>
+                    <h4 className="font-semibold">{t('learn.userBehavior')}</h4>
                   </div>
-                  <p className="text-sm text-slate-600">
-                    越来越多用户直接向 AI 提问而非使用传统搜索，改变了信息发现的方式
-                  </p>
+                  <p className="text-sm text-slate-600">{t('learn.userBehaviorDesc')}</p>
                 </div>
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center gap-2 mb-2">
                     <Clock className="w-5 h-5 text-emerald-600" />
-                    <h4 className="font-semibold">先发优势</h4>
+                    <h4 className="font-semibold">{t('learn.firstMover')}</h4>
                   </div>
-                  <p className="text-sm text-slate-600">
-                    AI 模型的训练数据会固化认知，早期建立存在感可形成持久优势
-                  </p>
+                  <p className="text-sm text-slate-600">{t('learn.firstMoverDesc')}</p>
                 </div>
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center gap-2 mb-2">
                     <Shield className="w-5 h-5 text-rose-600" />
-                    <h4 className="font-semibold">品牌控制</h4>
+                    <h4 className="font-semibold">{t('learn.brandControl')}</h4>
                   </div>
-                  <p className="text-sm text-slate-600">
-                    如果不主动优化，AI 可能会错误描述你的品牌或推荐竞争对手
-                  </p>
+                  <p className="text-sm text-slate-600">{t('learn.brandControlDesc')}</p>
                 </div>
               </div>
             </CardContent>
@@ -345,20 +372,20 @@ export default function LearnPage() {
                         <span className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-sm font-bold">
                           {strategy.id}
                         </span>
-                        <h3 className="font-semibold text-lg">{strategy.title}</h3>
+                        <h3 className="font-semibold text-lg">{locale === 'zh' ? strategy.titleZh : strategy.title}</h3>
                       </div>
-                      <p className="text-slate-600 mb-3">{strategy.description}</p>
+                      <p className="text-slate-600 mb-3">{locale === 'zh' ? strategy.descriptionZh : strategy.description}</p>
                       <div className="bg-slate-50 rounded-lg p-3 text-sm text-slate-600">
-                        <span className="font-medium text-slate-700">示例：</span> {strategy.example}
+                        <span className="font-medium text-slate-700">{t('learn.example')}:</span> {locale === 'zh' ? strategy.exampleZh : strategy.example}
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
                       <Badge variant={strategy.impact === 'high' ? 'default' : 'secondary'}>
-                        {strategy.impact === 'high' ? '高影响' : '中影响'}
+                        {strategy.impact === 'high' ? t('learn.highImpact') : t('learn.medImpact')}
                       </Badge>
                       <Badge variant="outline">
-                        {strategy.difficulty === 'low' ? '易实施' : 
-                         strategy.difficulty === 'medium' ? '中等难度' : '需技术'}
+                        {strategy.difficulty === 'low' ? t('learn.easyImpl') :
+                         strategy.difficulty === 'medium' ? t('learn.medDifficulty') : t('learn.techRequired')}
                       </Badge>
                     </div>
                   </div>
@@ -372,21 +399,12 @@ export default function LearnPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-emerald-800">
                 <CheckCircle2 className="w-5 h-5" />
-                快速检查清单
+                {t('learn.checklist')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-3">
-                {[
-                  '每个页面有 40-80 字的快速摘要',
-                  'H2/H3 使用问题式标题',
-                  '关键信息用列表和表格呈现',
-                  '添加 FAQPage Schema',
-                  '文章署名真实作者',
-                  '引用权威来源并标注年份',
-                  '季度更新高价值页面',
-                  '建立第三方权威平台存在',
-                ].map((item, i) => (
+                {checklistItems.map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-emerald-700">
                     <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                     <span className="text-sm">{item}</span>
@@ -408,8 +426,8 @@ export default function LearnPage() {
                       <metric.icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{metric.name}</h3>
-                      <p className="text-sm text-slate-600 mt-1">{metric.description}</p>
+                      <h3 className="font-semibold">{locale === 'zh' ? metric.nameZh : metric.name}</h3>
+                      <p className="text-sm text-slate-600 mt-1">{locale === 'zh' ? metric.descriptionZh : metric.description}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -420,39 +438,37 @@ export default function LearnPage() {
           {/* Measurement Framework */}
           <Card>
             <CardHeader>
-              <CardTitle>GEO 评估框架</CardTitle>
-              <CardDescription>基于 Princeton GEO 研究的评分维度</CardDescription>
+              <CardTitle>{t('learn.frameworkTitle')}</CardTitle>
+              <CardDescription>{t('learn.frameworkDesc')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-32 text-sm font-medium">可见性 (35%)</div>
+                  <div className="w-32 text-sm font-medium">{t('learn.frameworkVis')}</div>
                   <div className="flex-1 h-3 bg-violet-100 rounded-full overflow-hidden">
                     <div className="h-full bg-violet-600 rounded-full" style={{ width: '35%' }} />
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-32 text-sm font-medium">引用率 (25%)</div>
+                  <div className="w-32 text-sm font-medium">{t('learn.frameworkCit')}</div>
                   <div className="flex-1 h-3 bg-blue-100 rounded-full overflow-hidden">
                     <div className="h-full bg-blue-600 rounded-full" style={{ width: '25%' }} />
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-32 text-sm font-medium">表述准确 (25%)</div>
+                  <div className="w-32 text-sm font-medium">{t('learn.frameworkAcc')}</div>
                   <div className="flex-1 h-3 bg-emerald-100 rounded-full overflow-hidden">
                     <div className="h-full bg-emerald-600 rounded-full" style={{ width: '25%' }} />
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-32 text-sm font-medium">意图覆盖 (15%)</div>
+                  <div className="w-32 text-sm font-medium">{t('learn.frameworkInt')}</div>
                   <div className="flex-1 h-3 bg-amber-100 rounded-full overflow-hidden">
                     <div className="h-full bg-amber-600 rounded-full" style={{ width: '15%' }} />
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-slate-500 mt-4">
-                综合评分 = 可见性×35% + 引用率×25% + 表述准确×25% + 意图覆盖×15%
-              </p>
+              <p className="text-sm text-slate-500 mt-4">{t('learn.frameworkFormula')}</p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -461,13 +477,7 @@ export default function LearnPage() {
         <TabsContent value="resources" className="space-y-6">
           <div className="grid gap-4">
             {resources.map((resource, i) => (
-              <a
-                key={i}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-              >
+              <a key={i} href={resource.url} target="_blank" rel="noopener noreferrer" className="block">
                 <Card className="hover:shadow-md hover:border-violet-300 transition-all cursor-pointer">
                   <CardContent className="pt-6">
                     <div className="flex items-start justify-between gap-4">
@@ -477,16 +487,16 @@ export default function LearnPage() {
                           <ExternalLink className="w-4 h-4 text-slate-400" />
                         </div>
                         <p className="text-sm text-violet-600 mb-2">{resource.source}</p>
-                        <p className="text-slate-600">{resource.description}</p>
+                        <p className="text-slate-600">{locale === 'zh' ? resource.descriptionZh : resource.description}</p>
                       </div>
                       <Badge variant={
                         resource.type === 'research' ? 'default' :
                         resource.type === 'guide' ? 'secondary' :
                         resource.type === 'data' ? 'outline' : 'secondary'
                       }>
-                        {resource.type === 'research' ? '学术研究' :
-                         resource.type === 'guide' ? '实操指南' :
-                         resource.type === 'data' ? '数据集' : '教程'}
+                        {resource.type === 'research' ? t('learn.resourceType.research') :
+                         resource.type === 'guide' ? t('learn.resourceType.guide') :
+                         resource.type === 'data' ? t('learn.resourceType.data') : t('learn.resourceType.education')}
                       </Badge>
                     </div>
                   </CardContent>
@@ -500,16 +510,11 @@ export default function LearnPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold mb-2">开始优化你的品牌</h3>
-                  <p className="text-violet-100">
-                    使用 Luminos 追踪你的品牌在 AI 平台中的表现
-                  </p>
+                  <h3 className="text-xl font-bold mb-2">{t('learn.ctaTitle')}</h3>
+                  <p className="text-violet-100">{t('learn.ctaDesc')}</p>
                 </div>
-                <a
-                  href="/brands"
-                  className="flex items-center gap-2 px-6 py-3 bg-white text-violet-600 rounded-xl font-semibold hover:bg-violet-50 transition-colors"
-                >
-                  查看品牌分析
+                <a href="/brands" className="flex items-center gap-2 px-6 py-3 bg-white text-violet-600 rounded-xl font-semibold hover:bg-violet-50 transition-colors">
+                  {t('learn.ctaBtn')}
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>

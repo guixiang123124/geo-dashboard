@@ -17,6 +17,7 @@ import {
   ArrowDownRight,
   Minus,
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // ─── Demo Data ───────────────────────────────────────────────
 const WEEKS = ['W1 (1/6)', 'W2 (1/13)', 'W3 (1/20)', 'W4 (1/27)', 'W5 (2/3)', 'W6 (2/10)', 'W7 (2/17)', 'W8 (2/24)'];
@@ -66,17 +67,20 @@ const CATEGORY_TRENDS: CategoryTrend[] = [
 interface Season {
   name: string;
   nameZh: string;
+  nameKey: string;
   icon: React.ElementType;
   months: string;
+  monthsZh: string;
   peak: string;
+  peakZh: string;
   color: string;
 }
 
 const SEASONS: Season[] = [
-  { name: 'Spring Collection', nameZh: '春季新品', icon: Leaf, months: '2月-4月', peak: '3月', color: 'bg-green-100 text-green-700' },
-  { name: 'Summer / Swimwear', nameZh: '夏季泳装', icon: Sun, months: '5月-7月', peak: '6月', color: 'bg-yellow-100 text-yellow-700' },
-  { name: 'Back to School', nameZh: '开学季', icon: GraduationCap, months: '7月-9月', peak: '8月', color: 'bg-blue-100 text-blue-700' },
-  { name: 'Holiday / Winter', nameZh: '节日冬装', icon: Snowflake, months: '10月-12月', peak: '11月', color: 'bg-violet-100 text-violet-700' },
+  { name: 'Spring Collection', nameZh: '春季新品', nameKey: 'trends.season.spring', icon: Leaf, months: 'Feb-Apr', monthsZh: '2月-4月', peak: 'Mar', peakZh: '3月', color: 'bg-green-100 text-green-700' },
+  { name: 'Summer / Swimwear', nameZh: '夏季泳装', nameKey: 'trends.season.summer', icon: Sun, months: 'May-Jul', monthsZh: '5月-7月', peak: 'Jun', peakZh: '6月', color: 'bg-yellow-100 text-yellow-700' },
+  { name: 'Back to School', nameZh: '开学季', nameKey: 'trends.season.backToSchool', icon: GraduationCap, months: 'Jul-Sep', monthsZh: '7月-9月', peak: 'Aug', peakZh: '8月', color: 'bg-blue-100 text-blue-700' },
+  { name: 'Holiday / Winter', nameZh: '节日冬装', nameKey: 'trends.season.holiday', icon: Snowflake, months: 'Oct-Dec', monthsZh: '10月-12月', peak: 'Nov', peakZh: '11月', color: 'bg-violet-100 text-violet-700' },
 ];
 
 interface PlatformData {
@@ -101,6 +105,7 @@ function toX(i: number) { return padL + (i / (WEEKS.length - 1)) * plotW; }
 function toY(v: number, min: number, max: number) { return padT + plotH - ((v - min) / (max - min)) * plotH; }
 
 export default function TrendsPage() {
+  const { t, locale } = useLanguage();
   const [selectedBrands, setSelectedBrands] = useState<string[]>(['PatPat', 'Carter\'s', 'H&M Kids', 'Cat & Jack']);
 
   const allScores = BRAND_TRENDS.filter(b => selectedBrands.includes(b.name)).flatMap(b => b.scores);
@@ -121,15 +126,15 @@ export default function TrendsPage() {
       <div className="bg-gradient-to-r from-purple-700 via-violet-700 to-indigo-700 rounded-2xl p-6 md:p-8 text-white">
         <div className="flex items-center gap-3 mb-2">
           <LineChart className="w-8 h-8" />
-          <h1 className="text-2xl md:text-3xl font-bold">趋势追踪</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t('trends.title')}</h1>
         </div>
-        <p className="text-purple-200 text-sm md:text-base">追踪品牌在 AI 平台的可见度变化，发现品类趋势与季节性洞察</p>
+        <p className="text-purple-200 text-sm md:text-base">{t('trends.subtitle')}</p>
       </div>
 
       {/* Weekly Trend Chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><TrendingUp className="w-5 h-5 text-violet-600" />周度可见度趋势</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base"><TrendingUp className="w-5 h-5 text-violet-600" />{t('trends.weeklyTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2 mb-4">
@@ -176,7 +181,7 @@ export default function TrendsPage() {
         {/* Movers & Shakers */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base"><Zap className="w-5 h-5 text-amber-500" />涨跌榜</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base"><Zap className="w-5 h-5 text-amber-500" />{t('trends.moversTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -202,15 +207,15 @@ export default function TrendsPage() {
         {/* Category Trends */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base"><BarChart3 className="w-5 h-5 text-indigo-600" />品类趋势</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base"><BarChart3 className="w-5 h-5 text-indigo-600" />{t('trends.categoryTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {CATEGORY_TRENDS.map(c => (
                 <div key={c.name} className="flex items-center justify-between py-2.5 border-b border-slate-100 last:border-0">
                   <div>
-                    <p className="text-sm font-medium text-slate-800">{c.nameZh}</p>
-                    <p className="text-xs text-slate-400">{c.name}</p>
+                    <p className="text-sm font-medium text-slate-800">{locale === 'zh' ? c.nameZh : c.name}</p>
+                    <p className="text-xs text-slate-400">{locale === 'zh' ? c.name : c.nameZh}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -232,7 +237,7 @@ export default function TrendsPage() {
       {/* Seasonal Insights */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><Calendar className="w-5 h-5 text-violet-600" />季节性洞察</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base"><Calendar className="w-5 h-5 text-violet-600" />{t('trends.seasonTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -242,12 +247,12 @@ export default function TrendsPage() {
                 <div key={s.name} className={`rounded-xl border p-4 space-y-2 ${s.color.split(' ')[0]} border-transparent`}>
                   <div className="flex items-center gap-2">
                     <Icon className={`w-5 h-5 ${s.color.split(' ')[1]}`} />
-                    <span className={`text-sm font-bold ${s.color.split(' ')[1]}`}>{s.nameZh}</span>
+                    <span className={`text-sm font-bold ${s.color.split(' ')[1]}`}>{locale === 'zh' ? s.nameZh : s.name}</span>
                   </div>
-                  <p className="text-xs text-slate-600">{s.name}</p>
+                  <p className="text-xs text-slate-600">{locale === 'zh' ? s.name : s.nameZh}</p>
                   <div className="text-xs text-slate-500">
-                    <span className="block">时间: {s.months}</span>
-                    <span className="block">高峰: {s.peak}</span>
+                    <span className="block">{t('trends.season.time')}: {locale === 'zh' ? s.monthsZh : s.months}</span>
+                    <span className="block">{t('trends.season.peak')}: {locale === 'zh' ? s.peakZh : s.peak}</span>
                   </div>
                 </div>
               );
@@ -256,13 +261,13 @@ export default function TrendsPage() {
           {/* Timeline bar */}
           <div className="mt-6">
             <div className="flex h-8 rounded-lg overflow-hidden">
-              <div className="bg-green-200 flex-[3] flex items-center justify-center text-xs font-medium text-green-800">春季</div>
-              <div className="bg-yellow-200 flex-[3] flex items-center justify-center text-xs font-medium text-yellow-800">夏季</div>
-              <div className="bg-blue-200 flex-[3] flex items-center justify-center text-xs font-medium text-blue-800">开学</div>
-              <div className="bg-violet-200 flex-[3] flex items-center justify-center text-xs font-medium text-violet-800">节日</div>
+              <div className="bg-green-200 flex-[3] flex items-center justify-center text-xs font-medium text-green-800">{t('trends.timeline.spring')}</div>
+              <div className="bg-yellow-200 flex-[3] flex items-center justify-center text-xs font-medium text-yellow-800">{t('trends.timeline.summer')}</div>
+              <div className="bg-blue-200 flex-[3] flex items-center justify-center text-xs font-medium text-blue-800">{t('trends.timeline.school')}</div>
+              <div className="bg-violet-200 flex-[3] flex items-center justify-center text-xs font-medium text-violet-800">{t('trends.timeline.holiday')}</div>
             </div>
             <div className="flex justify-between mt-1 text-xs text-slate-400 px-1">
-              <span>1月</span><span>3月</span><span>5月</span><span>7月</span><span>9月</span><span>11月</span><span>12月</span>
+              <span>{t('trends.month.jan')}</span><span>{t('trends.month.mar')}</span><span>{t('trends.month.may')}</span><span>{t('trends.month.jul')}</span><span>{t('trends.month.sep')}</span><span>{t('trends.month.nov')}</span><span>{t('trends.month.dec')}</span>
             </div>
           </div>
         </CardContent>
@@ -271,14 +276,14 @@ export default function TrendsPage() {
       {/* AI Platform Comparison */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><Zap className="w-5 h-5 text-violet-600" />AI 平台对比</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base"><Zap className="w-5 h-5 text-violet-600" />{t('trends.platformTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 px-3 font-medium text-slate-500">品牌</th>
+                  <th className="text-left py-3 px-3 font-medium text-slate-500">{t('trends.brand')}</th>
                   {PLATFORM_DATA.map(p => (
                     <th key={p.platform} className="text-center py-3 px-3 font-medium text-slate-500">
                       <span className="flex items-center justify-center gap-1.5">
