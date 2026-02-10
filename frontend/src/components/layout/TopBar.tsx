@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 import {
   Eye, ChevronDown, Menu, X, Globe,
   Crosshair, LayoutDashboard, GitCompare, TrendingUp, Search,
-  GraduationCap, Lightbulb, BookMarked, User, LogOut, Package,
+  GraduationCap, Lightbulb, BookMarked, User, LogOut, Package, FlaskConical,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,6 +36,7 @@ const NAV_ITEMS = [
     label: 'Resources',
     labelKey: 'topbar.resources',
     items: [
+      { name: 'Luminos Lab', href: '/lab', icon: FlaskConical },
       { name: 'GEO Learning Center', href: '/learn', icon: GraduationCap },
       { name: 'Optimization Guide', href: '/optimize', icon: BookMarked },
     ],

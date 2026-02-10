@@ -23,6 +23,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.trends': 'Trends',
     'nav.insights': 'Insights',
     'nav.learn': 'GEO Learning',
+    'nav.lab': 'Luminos Lab',
     'nav.settings': 'Settings',
     'nav.more': 'More',
     // Legacy keys (kept for compatibility)
@@ -308,6 +309,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.trends': '趋势追踪',
     'nav.insights': '洞察探索',
     'nav.learn': 'GEO 学习中心',
+    'nav.lab': 'Luminos Lab',
     'nav.settings': '设置',
     'nav.more': '更多',
     // Legacy keys

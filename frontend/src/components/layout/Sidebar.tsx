@@ -13,6 +13,7 @@ import {
   GitCompareArrows,
   Lightbulb,
   BookOpen,
+  FlaskConical,
   Search,
   Zap,
 } from 'lucide-react';
@@ -29,6 +30,7 @@ const navigation = [
   { nameKey: 'nav.trends', href: '/trends', icon: TrendingUp },
   { nameKey: 'nav.optimize', href: '/optimize', icon: Zap },
   { nameKey: 'nav.learn', href: '/learn', icon: BookOpen },
+  { nameKey: 'nav.lab', href: '/lab', icon: FlaskConical },
 ];
 
 const bottomNav = [
