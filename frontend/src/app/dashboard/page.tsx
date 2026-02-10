@@ -12,10 +12,10 @@ import {
   Eye,
   TrendingUp,
   Users,
-  Zap,
   Star,
   BarChart3,
   ArrowRight,
+  Cpu,
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -53,6 +53,15 @@ interface RankingItem {
   evaluations: number;
 }
 
+/** Relative color scale: interpolate green→yellow→red based on position within data range */
+function relativeColor(value: number, min: number, max: number): string {
+  if (max === min) return '#fbbf24';
+  const t = (value - min) / (max - min); // 0=worst, 1=best
+  if (t >= 0.75) return '#34d399'; // top 25% → emerald
+  if (t >= 0.25) return '#fbbf24'; // middle 50% → amber
+  return '#f87171'; // bottom 25% → red
+}
+
 function scoreColor(v: number): string {
   if (v >= 50) return '#34d399';
   if (v >= 20) return '#fbbf24';
@@ -70,6 +79,7 @@ export default function DashboardPage() {
   const { categories, loading: catLoading } = useCategories();
   const [stats, setStats] = useState<StatsData | null>(null);
   const [rankings, setRankings] = useState<RankingItem[]>([]);
+  const [allRankings, setAllRankings] = useState<RankingItem[]>([]);
   const [allCategories, setAllCategories] = useState<CategoryInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -82,17 +92,24 @@ export default function DashboardPage() {
 
     const rankParams = new URLSearchParams(params);
     rankParams.set('sort_by', 'composite');
-    rankParams.set('limit', '50');
+    rankParams.set('limit', '200');
+
+    // Always fetch full rankings (no category filter) for visibility gap & cross-industry insights
+    const allRankParams = new URLSearchParams();
+    allRankParams.set('sort_by', 'composite');
+    allRankParams.set('limit', '200');
 
     Promise.all([
       fetch(`${API_URL}/api/v1/industry/stats?${params}`).then(r => r.json()),
       fetch(`${API_URL}/api/v1/industry/rankings?${rankParams}`).then(r => r.json()),
       fetch(`${API_URL}/api/v1/industry/categories`).then(r => r.json()),
+      fetch(`${API_URL}/api/v1/industry/rankings?${allRankParams}`).then(r => r.json()),
     ])
-      .then(([s, r, c]) => {
+      .then(([s, r, c, ar]) => {
         setStats(s);
         setRankings(r.rankings || []);
         setAllCategories(c.categories || []);
+        setAllRankings(ar.rankings || []);
       })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
@@ -131,30 +148,63 @@ export default function DashboardPage() {
   const topBrand = stats.top_brand;
   const avgScore = stats.score_averages.composite;
   const maxScore = stats.score_averages.composite_max;
-  const aboveAvg = rankings.filter(r => r.composite > avgScore).length;
-  const zeroBrands = rankings.filter(r => r.composite === 0).length;
-  const lowBrands = rankings.filter(r => r.composite > 0 && r.composite < 15).length;
+
+  // P0 #3: Use full rankings data for accurate visibility gap counts
+  const dataForGap = selectedCategory ? rankings : allRankings;
+  const zeroBrands = dataForGap.filter(r => r.composite === 0).length;
+  const lowBrands = dataForGap.filter(r => r.composite > 0 && r.composite < 15).length;
+  const aboveAvg = dataForGap.filter(r => r.composite > avgScore).length;
+
   const top5 = rankings.filter(r => r.composite > 0).slice(0, 5);
   const bottom3 = [...rankings].filter(r => r.composite > 0).sort((a, b) => a.composite - b.composite).slice(0, 3);
 
-  // Industry data sorted by avg composite (exclude zero)
-  const sortedIndustries = [...allCategories].filter(c => c.avg_composite > 0).sort((a, b) => b.avg_composite - a.avg_composite);
+  // Industry data sorted by avg composite (exclude zero eval)
+  const evaluatedCategories = allCategories.filter(c => c.eval_count > 0);
+  const sortedIndustries = [...evaluatedCategories].sort((a, b) => b.avg_composite - a.avg_composite);
   const globalAvg = sortedIndustries.length > 0
     ? Math.round(sortedIndustries.reduce((s, c) => s + c.avg_composite, 0) / sortedIndustries.length * 10) / 10
     : 0;
 
-  // Intent insights
+  // Total brands & evals across all categories
+  const totalBrands = allCategories.reduce((s, c) => s + c.brand_count, 0);
+  const totalEvals = allCategories.reduce((s, c) => s + c.eval_count, 0);
+  const evaluatedIndustryCount = evaluatedCategories.length;
+  const totalIndustryCount = allCategories.length;
+
+  // Intent insights (P1 #6: already category-aware via stats endpoint with ?category=X)
   const sortedIntents = [...stats.intent_breakdown].sort((a, b) => b.rate - a.rate);
   const bestIntent = sortedIntents[0];
   const worstIntent = sortedIntents[sortedIntents.length - 1];
 
-  // Hero headline
+  // P1 #7: Per-industry top brands for "Who's Dominating"
+  const industryChampions: { category: string; brand: string; score: number }[] = [];
+  if (!selectedCategory) {
+    const seen = new Set<string>();
+    for (const r of allRankings) {
+      if (!seen.has(r.category) && r.composite > 0) {
+        seen.add(r.category);
+        industryChampions.push({ category: r.category, brand: r.name, score: r.composite });
+      }
+    }
+    industryChampions.sort((a, b) => b.score - a.score);
+  }
+
+  // P0 #2: Score ratio
+  const scoreRatio = avgScore > 0 ? (maxScore / avgScore).toFixed(1) : '—';
+
+  // P0 #1: Hero headline — focus on score, not mention_rate
   const heroHeadline = selectedCategory
-    ? `${selectedCategory} brands average ${avgScore}/100`
-    : `${stats.mention_rate}% of brands are visible to AI`;
+    ? `${selectedCategory} averages ${avgScore}/100`
+    : `Average AI Visibility Score: ${avgScore}/100`;
   const heroSub = selectedCategory
-    ? topBrand ? `${topBrand.name} leads at ${topBrand.composite}` : ''
-    : `but only ${Math.round((aboveAvg / stats.total_brands) * 100)}% score above average`;
+    ? (topBrand ? `${topBrand.name} leads at ${topBrand.composite}` : '')
+    : 'most brands have weak AI presence';
+
+  // Build category avg map for P2 #9
+  const categoryAvgMap: Record<string, number> = {};
+  for (const c of allCategories) {
+    categoryAvgMap[c.category] = c.avg_composite;
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
@@ -164,16 +214,16 @@ export default function DashboardPage() {
         <div className="relative">
           <p className="text-violet-400 text-sm font-medium mb-2 uppercase tracking-wider">AI Visibility Report</p>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-            <span className="text-violet-300">{heroHeadline.split(/(\d+[%/]\d*|\d+)/)[0]}</span>
-            {heroHeadline.match(/(\d+[%/]?\d*)/)?.[0] && (
-              <span className="text-white">{heroHeadline.match(/(\d+[%/]?\d*)/)?.[0]}</span>
-            )}
-            <span className="text-violet-300">{heroHeadline.split(/(\d+[%/]\d*|\d+)/).slice(2).join('')}</span>
+            {heroHeadline}
           </h1>
           {heroSub && <p className="text-lg text-zinc-400">— {heroSub}</p>}
           <div className="flex items-center gap-4 mt-4 text-sm text-zinc-500">
-            <span>{stats.total_brands} brands · {allCategories.length} industries · {stats.total_evaluations.toLocaleString()} evaluations</span>
+            <span>{totalBrands} brands · {evaluatedIndustryCount} industries · {totalEvals.toLocaleString()} evaluations</span>
           </div>
+          {/* P0 #1: CTA link */}
+          <Link href="/audit" className="inline-flex items-center gap-1 mt-4 text-sm font-medium text-violet-400 hover:text-violet-300 transition-colors">
+            Check your brand <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
 
@@ -204,13 +254,15 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Section 2: Quick Stats Row */}
+      {/* Section 2: Quick Stats Row — P0 #2 fixes */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatCard
           icon={<Users className="w-4 h-4 text-violet-400" />}
           label="Brands Tracked"
-          value={`${stats.total_brands}`}
-          sub={`${allCategories.filter(c => c.eval_count > 0).length} industries`}
+          value={`${totalBrands}`}
+          sub={evaluatedIndustryCount < totalIndustryCount
+            ? `${totalIndustryCount} industries (${evaluatedIndustryCount} evaluated)`
+            : `${evaluatedIndustryCount} industries`}
         />
         <StatCard
           icon={<TrendingUp className="w-4 h-4 text-blue-400" />}
@@ -226,10 +278,10 @@ export default function DashboardPage() {
           sub={`${stats.total_mentioned} mentions`}
         />
         <StatCard
-          icon={<Zap className="w-4 h-4 text-yellow-400" />}
-          label="Evaluations"
-          value={stats.total_evaluations.toLocaleString()}
-          sub={`${stats.total_prompts} prompts`}
+          icon={<Cpu className="w-4 h-4 text-yellow-400" />}
+          label="AI Platform"
+          value="Gemini"
+          sub="10+ query types"
         />
         <StatCard
           icon={<Star className="w-4 h-4 text-amber-400" />}
@@ -241,8 +293,8 @@ export default function DashboardPage() {
         <StatCard
           icon={<BarChart3 className="w-4 h-4 text-red-400" />}
           label="Score Gap"
-          value={`${maxScore - avgScore}`}
-          sub={`Top ${maxScore} · Avg ${avgScore}`}
+          value={`${scoreRatio}×`}
+          sub={`Top ${maxScore} vs Avg ${avgScore}`}
         />
       </div>
 
@@ -265,31 +317,47 @@ export default function DashboardPage() {
 
       {/* Section 4: Key Insights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Who's Dominating */}
+        {/* Who's Dominating — P1 #7: per-industry champions when unfiltered */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-5 h-5 text-yellow-400" />
             <h3 className="font-bold text-white">Who&apos;s Dominating?</h3>
           </div>
           <div className="space-y-2">
-            {top5.slice(0, 3).map((b, i) => (
-              <div key={b.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-bold ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-zinc-300' : 'text-amber-600'}`}>
-                    {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
-                  </span>
-                  <span className="text-sm text-zinc-200 truncate">{b.name}</span>
+            {selectedCategory ? (
+              top5.slice(0, 3).map((b, i) => (
+                <div key={b.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-zinc-300' : 'text-amber-600'}`}>
+                      {['🥇', '🥈', '🥉'][i]}
+                    </span>
+                    <span className="text-sm text-zinc-200 truncate">{b.name}</span>
+                  </div>
+                  <span className={`text-sm font-bold font-mono ${scoreTextClass(b.composite)}`}>{b.composite}</span>
                 </div>
-                <span className={`text-sm font-bold font-mono ${scoreTextClass(b.composite)}`}>{b.composite}</span>
-              </div>
-            ))}
+              ))
+            ) : (
+              industryChampions.slice(0, 8).map(ch => (
+                <div key={ch.category} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xs">🏆</span>
+                    <span className="text-xs text-zinc-500 shrink-0">{ch.category}:</span>
+                    <span className="text-sm text-zinc-200 truncate">{ch.brand}</span>
+                  </div>
+                  <span className={`text-sm font-bold font-mono ml-2 ${scoreTextClass(ch.score)}`}>{ch.score}</span>
+                </div>
+              ))
+            )}
           </div>
-          <p className="text-xs text-zinc-500 mt-3">
-            Top brands appear in {top5[0] ? Math.round((top5[0].mentions / top5[0].evaluations) * 100) : 0}%+ of AI responses
-          </p>
+          {/* P2 #11: action link */}
+          <div className="mt-3 pt-2 border-t border-zinc-800">
+            <Link href="/insights" className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+              View full rankings <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
         </div>
 
-        {/* Visibility Gap */}
+        {/* Visibility Gap — P0 #3: uses allRankings for accurate counts */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle className="w-5 h-5 text-red-400" />
@@ -312,9 +380,15 @@ export default function DashboardPage() {
           <p className="text-xs text-zinc-500 mt-3">
             {zeroBrands + lowBrands > 0 ? `${zeroBrands + lowBrands} brands need GEO optimization` : 'All brands have some AI visibility'}
           </p>
+          {/* P2 #11: action link */}
+          <div className="mt-2 pt-2 border-t border-zinc-800">
+            <Link href="/audit" className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+              Run free diagnosis <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
         </div>
 
-        {/* Best Intent Coverage */}
+        {/* Best Intent Coverage — P1 #6: already category-aware via stats?category=X */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
             <Target className="w-5 h-5 text-violet-400" />
@@ -343,14 +417,22 @@ export default function DashboardPage() {
             </div>
           )}
           <p className="text-xs text-zinc-500 mt-3">
-            Opportunity: optimize for {worstIntent ? formatIntent(worstIntent.intent) : 'low-performing'} queries
+            {selectedCategory
+              ? `Showing intents for ${selectedCategory}`
+              : 'Showing intent patterns across all industries'}
           </p>
+          {/* P2 #11: action link */}
+          <div className="mt-2 pt-2 border-t border-zinc-800">
+            <Link href="/learn" className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+              See optimization tips <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Section 5: Brand Performance — Top 5 + Bottom 3 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Top Performers */}
+        {/* Top Performers — P2 #8: industry badges */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-zinc-800">
             <h3 className="font-bold text-white">Top Performers</h3>
@@ -365,7 +447,11 @@ export default function DashboardPage() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-white truncate">{b.name}</span>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-sm font-medium text-white truncate">{b.name}</span>
+                        {/* P2 #8: industry badge */}
+                        <span className="text-xs text-zinc-600 shrink-0">{b.category}</span>
+                      </div>
                       <span className={`text-sm font-bold font-mono ml-2 ${scoreTextClass(b.composite)}`}>{b.composite}</span>
                     </div>
                     <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
@@ -384,23 +470,32 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Needs Attention */}
+        {/* Needs Attention — P2 #9: industry-relative context */}
         <div className="bg-zinc-900 border border-red-900/30 rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-zinc-800 bg-red-950/20">
             <h3 className="font-bold text-white">Needs Attention</h3>
             <p className="text-xs text-zinc-500 mt-0.5">{zeroBrands} invisible + {lowBrands} low-scoring brands</p>
           </div>
           <div className="p-4 space-y-2">
-            {bottom3.map(b => (
-              <div key={b.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800/50 transition-colors">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-red-500" />
-                  <span className="text-sm text-zinc-300">{b.name}</span>
-                  {!selectedCategory && <span className="text-xs text-zinc-600">{b.category}</span>}
+            {bottom3.map(b => {
+              const industryAvg = categoryAvgMap[b.category] ?? avgScore;
+              return (
+                <div key={b.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800/50 transition-colors">
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                      <span className="text-sm text-zinc-300">{b.name}</span>
+                      <span className="text-xs text-zinc-600">{b.category}</span>
+                    </div>
+                    {/* P2 #9: show industry avg for context */}
+                    <span className="text-xs text-zinc-600 ml-4">
+                      Industry avg: {industryAvg.toFixed(1)}
+                    </span>
+                  </div>
+                  <span className={`text-sm font-bold font-mono ${scoreTextClass(b.composite)}`}>{b.composite}</span>
                 </div>
-                <span className={`text-sm font-bold font-mono ${scoreTextClass(b.composite)}`}>{b.composite}</span>
-              </div>
-            ))}
+              );
+            })}
             {zeroBrands > 0 && (
               <div className="mt-2 pt-2 border-t border-zinc-800">
                 <p className="text-xs text-zinc-500 mb-2">+ {zeroBrands} brands with zero AI visibility</p>
@@ -417,6 +512,13 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* P2 #10: Data source footer */}
+      <footer className="text-center py-4">
+        <p className="text-xs text-zinc-600">
+          Data Source: Gemini 2.0 Flash · Last Updated: {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · {totalEvals.toLocaleString()} evaluations across {evaluatedIndustryCount} industries
+        </p>
+      </footer>
     </div>
   );
 }
@@ -453,27 +555,34 @@ function StatCard({ icon, label, value, sub, gauge, highlight }: {
   );
 }
 
-// ── Industry Horizontal Bar Chart ───────────────────────────
+// ── Industry Horizontal Bar Chart — P1 #4: relative color scale, P1 #5: bigger avg line ──
 
 function IndustryBars({ industries, globalAvg }: { industries: CategoryInfo[]; globalAvg: number }) {
-  const maxVal = Math.max(...industries.map(c => c.avg_composite), 1);
+  const scores = industries.map(c => c.avg_composite);
+  const minScore = Math.min(...scores);
+  const maxScore = Math.max(...scores);
+  const maxVal = Math.max(maxScore, 1);
   const barH = 28;
   const gap = 6;
   const labelW = 170;
   const chartW = 700;
-  const h = industries.length * (barH + gap) + 10;
+  const h = industries.length * (barH + gap) + 30; // extra space for avg label
   const avgX = labelW + (globalAvg / maxVal) * (chartW - labelW - 80);
 
   return (
     <svg width="100%" height={h} viewBox={`0 0 ${chartW} ${h}`} preserveAspectRatio="xMinYMid meet">
-      {/* Global average line */}
-      <line x1={avgX} y1={0} x2={avgX} y2={h} stroke="#8b5cf6" strokeWidth={1.5} strokeDasharray="6 4" opacity={0.6} />
-      <text x={avgX} y={h - 2} textAnchor="middle" fill="#8b5cf6" fontSize={9} opacity={0.8}>avg {globalAvg}</text>
+      {/* P1 #5: Prominent average line */}
+      <line x1={avgX} y1={0} x2={avgX} y2={h - 20} stroke="#8b5cf6" strokeWidth={2} strokeDasharray="8 5" opacity={0.8} />
+      <rect x={avgX - 30} y={2} width={60} height={18} rx={4} fill="#8b5cf6" opacity={0.25} />
+      <text x={avgX} y={14} textAnchor="middle" fill="#a78bfa" fontSize={11} fontWeight={700}>
+        Avg {globalAvg}
+      </text>
 
       {industries.map((c, i) => {
-        const y = i * (barH + gap) + 4;
+        const y = i * (barH + gap) + 24;
         const w = (c.avg_composite / maxVal) * (chartW - labelW - 80);
-        const color = scoreColor(c.avg_composite);
+        // P1 #4: relative color scale
+        const color = relativeColor(c.avg_composite, minScore, maxScore);
         return (
           <g key={c.category}>
             <text x={8} y={y + barH / 2 + 4} fill="#a1a1aa" fontSize={12} fontWeight={500}>
@@ -482,7 +591,7 @@ function IndustryBars({ industries, globalAvg }: { industries: CategoryInfo[]; g
             <text x={30} y={y + barH / 2 + 4} fill="#d4d4d8" fontSize={12}>
               {c.category}
             </text>
-            <rect x={labelW} y={y} width={Math.max(w, 3)} height={barH} rx={4} fill={color} opacity={0.75} />
+            <rect x={labelW} y={y} width={Math.max(w, 3)} height={barH} rx={4} fill={color} opacity={0.85} />
             <text x={labelW + w + 8} y={y + barH / 2 + 4} fill="#e4e4e7" fontSize={12} fontWeight={700}>
               {c.avg_composite.toFixed(1)}
             </text>
