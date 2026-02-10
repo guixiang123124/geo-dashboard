@@ -22,6 +22,7 @@ interface AuthContextValue extends AuthState {
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  loginWithOAuth: (provider: 'google' | 'apple') => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -79,12 +80,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const loginWithOAuth = useCallback((provider: 'google' | 'apple') => {
+    const oauthUrl = authApi.getOAuthUrl(provider);
+    window.location.href = oauthUrl;
+  }, []);
+
   const value: AuthContextValue = {
     ...state,
     login,
     register,
     logout,
     refreshUser,
+    loginWithOAuth,
   };
 
   return (

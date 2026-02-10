@@ -20,6 +20,10 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
+    # OAuth fields
+    oauth_provider: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    oauth_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
     # Workspace association
     workspace_id: Mapped[Optional[str]] = mapped_column(
         String(36),

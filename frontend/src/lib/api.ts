@@ -154,6 +154,10 @@ export const authApi = {
       }),
     });
   },
+
+  getOAuthUrl(provider: string): string {
+    return `${API_V1}/auth/oauth/${provider}`;
+  },
 };
 
 // ============ Brands API ============

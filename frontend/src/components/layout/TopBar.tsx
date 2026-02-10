@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 import {
   Eye, ChevronDown, Menu, X, Globe,
   Crosshair, LayoutDashboard, GitCompare, TrendingUp, Search,
-  GraduationCap, Lightbulb, BookMarked, User, LogOut,
+  GraduationCap, Lightbulb, BookMarked, User, LogOut, Package,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -19,17 +19,24 @@ const NAV_ITEMS = [
     items: [
       { name: 'AI Brand Diagnosis', href: '/audit', icon: Crosshair },
       { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-      { name: 'Competitive Analysis', href: '/compete', icon: GitCompare },
-      { name: 'Trend Tracking', href: '/trends', icon: TrendingUp },
+      { name: 'Brands', href: '/brands', icon: Package },
+      { name: 'Competitors', href: '/compete', icon: GitCompare },
+    ],
+  },
+  {
+    label: 'Intelligence',
+    labelKey: 'topbar.intelligence',
+    items: [
+      { name: 'Industry Insights', href: '/insights', icon: Lightbulb },
+      { name: 'Trends', href: '/trends', icon: TrendingUp },
     ],
   },
   { label: 'Pricing', labelKey: 'topbar.pricing', href: '/pricing' },
   {
-    label: 'Learn',
-    labelKey: 'topbar.learn',
+    label: 'Resources',
+    labelKey: 'topbar.resources',
     items: [
       { name: 'GEO Learning Center', href: '/learn', icon: GraduationCap },
-      { name: 'Insights', href: '/insights', icon: Lightbulb },
       { name: 'Optimization Guide', href: '/optimize', icon: BookMarked },
     ],
   },

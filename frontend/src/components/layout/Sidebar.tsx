@@ -14,6 +14,7 @@ import {
   Lightbulb,
   BookOpen,
   Search,
+  Zap,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -24,8 +25,9 @@ const navigation = [
   { nameKey: 'nav.diagnosis', href: '/audit', icon: Search },
   { nameKey: 'nav.brands', href: '/brands', icon: Package },
   { nameKey: 'nav.competitors', href: '/compete', icon: GitCompareArrows },
-  { nameKey: 'nav.trends', href: '/trends', icon: TrendingUp },
   { nameKey: 'nav.insights', href: '/insights', icon: Lightbulb },
+  { nameKey: 'nav.trends', href: '/trends', icon: TrendingUp },
+  { nameKey: 'nav.optimize', href: '/optimize', icon: Zap },
   { nameKey: 'nav.learn', href: '/learn', icon: BookOpen },
 ];
 

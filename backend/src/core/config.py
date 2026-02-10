@@ -62,6 +62,14 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days
 
+    # OAuth
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    APPLE_CLIENT_ID: str = ""
+    APPLE_CLIENT_SECRET: str = ""
+    OAUTH_REDIRECT_BASE: str = ""  # e.g., https://geo-insights-api-production.up.railway.app
+    FRONTEND_URL: str = "https://geo-dashboard-sigma-ashen.vercel.app"
+
     # Evaluation
     DEFAULT_INTENT_POOL_PATH: str = "data/intent_pool.json"
     DEFAULT_BRANDS_PATH: str = "data/brands_database.json"

@@ -15,6 +15,7 @@ import {
   BookOpen,
   Settings,
   Home,
+  Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -22,15 +23,16 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const primaryTabs = [
   { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard },
   { nameKey: 'nav.diagnosis', href: '/audit', icon: Search },
-  { nameKey: 'nav.competitors', href: '/compete', icon: GitCompareArrows },
+  { nameKey: 'nav.insights', href: '/insights', icon: Lightbulb },
   { nameKey: 'nav.trends', href: '/trends', icon: TrendingUp },
 ];
 
 const moreTabs = [
   { nameKey: 'nav.home', href: '/', icon: Home },
   { nameKey: 'nav.brands', href: '/brands', icon: Package },
-  { nameKey: 'nav.insights', href: '/insights', icon: Lightbulb },
+  { nameKey: 'nav.competitors', href: '/compete', icon: GitCompareArrows },
   { nameKey: 'nav.learn', href: '/learn', icon: BookOpen },
+  { nameKey: 'nav.optimize', href: '/optimize', icon: Zap },
   { nameKey: 'nav.settings', href: '/settings', icon: Settings },
 ];
 
