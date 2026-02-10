@@ -342,7 +342,7 @@ CRITICAL CONTEXT: This brand sells to END CONSUMERS. Generate prompts that CONSU
 
 4. **Trend/Authority (4 prompts)**: "trending [category] 2026", "most innovative [category] companies", "award winning [category] brands", "[category] industry leaders"
 
-5. **Problem-Solving (4 prompts)**: Based on target audience needs: "[target audience] [category] needs", "best [product] for [use case]", "[category] for [specific problem]", "how to choose [product] for [audience]"
+5. **Problem-Solving (4 prompts)**: Always phrase to elicit brand recommendations: "which brands make the best [product] for [use case]", "recommend [category] brands for [audience]", "what [category] brands do experts recommend", "which [category] brands are worth the money"
 
 6. **Local/Contextual (4 prompts)**: "best [category] in US", "[category] for [specific audience]", "sustainable [category] brands", "organic [product] brands"
 
@@ -422,13 +422,13 @@ Example format:
         {"text": f"{category_lower} industry leaders", "intent": "trend", "type": "generic"},
     ])
     
-    # Problem-Solving (4)
+    # Problem-Solving (4) — phrased to elicit brand recommendations
     target = profile.target_audience.lower() if profile.target_audience else "families"
     fallback_prompts.extend([
-        {"text": f"best {main_product} for {target}", "intent": "problem_solving", "type": "generic"},
-        {"text": f"how to choose {category_lower}", "intent": "problem_solving", "type": "generic"},
-        {"text": f"{category_lower} for specific needs", "intent": "problem_solving", "type": "generic"},
-        {"text": f"quality {main_product} guide", "intent": "problem_solving", "type": "generic"},
+        {"text": f"which brands make the best {main_product} for {target}", "intent": "problem_solving", "type": "generic"},
+        {"text": f"recommend {category_lower} brands for everyday use", "intent": "problem_solving", "type": "generic"},
+        {"text": f"what {category_lower} brands do experts recommend", "intent": "problem_solving", "type": "generic"},
+        {"text": f"which {category_lower} brands are worth the money", "intent": "problem_solving", "type": "generic"},
     ])
     
     # Local/Contextual (4)
@@ -593,19 +593,55 @@ async def evaluate_prompt(brand_name: str, prompt_text: str, model_name: str, mo
         lines = response_text.split("\n")
         for line in lines:
             if brand_lower in line.lower() or brand_simple in re.sub(r"['\-\s]", "", line.lower()):
+                # Try numbered list: "1. Brand" or "1) Brand"
                 match = re.match(r"^\s*(\d+)[\.\)]\s", line)
                 if match:
                     rank = int(match.group(1))
+                else:
+                    # Try markdown headers: "### 1. Brand" or "**1. Brand**"
+                    match = re.match(r"^\s*(?:#{1,4}\s*)?(?:\*\*)?(\d+)[\.\):]?\s", line)
+                    if match:
+                        rank = int(match.group(1))
+                    elif not rank:
+                        # Fallback: count how many brands/items appeared before this one
+                        # by counting numbered items or bold items above
+                        brand_line_idx = lines.index(line) if line in lines else -1
+                        if brand_line_idx > 0:
+                            position = 0
+                            for prev_line in lines[:brand_line_idx]:
+                                if re.match(r"^\s*(?:#{1,4}\s*)?(?:\*\*)?(\d+)[\.\):]?\s", prev_line):
+                                    position += 1
+                                elif re.match(r"^\s*[\*\-]\s+\*\*", prev_line):
+                                    position += 1
+                            if position > 0:
+                                rank = position + 1  # brand is next after counted items
                 snippet = line.strip()[:200]
                 break
 
     sentiment = None
     if is_mentioned:
-        positive_words = ["best", "top", "excellent", "quality", "premium", "trusted", "popular", "recommended", "great", "love", "known for"]
-        negative_words = ["cheap", "poor", "bad", "worst", "avoid", "overpriced", "disappointing", "unreliable"]
-        if any(w in text_lower for w in positive_words):
+        # Enhanced sentiment analysis: check context around brand mention
+        positive_words = ["best", "top", "excellent", "quality", "premium", "trusted", "popular", 
+                         "recommended", "great", "love", "known for", "leading", "innovative",
+                         "reliable", "standout", "favorite", "well-regarded", "highly rated",
+                         "renowned", "exceptional", "superior", "impressive", "strong"]
+        negative_words = ["cheap", "poor", "bad", "worst", "avoid", "overpriced", "disappointing", 
+                         "unreliable", "controversy", "criticized", "lawsuit", "recall", "complaints",
+                         "declining", "problematic", "issues with"]
+        
+        # Weight: check words near brand mention, not just anywhere in text
+        brand_context = ""
+        for line in lines:
+            if brand_lower in line.lower() or brand_simple in re.sub(r"['\-\s]", "", line.lower()):
+                brand_context += " " + line.lower()
+        
+        context_to_check = brand_context if brand_context else text_lower
+        pos_count = sum(1 for w in positive_words if w in context_to_check)
+        neg_count = sum(1 for w in negative_words if w in context_to_check)
+        
+        if pos_count > neg_count:
             sentiment = "positive"
-        elif any(w in text_lower for w in negative_words):
+        elif neg_count > pos_count:
             sentiment = "negative"
         else:
             sentiment = "neutral"
@@ -901,6 +937,12 @@ Return only one word: accurate/partially_accurate/inaccurate/insufficient_data""
 
     if len(models_used) > 1:
         insights.append(f"Evaluated across {len(models_used)} AI platforms: {', '.join(models_used)}")
+        # Add per-model comparison insight
+        if per_model_scores:
+            best_model = max(per_model_scores, key=per_model_scores.get)
+            worst_model = min(per_model_scores, key=per_model_scores.get)
+            if per_model_scores[best_model] - per_model_scores[worst_model] >= 15:
+                insights.append(f"Platform gap: {best_model} mentions you {per_model_scores[best_model]}% vs {worst_model} only {per_model_scores[worst_model]}% — optimize for weaker platforms")
 
     recommendations = []
     if visibility < 50:
