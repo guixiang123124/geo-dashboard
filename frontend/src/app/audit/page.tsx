@@ -539,19 +539,105 @@ export default function AuditPage() {
                 <ScoreBar label="Citation" score={diagnosis.score.citation} icon={Link2} weight="25%" />
                 <ScoreBar label="Framing" score={diagnosis.score.representation} icon={MessageSquare} weight="25%" />
                 <ScoreBar label="Intent Coverage" score={diagnosis.score.intent} icon={Target} weight="15%" />
-                {diagnosis.score.per_model_scores && Object.keys(diagnosis.score.per_model_scores).length > 1 && (
-                  <div className="pt-4 border-t space-y-3">
-                    <h4 className="text-sm font-semibold text-slate-700">Per-Model Visibility</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {Object.entries(diagnosis.score.per_model_scores).map(([model, score]) => (
-                        <div key={model} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50">
-                          <ModelBadge model={model} />
-                          <span className="text-sm font-bold text-slate-900">{score}%</span>
+                {diagnosis.score.per_model_scores && Object.keys(diagnosis.score.per_model_scores).length > 1 && (() => {
+                  const scores = diagnosis.score.per_model_scores!;
+                  const models = Object.keys(scores);
+                  const maxScore = Math.max(...Object.values(scores));
+                  const minScore = Math.min(...Object.values(scores));
+                  const gap = maxScore - minScore;
+                  const bestModel = models.find(m => scores[m] === maxScore) || '';
+                  const worstModel = models.find(m => scores[m] === minScore) || '';
+                  const MODEL_COLORS: Record<string, string> = {
+                    gemini: 'bg-blue-500', openai: 'bg-green-500', grok: 'bg-orange-500',
+                  };
+                  const MODEL_LABELS: Record<string, string> = {
+                    gemini: 'Google Gemini', openai: 'OpenAI GPT', grok: 'xAI Grok',
+                  };
+                  // Per-model sentiment from results
+                  const modelSentiment: Record<string, { pos: number; neu: number; neg: number; none: number }> = {};
+                  const modelGeneric: Record<string, { mentioned: number; total: number }> = {};
+                  models.forEach(m => {
+                    modelSentiment[m] = { pos: 0, neu: 0, neg: 0, none: 0 };
+                    modelGeneric[m] = { mentioned: 0, total: 0 };
+                  });
+                  diagnosis.results.forEach(r => {
+                    if (r.model_name && modelSentiment[r.model_name]) {
+                      if (r.mentioned) {
+                        if (r.sentiment === 'positive') modelSentiment[r.model_name].pos++;
+                        else if (r.sentiment === 'neutral') modelSentiment[r.model_name].neu++;
+                        else if (r.sentiment === 'negative') modelSentiment[r.model_name].neg++;
+                        else modelSentiment[r.model_name].none++;
+                      }
+                      if (r.prompt_type === 'generic') {
+                        modelGeneric[r.model_name].total++;
+                        if (r.mentioned) modelGeneric[r.model_name].mentioned++;
+                      }
+                    }
+                  });
+
+                  return (
+                    <div className="pt-4 border-t space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                          <Globe className="w-4 h-4" />
+                          Platform Comparison
+                        </h4>
+                        {gap >= 10 && (
+                          <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">
+                            {gap}pp platform gap
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Bar Chart */}
+                      <div className="space-y-3">
+                        {models.sort((a, b) => scores[b] - scores[a]).map(model => (
+                          <div key={model} className="space-y-1">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="font-medium text-slate-700">{MODEL_LABELS[model] || model}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-slate-900">{scores[model]}%</span>
+                                {model === bestModel && models.length > 1 && (
+                                  <span className="text-xs text-green-600">★ Best</span>
+                                )}
+                                {model === worstModel && models.length > 1 && gap >= 5 && (
+                                  <span className="text-xs text-red-500">⚠ Weakest</span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-3">
+                              <div
+                                className={`${MODEL_COLORS[model] || 'bg-slate-500'} h-3 rounded-full transition-all duration-500`}
+                                style={{ width: `${scores[model]}%` }}
+                              />
+                            </div>
+                            {/* Mini stats row */}
+                            <div className="flex gap-3 text-xs text-slate-500">
+                              {modelGeneric[model] && modelGeneric[model].total > 0 && (
+                                <span>Generic: {Math.round((modelGeneric[model].mentioned / modelGeneric[model].total) * 100)}%</span>
+                              )}
+                              {modelSentiment[model] && (
+                                <span>
+                                  👍{modelSentiment[model].pos} 😐{modelSentiment[model].neu} 👎{modelSentiment[model].neg}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Insight */}
+                      {gap >= 5 && (
+                        <div className="p-3 rounded-lg bg-blue-50 border border-blue-100 text-sm text-blue-800">
+                          <strong>💡 Insight:</strong> Your brand is {gap}pp more visible on {MODEL_LABELS[bestModel] || bestModel} than {MODEL_LABELS[worstModel] || worstModel}.
+                          {worstModel === 'gemini' && ' Gemini (Google AI) is the hardest platform to crack — improving here has the highest strategic value.'}
+                          {worstModel === 'openai' && ' Focus on creating authoritative content that ChatGPT can reference.'}
+                          {worstModel === 'grok' && ' Grok is typically the most brand-friendly — a low score here suggests broader visibility issues.'}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
                 <div className="pt-4 border-t flex items-center justify-between text-sm text-slate-500">
                   <span>{diagnosis.score.mentioned_count}/{diagnosis.score.total_prompts} prompts mentioned brand</span>
                   <span>
