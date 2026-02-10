@@ -806,16 +806,8 @@ Return ONLY valid JSON, no markdown fences."""
 
     models_used = list(models_to_use.keys())
 
-    # Calculate new metrics
-    # competitor_gap: Brand mention rate vs category top 3 average
+    # Calculate new metrics (competitor_gap calculated after competitor extraction below)
     competitor_gap = None
-    if competitors and len(competitors) >= 3:
-        top_3_avg_mentions = sum(c.mention_count for c in competitors[:3]) / 3
-        generic_mention_rate = (generic_mentioned / generic_total) * 100 if generic_total else 0
-        # Estimate top 3 mention rate (they're in more prompts typically)
-        top_3_mention_rate = min(100, top_3_avg_mentions * 10)  # rough scaling
-        if top_3_mention_rate > 0:
-            competitor_gap = int(min(100, (generic_mention_rate / top_3_mention_rate) * 100))
 
     # recommendation_position: Average rank across all results where brand was mentioned and had a rank
     ranks_with_values = [r.rank for r in results if r.mentioned and r.rank is not None and r.rank > 0]
@@ -867,6 +859,14 @@ Return only one word: accurate/partially_accurate/inaccurate/insufficient_data""
         print(f"[diagnosis] Extracting competitors from {len(generic_responses)} generic responses...")
         competitors = await extract_competitors(profile.name, generic_responses, profile.category)
         print(f"[diagnosis] Found {len(competitors)} competitors")
+
+    # Calculate competitor_gap now that competitors are available
+    if competitors and len(competitors) >= 3:
+        top_3_avg_mentions = sum(c.mention_count for c in competitors[:3]) / 3
+        generic_mention_rate = (generic_mentioned / generic_total) * 100 if generic_total else 0
+        top_3_mention_rate = min(100, top_3_avg_mentions * 10)
+        if top_3_mention_rate > 0:
+            competitor_gap = int(min(100, (generic_mention_rate / top_3_mention_rate) * 100))
 
     # Step 6: Generate insights & recommendations
     insights = []
