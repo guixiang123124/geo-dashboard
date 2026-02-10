@@ -220,6 +220,9 @@ export default function AuditPage() {
         }
       }
 
+      // Default to free tier
+      body.pro = false;
+
       const res = await fetch(`${API_URL}/api/v1/diagnosis`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

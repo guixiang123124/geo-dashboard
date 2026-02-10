@@ -191,6 +191,7 @@ class DiagnosisRequest(BaseModel):
     domain: Optional[str] = None
     brand_name: Optional[str] = None
     custom_prompts: Optional[list[str]] = None
+    pro: bool = False
 
 
 class PromptResult(BaseModel):
@@ -224,6 +225,9 @@ class DiagnosisScore(BaseModel):
     mentioned_count: int
     models_used: list[str] = []
     per_model_scores: Optional[dict] = None
+    competitor_gap: Optional[int] = None  # Brand mention rate vs category top 3 average
+    recommendation_position: Optional[float] = None  # Average rank position in list-type answers
+    knowledge_accuracy: Optional[str] = None  # Brief assessment of AI knowledge accuracy
 
 
 class BrandProfile(BaseModel):
@@ -317,58 +321,166 @@ Return ONLY valid JSON, no markdown fences."""
 
 
 async def generate_smart_prompts(profile: BrandProfile) -> list[dict]:
-    """Generate 10 tailored evaluation prompts: 5 generic (visibility) + 5 brand-specific (sentiment/framing)."""
-    prompt = f"""You are an expert in AI visibility (GEO/AEO). Generate exactly 10 search prompts for evaluating this brand's AI visibility.
+    """Generate ~45 tailored evaluation prompts: ~25 generic (visibility) + ~20 brand-specific (sentiment/framing)."""
+    prompt = f"""You are an expert in AI visibility (GEO/AEO). Generate exactly 45 search prompts for evaluating this brand's AI visibility.
 
 Brand: {profile.name}
 Category: {profile.category}
 Products: {', '.join(profile.key_products)}
 Target audience: {profile.target_audience}
+Positioning: {profile.positioning}
 
-CRITICAL CONTEXT: This brand sells to END CONSUMERS (parents, shoppers). Generate prompts that CONSUMERS would search — NOT wholesale/B2B queries. Focus on the product category from the consumer perspective.
+CRITICAL CONTEXT: This brand sells to END CONSUMERS. Generate prompts that CONSUMERS would search.
 
-IMPORTANT: Generate TWO types of prompts:
+**Type A — Generic Discovery (25 prompts, DO NOT include the brand name "{profile.name}"):**
 
-**Type A — Generic Discovery (5 prompts, DO NOT include the brand name "{profile.name}"):**
-These test whether AI recommends this brand when consumers search for the category.
-- "discovery" — what consumers actually search: "best [category] brands", "top [products] for [audience]"
-- "informational" — educational queries: "how to choose [products]", "what to look for in [category]"
-CRITICAL: Prompts MUST be about {profile.category} from a consumer perspective!
-Good examples: "What are the best kids clothing brands?", "Best affordable children's dresses", "How to choose quality kids clothes"
-BAD examples (avoid): wholesale, B2B, supplier, dropshipping queries
+1. **Discovery (5 prompts)**: "best [category] brands", "top rated [category]", "most popular [category] brands", "recommended [category] companies", "leading [product] brands"
 
-**Type B — Brand-Specific Analysis (5 prompts, MUST include "{profile.name}"):**
-These measure how AI talks about the brand when asked directly.
-- "comparison" — brand vs specific competitors: "{profile.name} vs [real competitor in same category]"
-- "sentiment" — direct questions: "Is {profile.name} good?", "{profile.name} reviews"
-CRITICAL: Compare against REAL brands in the same consumer category, not random brands.
+2. **Comparison (4 prompts)**: "[category] brand comparison", "alternatives to [known competitor]", "[category] vs [category] comparison", "which [category] brand is best"
 
-Return a JSON array of 10 objects with keys: "text", "intent" (discovery/informational/comparison/sentiment), "type" ("generic" or "brand_specific").
-Return ONLY valid JSON, no markdown fences."""
+3. **Purchase Intent (4 prompts)**: "where to buy [product type]", "most affordable [category]", "buy [product] online", "[category] shopping guide"
 
-    text = await gemini_generate(prompt, max_tokens=1024)
+4. **Trend/Authority (4 prompts)**: "trending [category] 2026", "most innovative [category] companies", "award winning [category] brands", "[category] industry leaders"
+
+5. **Problem-Solving (4 prompts)**: Based on target audience needs: "[target audience] [category] needs", "best [product] for [use case]", "[category] for [specific problem]", "how to choose [product] for [audience]"
+
+6. **Local/Contextual (4 prompts)**: "best [category] in US", "[category] for [specific audience]", "sustainable [category] brands", "organic [product] brands"
+
+**Type B — Brand-Specific Analysis (20 prompts, MUST include "{profile.name}"):**
+
+1. **Reputation (4 prompts)**: "is {profile.name} good", "{profile.name} reviews", "{profile.name} quality", "what customers say about {profile.name}"
+
+2. **Comparison (4 prompts)**: "{profile.name} vs [real competitor]", "{profile.name} compared to competitors", "alternatives to {profile.name}", "{profile.name} or [competitor]"
+
+3. **Product Deep-dive (4 prompts)**: "{profile.name} best products", "{profile.name} for [use case]", "{profile.name} product reviews", "{profile.name} [specific product type]"
+
+4. **Sentiment Probing (4 prompts)**: "{profile.name} pros and cons", "problems with {profile.name}", "{profile.name} worth it", "{profile.name} customer complaints"
+
+5. **Authority (4 prompts)**: "{profile.name} sustainability", "{profile.name} awards", "{profile.name} company history", "{profile.name} brand story"
+
+Each prompt should have these keys: "text", "intent" (discovery/comparison/purchase_intent/trend/problem_solving/contextual/reputation/product/sentiment/authority), "type" ("generic" or "brand_specific").
+
+IMPORTANT: Use REAL category competitors when possible. For generic prompts, focus on the consumer perspective of {profile.category}.
+
+Return a JSON array of exactly 45 objects. Return ONLY valid JSON, no markdown fences.
+
+Example format:
+[
+  {{"text": "best {profile.category.lower()} brands", "intent": "discovery", "type": "generic"}},
+  {{"text": "is {profile.name} a good brand", "intent": "reputation", "type": "brand_specific"}}
+]"""
+
+    text = await gemini_generate(prompt, max_tokens=2048)
     try:
         text = re.sub(r'^```json?\s*', '', text.strip())
         text = re.sub(r'\s*```$', '', text.strip())
         prompts = json.loads(text)
-        if isinstance(prompts, list):
-            return prompts[:10]
+        if isinstance(prompts, list) and len(prompts) >= 30:
+            # Cap at 50 max as requested
+            return prompts[:50]
     except json.JSONDecodeError:
-        pass
+        print("[diagnosis] Failed to parse Gemini-generated prompts, using fallback")
 
-    # Fallback: generic + brand-specific prompts
-    return [
-        {"text": f"What are the best {profile.category.lower()} brands?", "intent": "discovery", "type": "generic"},
-        {"text": f"How to choose the right {profile.category.lower()}?", "intent": "informational", "type": "generic"},
-        {"text": f"Top rated {profile.key_products[0] if profile.key_products else 'products'} recommendations", "intent": "discovery", "type": "generic"},
-        {"text": f"Best affordable {profile.category.lower()} online", "intent": "discovery", "type": "generic"},
-        {"text": f"What should I look for when buying {profile.category.lower()}?", "intent": "informational", "type": "generic"},
-        {"text": f"Is {profile.name} a good brand?", "intent": "sentiment", "type": "brand_specific"},
-        {"text": f"{profile.name} reviews and alternatives", "intent": "comparison", "type": "brand_specific"},
-        {"text": f"{profile.name} vs competitors: which is better?", "intent": "comparison", "type": "brand_specific"},
-        {"text": f"What do people think of {profile.name}?", "intent": "sentiment", "type": "brand_specific"},
-        {"text": f"Is {profile.name} worth the price?", "intent": "sentiment", "type": "brand_specific"},
-    ]
+    # Enhanced fallback: ~45 prompts
+    category_lower = profile.category.lower()
+    products = profile.key_products if profile.key_products else ["products"]
+    main_product = products[0].lower() if products else "products"
+    
+    fallback_prompts = []
+    
+    # Generic prompts (~25)
+    # Discovery (5)
+    fallback_prompts.extend([
+        {"text": f"best {category_lower} brands", "intent": "discovery", "type": "generic"},
+        {"text": f"top rated {category_lower}", "intent": "discovery", "type": "generic"},
+        {"text": f"most popular {category_lower} brands", "intent": "discovery", "type": "generic"},
+        {"text": f"recommended {category_lower} companies", "intent": "discovery", "type": "generic"},
+        {"text": f"leading {main_product} brands", "intent": "discovery", "type": "generic"},
+    ])
+    
+    # Comparison (4)
+    fallback_prompts.extend([
+        {"text": f"{category_lower} brand comparison", "intent": "comparison", "type": "generic"},
+        {"text": f"alternatives to popular {category_lower}", "intent": "comparison", "type": "generic"},
+        {"text": f"which {category_lower} brand is best", "intent": "comparison", "type": "generic"},
+        {"text": f"{category_lower} vs {category_lower} comparison", "intent": "comparison", "type": "generic"},
+    ])
+    
+    # Purchase Intent (4)
+    fallback_prompts.extend([
+        {"text": f"where to buy {main_product}", "intent": "purchase_intent", "type": "generic"},
+        {"text": f"most affordable {category_lower}", "intent": "purchase_intent", "type": "generic"},
+        {"text": f"buy {main_product} online", "intent": "purchase_intent", "type": "generic"},
+        {"text": f"{category_lower} shopping guide", "intent": "purchase_intent", "type": "generic"},
+    ])
+    
+    # Trend/Authority (4)
+    fallback_prompts.extend([
+        {"text": f"trending {category_lower} 2026", "intent": "trend", "type": "generic"},
+        {"text": f"most innovative {category_lower} companies", "intent": "trend", "type": "generic"},
+        {"text": f"award winning {category_lower} brands", "intent": "trend", "type": "generic"},
+        {"text": f"{category_lower} industry leaders", "intent": "trend", "type": "generic"},
+    ])
+    
+    # Problem-Solving (4)
+    target = profile.target_audience.lower() if profile.target_audience else "families"
+    fallback_prompts.extend([
+        {"text": f"best {main_product} for {target}", "intent": "problem_solving", "type": "generic"},
+        {"text": f"how to choose {category_lower}", "intent": "problem_solving", "type": "generic"},
+        {"text": f"{category_lower} for specific needs", "intent": "problem_solving", "type": "generic"},
+        {"text": f"quality {main_product} guide", "intent": "problem_solving", "type": "generic"},
+    ])
+    
+    # Local/Contextual (4)
+    fallback_prompts.extend([
+        {"text": f"best {category_lower} in US", "intent": "contextual", "type": "generic"},
+        {"text": f"sustainable {category_lower} brands", "intent": "contextual", "type": "generic"},
+        {"text": f"organic {main_product} brands", "intent": "contextual", "type": "generic"},
+        {"text": f"{category_lower} for parents", "intent": "contextual", "type": "generic"},
+    ])
+    
+    # Brand-specific prompts (~20)
+    # Reputation (4)
+    fallback_prompts.extend([
+        {"text": f"is {profile.name} good", "intent": "reputation", "type": "brand_specific"},
+        {"text": f"{profile.name} reviews", "intent": "reputation", "type": "brand_specific"},
+        {"text": f"{profile.name} quality", "intent": "reputation", "type": "brand_specific"},
+        {"text": f"what customers say about {profile.name}", "intent": "reputation", "type": "brand_specific"},
+    ])
+    
+    # Comparison (4)
+    fallback_prompts.extend([
+        {"text": f"{profile.name} vs competitors", "intent": "comparison", "type": "brand_specific"},
+        {"text": f"{profile.name} compared to other brands", "intent": "comparison", "type": "brand_specific"},
+        {"text": f"alternatives to {profile.name}", "intent": "comparison", "type": "brand_specific"},
+        {"text": f"{profile.name} or other {category_lower}", "intent": "comparison", "type": "brand_specific"},
+    ])
+    
+    # Product Deep-dive (4)
+    fallback_prompts.extend([
+        {"text": f"{profile.name} best products", "intent": "product", "type": "brand_specific"},
+        {"text": f"{profile.name} {main_product}", "intent": "product", "type": "brand_specific"},
+        {"text": f"{profile.name} product reviews", "intent": "product", "type": "brand_specific"},
+        {"text": f"{profile.name} product line", "intent": "product", "type": "brand_specific"},
+    ])
+    
+    # Sentiment Probing (4)
+    fallback_prompts.extend([
+        {"text": f"{profile.name} pros and cons", "intent": "sentiment", "type": "brand_specific"},
+        {"text": f"problems with {profile.name}", "intent": "sentiment", "type": "brand_specific"},
+        {"text": f"{profile.name} worth it", "intent": "sentiment", "type": "brand_specific"},
+        {"text": f"{profile.name} customer feedback", "intent": "sentiment", "type": "brand_specific"},
+    ])
+    
+    # Authority (4)
+    fallback_prompts.extend([
+        {"text": f"{profile.name} sustainability", "intent": "authority", "type": "brand_specific"},
+        {"text": f"{profile.name} awards", "intent": "authority", "type": "brand_specific"},
+        {"text": f"{profile.name} company history", "intent": "authority", "type": "brand_specific"},
+        {"text": f"{profile.name} brand story", "intent": "authority", "type": "brand_specific"},
+    ])
+    
+    return fallback_prompts
 
 
 async def extract_competitors(brand_name: str, responses: list[dict], category: str) -> list[CompetitorInfo]:
@@ -527,7 +639,22 @@ async def diagnose_brand(req: DiagnosisRequest, db: AsyncSession = Depends(get_d
     if not available_models:
         raise HTTPException(500, "No AI API keys configured")
 
-    print(f"[diagnosis] Starting diagnosis: domain={req.domain}, brand={req.brand_name}, models={list(available_models.keys())}")
+    # Model selection based on pro/free tier
+    if req.pro:
+        # Pro: use ALL available models
+        models_to_use = available_models
+        print(f"[diagnosis] Pro tier: using all {len(models_to_use)} models")
+    else:
+        # Free: use only ONE model (prefer Gemini, fallback to any available)
+        if "gemini" in available_models:
+            models_to_use = {"gemini": available_models["gemini"]}
+        else:
+            # Take the first available model
+            first_model = next(iter(available_models.items()))
+            models_to_use = {first_model[0]: first_model[1]}
+        print(f"[diagnosis] Free tier: using single model {list(models_to_use.keys())[0]}")
+
+    print(f"[diagnosis] Starting diagnosis: domain={req.domain}, brand={req.brand_name}, models={list(models_to_use.keys())}")
 
     start_time = time.time()
     domain = req.domain or ""
@@ -579,17 +706,17 @@ Return ONLY valid JSON, no markdown fences."""
     if req.custom_prompts:
         for cp in req.custom_prompts[:5]:
             if cp.strip():
-                smart_prompts.append({"text": cp.strip(), "intent": "custom"})
+                smart_prompts.append({"text": cp.strip(), "intent": "custom", "type": "custom"})
 
-    # Cap total at 15
-    smart_prompts = smart_prompts[:15]
+    # Cap total at 50 max
+    smart_prompts = smart_prompts[:50]
 
     print(f"[diagnosis] Step 3 done: {len(smart_prompts)} prompts (incl custom)")
 
-    # Step 4: Evaluate prompts across ALL available models
+    # Step 4: Evaluate prompts across selected models
     results: list[PromptResult] = []
     cited_count = 0
-    per_model_results: dict[str, list[dict]] = {m: [] for m in available_models}
+    per_model_results: dict[str, list[dict]] = {m: [] for m in models_to_use}
 
     async def eval_one(sp: dict, model_name: str, model_fn) -> tuple:
         try:
@@ -618,10 +745,10 @@ Return ONLY valid JSON, no markdown fences."""
                 response_text=None,
             ), False, model_name, "", sp)
 
-    # Build tasks for all prompts x all models
+    # Build tasks for all prompts x selected models
     tasks = []
     for sp in smart_prompts:
-        for model_name, model_fn in available_models.items():
+        for model_name, model_fn in models_to_use.items():
             tasks.append(eval_one(sp, model_name, model_fn))
 
     generic_responses = []  # Collect for competitor discovery
@@ -677,7 +804,47 @@ Return ONLY valid JSON, no markdown fences."""
             m_mentioned = sum(1 for r in mr if r["mentioned"])
             per_model_scores[mn] = int((m_mentioned / len(mr)) * 100)
 
-    models_used = list(available_models.keys())
+    models_used = list(models_to_use.keys())
+
+    # Calculate new metrics
+    # competitor_gap: Brand mention rate vs category top 3 average
+    competitor_gap = None
+    if competitors and len(competitors) >= 3:
+        top_3_avg_mentions = sum(c.mention_count for c in competitors[:3]) / 3
+        generic_mention_rate = (generic_mentioned / generic_total) * 100 if generic_total else 0
+        # Estimate top 3 mention rate (they're in more prompts typically)
+        top_3_mention_rate = min(100, top_3_avg_mentions * 10)  # rough scaling
+        if top_3_mention_rate > 0:
+            competitor_gap = int(min(100, (generic_mention_rate / top_3_mention_rate) * 100))
+
+    # recommendation_position: Average rank across all results where brand was mentioned and had a rank
+    ranks_with_values = [r.rank for r in results if r.mentioned and r.rank is not None and r.rank > 0]
+    recommendation_position = sum(ranks_with_values) / len(ranks_with_values) if ranks_with_values else None
+
+    # knowledge_accuracy: Compare AI responses against website info
+    knowledge_accuracy = None
+    brand_responses = [r.response_text for r in results if r.mentioned and r.response_text and r.prompt_type == "brand_specific"]
+    if brand_responses and site_text:
+        accuracy_prompt = f"""Given this website info about the brand: {site_text[:500]}
+        
+And these AI responses about the brand: {' | '.join(brand_responses[:3])}
+
+Rate the accuracy of AI's knowledge about this brand:
+- "accurate": AI information matches website facts well
+- "partially_accurate": Some correct info, some gaps/errors
+- "inaccurate": AI information contradicts or misses key facts
+- "insufficient_data": AI admits lack of knowledge
+
+Return only one word: accurate/partially_accurate/inaccurate/insufficient_data"""
+        try:
+            accuracy_result = await call_gemini(accuracy_prompt, max_tokens=50)
+            if accuracy_result:
+                knowledge_accuracy = accuracy_result.strip().lower()
+                # Ensure it's one of the expected values
+                if knowledge_accuracy not in ["accurate", "partially_accurate", "inaccurate", "insufficient_data"]:
+                    knowledge_accuracy = "insufficient_data"
+        except Exception:
+            knowledge_accuracy = "insufficient_data"
 
     score = DiagnosisScore(
         composite=composite,
@@ -689,6 +856,9 @@ Return ONLY valid JSON, no markdown fences."""
         mentioned_count=sum(1 for r in results if r.mentioned),
         models_used=models_used,
         per_model_scores=per_model_scores,
+        competitor_gap=competitor_gap,
+        recommendation_position=recommendation_position,
+        knowledge_accuracy=knowledge_accuracy,
     )
 
     # Step 5.5: Competitor Discovery — extract brands mentioned in generic responses
