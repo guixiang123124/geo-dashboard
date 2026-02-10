@@ -638,12 +638,13 @@ Return ONLY valid JSON, no markdown fences."""
     # Step 5: Calculate scores
     total = len(results)
     mentioned = sum(1 for r in results if r.mentioned)
-    # Intent coverage based on generic prompts only (brand-specific always "mention" the brand)
-    intents_with_mention = len(set(r.intent for r in generic_results if r.mentioned))
-    total_intents = len(set(r.intent for r in generic_results)) if generic_results else len(set(r.intent for r in results))
 
     # True visibility = only from GENERIC prompts (no brand name)
     generic_results = [r for r in results if r.prompt_type == "generic"]
+
+    # Intent coverage based on generic prompts only (brand-specific always "mention" the brand)
+    intents_with_mention = len(set(r.intent for r in generic_results if r.mentioned))
+    total_intents = len(set(r.intent for r in generic_results)) if generic_results else len(set(r.intent for r in results))
     generic_mentioned = sum(1 for r in generic_results if r.mentioned)
     generic_total = len(generic_results) if generic_results else 1
 
