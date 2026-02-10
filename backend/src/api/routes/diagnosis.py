@@ -841,12 +841,21 @@ Return ONLY valid JSON, no markdown fences."""
     # Composite: visibility is king, citation gets minimal weight (AI rarely cites)
     composite = int(visibility * 0.40 + representation * 0.25 + intent_score * 0.25 + citation * 0.10)
 
-    # Per-model scores
+    # Per-model scores with weights (Gemini hardest to appear in = most valuable signal)
+    MODEL_WEIGHTS = {"gemini": 1.5, "openai": 1.0, "grok": 0.8}
     per_model_scores = {}
     for mn, mr in per_model_results.items():
         if mr:
             m_mentioned = sum(1 for r in mr if r["mentioned"])
             per_model_scores[mn] = int((m_mentioned / len(mr)) * 100)
+
+    # Model-weighted visibility: weight each model's visibility by importance
+    if len(per_model_scores) > 1:
+        weighted_sum = sum(per_model_scores[m] * MODEL_WEIGHTS.get(m, 1.0) for m in per_model_scores)
+        total_model_weight = sum(MODEL_WEIGHTS.get(m, 1.0) for m in per_model_scores)
+        weighted_visibility = int(weighted_sum / total_model_weight)
+        # Use weighted visibility in composite when multi-model
+        composite = int(weighted_visibility * 0.40 + representation * 0.25 + intent_score * 0.25 + citation * 0.10)
 
     models_used = list(models_to_use.keys())
 
