@@ -1,7 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useBrands } from '@/hooks/useBrands';
+import { useCategories } from '@/hooks/useCategories';
+import CategorySelector from '@/components/filters/CategorySelector';
 import ScoreCard from '@/components/geo/ScoreCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +30,9 @@ import {
 } from 'lucide-react';
 
 export default function Home() {
-  const { brands, loading, error } = useBrands();
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const { categories, loading: catLoading } = useCategories();
+  const { brands, loading, error } = useBrands(selectedCategory || undefined);
 
   if (loading) {
     return (
@@ -218,6 +223,14 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Industry Filter */}
+        <CategorySelector
+          categories={categories}
+          selected={selectedCategory}
+          onChange={setSelectedCategory}
+          loading={catLoading}
+        />
 
         {/* Key Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">

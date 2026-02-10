@@ -123,6 +123,17 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string; accent: string
   'Food & Beverage': { bg: 'bg-red-500/15', text: 'text-red-400', accent: 'border-red-500/50', hex: '#ef4444' },
 };
 
+const SHORT_CATEGORY_NAMES: Record<string, string> = {
+  'Kids Fashion': 'Kids',
+  'Fintech & Financial Services': 'Fintech',
+  'Food & Beverage': 'Food',
+  'Health & Wellness': 'Health',
+  'Real Estate & Home': 'Real Estate',
+  'Travel & Hospitality': 'Travel',
+  'Education & EdTech': 'Education',
+  'SaaS & Technology': 'SaaS',
+};
+
 function getCatColor(cat: string) {
   return CATEGORY_COLORS[cat] || { bg: 'bg-violet-500/15', text: 'text-violet-400', accent: 'border-violet-500/50', hex: '#8b5cf6' };
 }
@@ -283,13 +294,13 @@ export default function InsightsPage() {
   return (
     <div className="min-h-screen p-4 md:p-6 space-y-6">
       {/* Header */}
-      <div>
+      <div className="mb-2">
         <h1 className="text-3xl font-bold text-white">Industry Intelligence</h1>
-        <p className="text-zinc-400 mt-1">AI visibility benchmarks across competitive landscapes</p>
+        <p className="text-zinc-400 mt-2">AI visibility benchmarks across competitive landscapes</p>
       </div>
 
       {/* Category Selector */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 pt-2">
         <button
           onClick={() => setSelectedCategory('')}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
@@ -406,7 +417,7 @@ function OverviewTab({ category, categories }: { category: string; categories: C
           <CardContent>
             <BarChartSVG
               data={categories.filter(c => c.avg_composite > 0).map(c => ({
-                label: c.category.replace(' & ', '\n& '),
+                label: SHORT_CATEGORY_NAMES[c.category] || c.category,
                 value: c.avg_composite,
                 color: getCatColor(c.category).hex,
               }))}
@@ -433,12 +444,12 @@ function OverviewTab({ category, categories }: { category: string; categories: C
                       <div className="text-white font-bold">{c.eval_count.toLocaleString()}</div>
                     </div>
                     <div className="col-span-2">
-                      <div className="text-zinc-500 text-xs">Avg Composite</div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${c.avg_composite}%`, backgroundColor: scoreHex(c.avg_composite) }} />
-                        </div>
-                        <span className={`text-sm font-mono font-bold ${scoreColor(c.avg_composite)}`}>{c.avg_composite}</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-zinc-500 text-xs">Avg Composite</span>
+                        <span className={`text-lg font-mono font-bold ${scoreColor(c.avg_composite)}`}>{c.avg_composite}</span>
+                      </div>
+                      <div className="flex-1 h-3 bg-zinc-800 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${c.avg_composite}%`, backgroundColor: scoreHex(c.avg_composite) }} />
                       </div>
                     </div>
                   </div>

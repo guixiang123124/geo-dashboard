@@ -5,7 +5,7 @@ API routes for Brand management.
 from typing import List
 from uuid import uuid4
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...core.database import get_db
@@ -24,7 +24,7 @@ router = APIRouter()
 async def list_brands(
     workspace_id: str = Query(..., description="Workspace ID"),
     page: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1, le=100),
+    page_size: int = Query(50, ge=1, le=500),
     category: str = Query(None, description="Filter by category"),
     db: AsyncSession = Depends(get_db),
 ):
@@ -36,9 +36,11 @@ async def list_brands(
     if category:
         query = query.where(Brand.category == category)
 
-    # Get total count
-    count_result = await db.execute(select(Brand).where(Brand.workspace_id == workspace_id))
-    total = len(count_result.scalars().all())
+    # Get total count (with same filters)
+    count_query = select(func.count()).select_from(Brand).where(Brand.workspace_id == workspace_id)
+    if category:
+        count_query = count_query.where(Brand.category == category)
+    total = (await db.execute(count_query)).scalar()
 
     # Apply pagination
     offset = (page - 1) * page_size

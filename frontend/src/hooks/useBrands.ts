@@ -9,7 +9,7 @@ export interface BrandWithScore extends Brand {
   score?: ScoreCard;
 }
 
-export function useBrands() {
+export function useBrands(category?: string) {
   const [brands, setBrands] = useState<BrandWithScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,8 +20,8 @@ export function useBrands() {
         setLoading(true);
         setError(null);
 
-        // Fetch brands
-        const brandsResponse = await brandsAPI.list(DEFAULT_WORKSPACE_ID, 1, 100);
+        // Fetch all brands (page_size=500 to get them all)
+        const brandsResponse = await brandsAPI.list(DEFAULT_WORKSPACE_ID, 1, 500, category);
 
         // Fetch latest scores for all brands
         const brandsWithScores: BrandWithScore[] = await Promise.all(
@@ -45,7 +45,7 @@ export function useBrands() {
     }
 
     fetchBrandsAndScores();
-  }, []);
+  }, [category]);
 
   return { brands, loading, error };
 }

@@ -7,11 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Package, TrendingUp, TrendingDown, ArrowRight, Download, Plus } from 'lucide-react';
 import { useBrands } from '@/hooks/useBrands';
+import { useCategories } from '@/hooks/useCategories';
+import CategorySelector from '@/components/filters/CategorySelector';
 import AdvancedFilters, { type FilterState } from '@/components/filters/AdvancedFilters';
 import { exportBrandsToCSV } from '@/lib/export';
 
 export default function BrandsPage() {
-    const { brands, loading } = useBrands();
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const { categories, loading: catLoading } = useCategories();
+    const { brands, loading } = useBrands(selectedCategory || undefined);
     const [filters, setFilters] = useState<FilterState>({
         search: '',
         category: [],
@@ -130,6 +134,14 @@ export default function BrandsPage() {
                         </Button>
                     </div>
                 </div>
+
+                {/* Industry Filter */}
+                <CategorySelector
+                    categories={categories}
+                    selected={selectedCategory}
+                    onChange={setSelectedCategory}
+                    loading={catLoading}
+                />
 
                 {/* Advanced Filters */}
                 <AdvancedFilters onFilterChange={handleFilterChange} onReset={handleReset} />

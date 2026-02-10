@@ -170,11 +170,12 @@ export const brandsApi = {
   async list(
     workspaceId: string,
     page = 1,
-    pageSize = 20
+    pageSize = 20,
+    category?: string
   ): Promise<PaginatedResponse<BrandWithScore>> {
-    const raw = await fetchApi<BackendBrandListResponse>(
-      `/brands?workspace_id=${workspaceId}&page=${page}&page_size=${pageSize}`
-    );
+    let url = `/brands?workspace_id=${workspaceId}&page=${page}&page_size=${pageSize}`;
+    if (category) url += `&category=${encodeURIComponent(category)}`;
+    const raw = await fetchApi<BackendBrandListResponse>(url);
     return {
       items: raw.brands ?? [],
       total: raw.total ?? 0,
@@ -381,8 +382,8 @@ export async function checkApiHealth(): Promise<boolean> {
 
 export const brandsAPI = {
   ...brandsApi,
-  async list(workspaceId: string, page = 1, pageSize = 20) {
-    const result = await brandsApi.list(workspaceId, page, pageSize);
+  async list(workspaceId: string, page = 1, pageSize = 20, category?: string) {
+    const result = await brandsApi.list(workspaceId, page, pageSize, category);
     return { brands: result.items, total: result.total };
   },
 };
