@@ -603,18 +603,19 @@ async def evaluate_prompt(brand_name: str, prompt_text: str, model_name: str, mo
                     if match:
                         rank = int(match.group(1))
                     elif not rank:
-                        # Fallback: count how many brands/items appeared before this one
-                        # by counting numbered items or bold items above
+                        # Fallback: count peer list items (same indent level) before this line
                         brand_line_idx = lines.index(line) if line in lines else -1
                         if brand_line_idx > 0:
-                            position = 0
-                            for prev_line in lines[:brand_line_idx]:
-                                if re.match(r"^\s*(?:#{1,4}\s*)?(?:\*\*)?(\d+)[\.\):]?\s", prev_line):
-                                    position += 1
-                                elif re.match(r"^\s*[\*\-]\s+\*\*", prev_line):
-                                    position += 1
-                            if position > 0:
-                                rank = position + 1  # brand is next after counted items
+                            # Find the indent/prefix pattern of the brand line
+                            brand_prefix = re.match(r'^(\s*[\*\-]\s+)', line)
+                            if brand_prefix:
+                                prefix_pattern = brand_prefix.group(1)
+                                position = 0
+                                for prev_line in lines[:brand_line_idx]:
+                                    if prev_line.startswith(prefix_pattern) and '**' in prev_line:
+                                        position += 1
+                                if position > 0:
+                                    rank = position + 1
                 snippet = line.strip()[:200]
                 break
 
@@ -646,7 +647,13 @@ async def evaluate_prompt(brand_name: str, prompt_text: str, model_name: str, mo
         else:
             sentiment = "neutral"
 
-    has_citation = bool(re.search(r'https?://[^\s]*' + re.escape(brand_lower.replace(" ", "")), text_lower))
+    # Check for citations: URLs containing brand name or brand domain
+    brand_domain = brand_lower.replace(" ", "").replace("'", "")
+    has_citation = bool(
+        re.search(r'https?://[^\s]*' + re.escape(brand_domain), text_lower) or
+        re.search(r'https?://(?:www\.)?' + re.escape(brand_domain) + r'\.', text_lower) or
+        re.search(r'\b' + re.escape(brand_domain) + r'\.com\b', text_lower)
+    )
 
     return {
         "mentioned": is_mentioned,
@@ -831,7 +838,8 @@ Return ONLY valid JSON, no markdown fences."""
     representation = int((avg_repr / 3) * 100) if avg_repr else 0
     intent_score = int((intents_with_mention / total_intents) * 100) if total_intents else 0
 
-    composite = int(visibility * 0.35 + citation * 0.25 + representation * 0.25 + intent_score * 0.15)
+    # Composite: visibility is king, citation gets minimal weight (AI rarely cites)
+    composite = int(visibility * 0.40 + representation * 0.25 + intent_score * 0.25 + citation * 0.10)
 
     # Per-model scores
     per_model_scores = {}
