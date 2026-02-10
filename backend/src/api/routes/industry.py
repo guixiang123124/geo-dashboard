@@ -94,7 +94,7 @@ async def get_categories(
 @router.get("/rankings")
 async def get_brand_rankings(
     sort_by: str = Query("composite", description="Sort field"),
-    limit: int = Query(30, ge=1, le=100),
+    limit: int = Query(30, ge=1, le=500),
     category: Optional[str] = Query(None, description="Filter by industry category"),
     db: AsyncSession = Depends(get_db),
 ):
