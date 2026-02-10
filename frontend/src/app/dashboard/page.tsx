@@ -1,677 +1,532 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useBrands } from '@/hooks/useBrands';
 import { useCategories } from '@/hooks/useCategories';
-import CategorySelector from '@/components/filters/CategorySelector';
-import ScoreCard from '@/components/geo/ScoreCard';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  BarChart3,
-  TrendingUp,
-  Target,
-  AlertCircle,
   Loader2,
+  AlertCircle,
+  Trophy,
+  AlertTriangle,
+  Target,
   Eye,
-  Link2,
-  MessageSquare,
+  TrendingUp,
   Users,
-  Activity,
-  Info,
-  PlayCircle,
-  Plus,
-  Clock,
-  FileText,
-  PieChart,
+  Zap,
+  Star,
+  BarChart3,
   ArrowRight,
-  Search,
 } from 'lucide-react';
 
-export default function Home() {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+interface StatsData {
+  total_evaluations: number;
+  total_mentioned: number;
+  mention_rate: number;
+  total_brands: number;
+  total_prompts: number;
+  intent_breakdown: { intent: string; total: number; mentioned: number; rate: number }[];
+  sentiment_distribution: Record<string, number>;
+  score_averages: { composite: number; composite_min: number; composite_max: number; visibility: number; citation: number; representation: number; intent: number };
+  top_brand?: { name: string; composite: number } | null;
+}
+
+interface CategoryInfo {
+  category: string;
+  brand_count: number;
+  eval_count: number;
+  avg_composite: number;
+}
+
+interface RankingItem {
+  rank: number;
+  name: string;
+  domain: string;
+  category: string;
+  composite: number;
+  visibility: number;
+  citation: number;
+  representation: number;
+  intent: number;
+  mentions: number;
+  evaluations: number;
+}
+
+function scoreColor(v: number): string {
+  if (v >= 50) return '#34d399';
+  if (v >= 20) return '#fbbf24';
+  return '#f87171';
+}
+
+function scoreTextClass(v: number): string {
+  if (v >= 50) return 'text-emerald-400';
+  if (v >= 20) return 'text-yellow-400';
+  return 'text-red-400';
+}
+
+export default function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const { categories, loading: catLoading } = useCategories();
-  const { brands, loading, error } = useBrands(selectedCategory || undefined);
+  const [stats, setStats] = useState<StatsData | null>(null);
+  const [rankings, setRankings] = useState<RankingItem[]>([]);
+  const [allCategories, setAllCategories] = useState<CategoryInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setLoading(true);
+    setError('');
+    const params = new URLSearchParams();
+    if (selectedCategory) params.set('category', selectedCategory);
+
+    const rankParams = new URLSearchParams(params);
+    rankParams.set('sort_by', 'composite');
+    rankParams.set('limit', '50');
+
+    Promise.all([
+      fetch(`${API_URL}/api/v1/industry/stats?${params}`).then(r => r.json()),
+      fetch(`${API_URL}/api/v1/industry/rankings?${rankParams}`).then(r => r.json()),
+      fetch(`${API_URL}/api/v1/industry/categories`).then(r => r.json()),
+    ])
+      .then(([s, r, c]) => {
+        setStats(s);
+        setRankings(r.rankings || []);
+        setAllCategories(c.categories || []);
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [selectedCategory]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-zinc-950">
         <div className="text-center space-y-4">
-          <Loader2 className="w-10 h-10 animate-spin text-violet-600 mx-auto" />
-          <div>
-            <p className="text-lg font-semibold text-slate-900">Loading Luminos</p>
-            <p className="text-sm text-slate-500 mt-1">Fetching brand performance data...</p>
-          </div>
+          <Loader2 className="w-10 h-10 animate-spin text-violet-500 mx-auto" />
+          <p className="text-lg font-semibold text-white">Loading Luminos</p>
+          <p className="text-sm text-zinc-400">Fetching AI visibility data...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !stats) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <AlertCircle className="w-5 h-5" />
-              Error Loading Data
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-slate-700 mb-4">{error}</p>
-            <p className="text-sm text-slate-500">
-              Make sure the backend API is running at{' '}
-              <code className="bg-slate-100 px-2 py-1 rounded text-slate-700">the backend API</code>
-            </p>
-            <Button onClick={() => window.location.reload()} className="mt-4">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center min-h-screen bg-zinc-950">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 max-w-md">
+          <div className="flex items-center gap-2 text-red-400 mb-4">
+            <AlertCircle className="w-5 h-5" />
+            <h2 className="text-lg font-bold">Error Loading Data</h2>
+          </div>
+          <p className="text-zinc-400 mb-4">{error || 'No data available'}</p>
+          <button onClick={() => window.location.reload()} className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors">
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
-  // Calculate stats from real data
-  const brandsWithScores = brands.filter((b) => b.score);
-  const totalBrands = brands.length;
-  const scoredCount = brandsWithScores.length;
-  const visibleBrands = brandsWithScores.filter((b) => (b.score?.composite_score ?? 0) > 0);
+  // Derived data
+  const topBrand = stats.top_brand;
+  const avgScore = stats.score_averages.composite;
+  const maxScore = stats.score_averages.composite_max;
+  const aboveAvg = rankings.filter(r => r.composite > avgScore).length;
+  const zeroBrands = rankings.filter(r => r.composite === 0).length;
+  const lowBrands = rankings.filter(r => r.composite > 0 && r.composite < 15).length;
+  const top5 = rankings.filter(r => r.composite > 0).slice(0, 5);
+  const bottom3 = [...rankings].filter(r => r.composite > 0).sort((a, b) => a.composite - b.composite).slice(0, 3);
 
-  const avgComposite =
-    scoredCount > 0
-      ? Math.round(
-          brandsWithScores.reduce((sum, b) => sum + (b.score?.composite_score ?? 0), 0) /
-            scoredCount
-        )
-      : 0;
+  // Industry data sorted by avg composite (exclude zero)
+  const sortedIndustries = [...allCategories].filter(c => c.avg_composite > 0).sort((a, b) => b.avg_composite - a.avg_composite);
+  const globalAvg = sortedIndustries.length > 0
+    ? Math.round(sortedIndustries.reduce((s, c) => s + c.avg_composite, 0) / sortedIndustries.length * 10) / 10
+    : 0;
 
-  // Total mentions and mention rate
-  const totalMentions = brandsWithScores.reduce(
-    (sum, b) => sum + (b.score?.total_mentions ?? 0),
-    0
-  );
-  const totalEvaluations = brandsWithScores.reduce(
-    (sum, b) => sum + (b.score?.evaluation_count ?? 0),
-    0
-  );
-  // Mention rate: brands mentioned at least once / total evaluated brands
-  const mentionRate =
-    scoredCount > 0 ? Math.round((visibleBrands.length / scoredCount) * 100) : 0;
+  // Intent insights
+  const sortedIntents = [...stats.intent_breakdown].sort((a, b) => b.rate - a.rate);
+  const bestIntent = sortedIntents[0];
+  const worstIntent = sortedIntents[sortedIntents.length - 1];
 
-  // Average citation rate
-  const avgCitationRate =
-    scoredCount > 0
-      ? Math.round(
-          (brandsWithScores.reduce((sum, b) => sum + (b.score?.citation_rate ?? 0), 0) /
-            scoredCount) *
-            100
-        )
-      : 0;
-
-  // Dimension averages
-  const dimAvg = (key: 'visibility_score' | 'citation_score' | 'representation_score' | 'intent_score') =>
-    scoredCount > 0
-      ? Math.round(
-          brandsWithScores.reduce((sum, b) => sum + (b.score?.[key] ?? 0), 0) / scoredCount
-        )
-      : 0;
-
-  const dimensionData = [
-    { label: 'Visibility', avg: dimAvg('visibility_score'), weight: '35%', icon: Eye, color: 'blue' },
-    { label: 'Citation', avg: dimAvg('citation_score'), weight: '25%', icon: Link2, color: 'green' },
-    { label: 'Framing', avg: dimAvg('representation_score'), weight: '25%', icon: MessageSquare, color: 'amber' },
-    { label: 'Intent', avg: dimAvg('intent_score'), weight: '15%', icon: Target, color: 'purple' },
-  ];
-
-  // Top performers (non-zero only) and brands needing attention
-  const sortedByScore = [...brandsWithScores].sort(
-    (a, b) => (b.score?.composite_score ?? 0) - (a.score?.composite_score ?? 0)
-  );
-  const top5 = sortedByScore.filter((b) => (b.score?.composite_score ?? 0) > 0).slice(0, 5);
-  const notVisible = brandsWithScores.filter((b) => (b.score?.composite_score ?? 0) === 0);
-  const lowPerformers = sortedByScore
-    .filter((b) => {
-      const s = b.score?.composite_score ?? 0;
-      return s > 0 && s < 15;
-    })
-    .slice(-5)
-    .reverse();
-
-  const maxComposite = top5[0]?.score?.composite_score ?? 1;
-
-  // Last evaluation timestamp
-  const lastEvaluationDate = brandsWithScores.reduce<string | null>((latest, b) => {
-    const d = b.score?.last_evaluation_date ?? b.score?.updated_at;
-    if (!d) return latest;
-    if (!latest) return d;
-    return d > latest ? d : latest;
-  }, null);
-
-  const formatLastEvaluated = (dateStr: string | null): string => {
-    if (!dateStr) return 'No evaluations yet';
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffHours < 1) return 'Less than an hour ago';
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
+  // Hero headline
+  const heroHeadline = selectedCategory
+    ? `${selectedCategory} brands average ${avgScore}/100`
+    : `${stats.mention_rate}% of brands are visible to AI`;
+  const heroSub = selectedCategory
+    ? topBrand ? `${topBrand.name} leads at ${topBrand.composite}` : ''
+    : `but only ${Math.round((aboveAvg / stats.total_brands) * 100)}% score above average`;
 
   return (
-    <div className="space-y-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-2xl bg-slate-900 p-8 md:p-12 text-white">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-          <div className="relative">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
-              AI Visibility Dashboard
-            </h1>
-            <p className="text-lg text-slate-300 mb-6 max-w-2xl">
-              Generative Engine Optimization — measuring how AI platforms represent your brands
-            </p>
-
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              <Link href="/evaluations/new">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium text-sm transition-colors">
-                  <PlayCircle className="w-4 h-4" />
-                  Run Evaluation
-                </button>
-              </Link>
-              <Link href="/brands">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white rounded-lg font-medium text-sm transition-colors">
-                  <Plus className="w-4 h-4" />
-                  Add Brand
-                </button>
-              </Link>
-              <Link href="/analytics">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white rounded-lg font-medium text-sm transition-colors">
-                  <FileText className="w-4 h-4" />
-                  View Reports
-                </button>
-              </Link>
-            </div>
-
-            {/* Last Evaluated + AI Model Status */}
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                <Clock className="w-4 h-4 text-slate-300" />
-                <span className="text-sm text-slate-300">Last evaluated: <span className="text-white font-medium">{formatLastEvaluated(lastEvaluationDate)}</span></span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/15 px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-white">Gemini 2.0 Flash</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
-                <span className="text-sm font-medium text-slate-400">ChatGPT (planned)</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
-                <span className="text-sm font-medium text-slate-400">Claude (planned)</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
-                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
-                <span className="text-sm font-medium text-slate-400">Perplexity (planned)</span>
-              </div>
-            </div>
+    <div className="min-h-screen bg-zinc-950 p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
+      {/* Section 1: Hero Insight Banner */}
+      <div className="relative overflow-hidden rounded-2xl p-8 md:p-10" style={{ background: 'linear-gradient(135deg, #1e1044 0%, #0f172a 100%)' }}>
+        <div className="absolute top-0 right-0 w-80 h-80 bg-violet-600/15 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+        <div className="relative">
+          <p className="text-violet-400 text-sm font-medium mb-2 uppercase tracking-wider">AI Visibility Report</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            <span className="text-violet-300">{heroHeadline.split(/(\d+[%/]\d*|\d+)/)[0]}</span>
+            {heroHeadline.match(/(\d+[%/]?\d*)/)?.[0] && (
+              <span className="text-white">{heroHeadline.match(/(\d+[%/]?\d*)/)?.[0]}</span>
+            )}
+            <span className="text-violet-300">{heroHeadline.split(/(\d+[%/]\d*|\d+)/).slice(2).join('')}</span>
+          </h1>
+          {heroSub && <p className="text-lg text-zinc-400">— {heroSub}</p>}
+          <div className="flex items-center gap-4 mt-4 text-sm text-zinc-500">
+            <span>{stats.total_brands} brands · {allCategories.length} industries · {stats.total_evaluations.toLocaleString()} evaluations</span>
           </div>
         </div>
+      </div>
 
-        {/* Industry Filter */}
-        <CategorySelector
-          categories={categories}
-          selected={selectedCategory}
-          onChange={setSelectedCategory}
-          loading={catLoading}
+      {/* Category Filter */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setSelectedCategory('')}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+            !selectedCategory
+              ? 'bg-violet-600 text-white border-violet-500'
+              : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-zinc-200'
+          }`}
+        >
+          All Industries
+        </button>
+        {!catLoading && categories.map(c => (
+          <button
+            key={c.category}
+            onClick={() => setSelectedCategory(c.category)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+              selectedCategory === c.category
+                ? 'bg-violet-600 text-white border-violet-500'
+                : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-zinc-200'
+            }`}
+          >
+            {c.category}
+          </button>
+        ))}
+      </div>
+
+      {/* Section 2: Quick Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <StatCard
+          icon={<Users className="w-4 h-4 text-violet-400" />}
+          label="Brands Tracked"
+          value={`${stats.total_brands}`}
+          sub={`${allCategories.filter(c => c.eval_count > 0).length} industries`}
         />
+        <StatCard
+          icon={<TrendingUp className="w-4 h-4 text-blue-400" />}
+          label="Avg Score"
+          value={`${avgScore}`}
+          sub="/100"
+          gauge={avgScore}
+        />
+        <StatCard
+          icon={<Eye className="w-4 h-4 text-emerald-400" />}
+          label="AI Visible"
+          value={`${stats.mention_rate}%`}
+          sub={`${stats.total_mentioned} mentions`}
+        />
+        <StatCard
+          icon={<Zap className="w-4 h-4 text-yellow-400" />}
+          label="Evaluations"
+          value={stats.total_evaluations.toLocaleString()}
+          sub={`${stats.total_prompts} prompts`}
+        />
+        <StatCard
+          icon={<Star className="w-4 h-4 text-amber-400" />}
+          label="Top Score"
+          value={`${maxScore}`}
+          sub={topBrand?.name ?? 'N/A'}
+          highlight
+        />
+        <StatCard
+          icon={<BarChart3 className="w-4 h-4 text-red-400" />}
+          label="Score Gap"
+          value={`${maxScore - avgScore}`}
+          sub={`Top ${maxScore} · Avg ${avgScore}`}
+        />
+      </div>
 
-        {/* Key Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Users className="w-4 h-4 text-purple-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Brands</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{totalBrands}</p>
-            <p className="text-xs text-slate-500 mt-1">{scoredCount} evaluated</p>
+      {/* Section 3: AI Visibility Landscape */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+        <h2 className="text-lg font-bold text-white mb-1">
+          {selectedCategory ? `Top Brands — ${selectedCategory}` : 'AI Visibility Landscape'}
+        </h2>
+        <p className="text-sm text-zinc-500 mb-5">
+          {selectedCategory
+            ? `Top ${Math.min(10, top5.length)} brands by composite GEO score`
+            : 'Which industries does AI know best? Ranked by average composite score'}
+        </p>
+        {selectedCategory ? (
+          <IndustryBrandBars brands={top5.slice(0, 10)} maxVal={maxScore} />
+        ) : (
+          <IndustryBars industries={sortedIndustries} globalAvg={globalAvg} />
+        )}
+      </div>
+
+      {/* Section 4: Key Insights */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Who's Dominating */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Trophy className="w-5 h-5 text-yellow-400" />
+            <h3 className="font-bold text-white">Who&apos;s Dominating?</h3>
           </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-4 h-4 text-blue-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Avg Score</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{avgComposite}<span className="text-sm font-normal text-slate-500">/100</span></p>
-            <p className="text-xs text-slate-500 mt-1">composite GEO</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Eye className="w-4 h-4 text-green-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Visible</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{visibleBrands.length}<span className="text-sm font-normal text-slate-500">/{scoredCount}</span></p>
-            <p className="text-xs text-slate-500 mt-1">{mentionRate}% mentioned by AI</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Activity className="w-4 h-4 text-indigo-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Mentions</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{totalMentions}</p>
-            <p className="text-xs text-slate-500 mt-1">across all prompts</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Link2 className="w-4 h-4 text-emerald-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Citation</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{avgCitationRate}%</p>
-            <p className="text-xs text-slate-500 mt-1">avg citation rate</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="w-4 h-4 text-amber-500" />
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Top Score</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{maxComposite}</p>
-            <p className="text-xs text-slate-500 mt-1">{top5[0]?.name ?? 'N/A'}</p>
-          </div>
-        </div>
-
-        {/* Dimension Breakdown */}
-        <Card className="border-slate-200">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">GEO Score Dimensions</CardTitle>
-            <p className="text-sm text-slate-500">
-              The composite GEO score (0-100) is calculated from four dimensions
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {dimensionData.map((dim) => {
-                const Icon = dim.icon;
-                const colorMap: Record<string, { bg: string; icon: string; bar: string; text: string }> = {
-                  blue: { bg: 'bg-blue-50', icon: 'text-blue-600', bar: 'bg-blue-500', text: 'text-blue-700' },
-                  green: { bg: 'bg-green-50', icon: 'text-green-600', bar: 'bg-green-500', text: 'text-green-700' },
-                  amber: { bg: 'bg-amber-50', icon: 'text-amber-600', bar: 'bg-amber-500', text: 'text-amber-700' },
-                  purple: { bg: 'bg-purple-50', icon: 'text-purple-600', bar: 'bg-purple-500', text: 'text-purple-700' },
-                };
-                const c = colorMap[dim.color];
-                return (
-                  <div key={dim.label} className={`p-4 rounded-lg ${c.bg} border border-slate-100`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Icon className={`w-4 h-4 ${c.icon}`} />
-                      <span className="text-sm font-medium text-slate-700">{dim.label}</span>
-                      <span className="text-xs text-slate-500 ml-auto">{dim.weight}</span>
-                    </div>
-                    <div className={`text-2xl font-bold ${c.text}`}>{dim.avg}</div>
-                    <div className="w-full bg-white/60 rounded-full h-1.5 mt-2">
-                      <div
-                        className={`${c.bar} h-1.5 rounded-full transition-all`}
-                        style={{ width: `${Math.min(100, dim.avg * 2)}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1">avg across {scoredCount} brands</p>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Brand ScoreCards */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900">Brand Performance</h2>
-              <p className="text-sm text-slate-600 mt-1">
-                {visibleBrands.length} brands visible to AI out of {scoredCount} evaluated
-              </p>
-            </div>
-            <Link href="/analytics">
-              <Button className="bg-violet-600 hover:bg-violet-700 text-white transition-colors">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                View Analytics
-              </Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {brandsWithScores.map((brand) => (
-              <ScoreCard
-                key={brand.id}
-                brandName={brand.name}
-                category={brand.category}
-                score={{
-                  brandId: brand.id,
-                  brandName: brand.name,
-                  scores: {
-                    composite: brand.score!.composite_score,
-                    visibility: brand.score!.visibility_score,
-                    citation: brand.score!.citation_score,
-                    representation: brand.score!.representation_score,
-                    intent: brand.score!.intent_score,
-                  },
-                  totalMentions: brand.score!.total_mentions,
-                  avgRank: brand.score!.avg_rank || undefined,
-                  citationRate: brand.score!.citation_rate,
-                  intentCoverage: brand.score!.intent_coverage,
-                  lastUpdated: brand.score!.last_evaluation_date || brand.score!.updated_at,
-                }}
-              />
+          <div className="space-y-2">
+            {top5.slice(0, 3).map((b, i) => (
+              <div key={b.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-bold ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-zinc-300' : 'text-amber-600'}`}>
+                    {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
+                  </span>
+                  <span className="text-sm text-zinc-200 truncate">{b.name}</span>
+                </div>
+                <span className={`text-sm font-bold font-mono ${scoreTextClass(b.composite)}`}>{b.composite}</span>
+              </div>
             ))}
           </div>
-        </section>
+          <p className="text-xs text-zinc-500 mt-3">
+            Top brands appear in {top5[0] ? Math.round((top5[0].mentions / top5[0].evaluations) * 100) : 0}%+ of AI responses
+          </p>
+        </div>
 
-        {/* Quick Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-green-100">
-              <h3 className="text-lg font-bold text-slate-900">Top Performers</h3>
-              <p className="text-sm text-slate-600 mt-1">Highest GEO composite scores</p>
+        {/* Visibility Gap */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-5 h-5 text-red-400" />
+            <h3 className="font-bold text-white">The Visibility Gap</h3>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-zinc-400">Invisible to AI (score 0)</span>
+              <span className="text-lg font-bold text-red-400">{zeroBrands}</span>
             </div>
-            <div className="p-6 space-y-3">
-              {top5.map((brand, index) => {
-                const score = brand.score?.composite_score ?? 0;
-                const barPct = maxComposite > 0 ? (score / maxComposite) * 100 : 0;
-                return (
-                  <Link key={brand.id} href={`/brands/${brand.id}`}>
-                    <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                      <span className="text-sm font-bold text-slate-500 w-6 text-right">#{index + 1}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-semibold text-slate-900 truncate">{brand.name}</span>
-                          <span className="text-lg font-bold text-green-600 ml-2">{score}</span>
-                        </div>
-                        <div className="w-full bg-green-100 rounded-full h-1.5">
-                          <div
-                            className="bg-gradient-to-r from-green-500 to-emerald-500 h-1.5 rounded-full"
-                            style={{ width: `${barPct}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-              {top5.length === 0 && (
-                <p className="text-sm text-slate-500 py-4 text-center">No brands with scores yet</p>
-              )}
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-zinc-400">Barely mentioned (&lt;15)</span>
+              <span className="text-lg font-bold text-yellow-400">{lowBrands}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-zinc-400">Above average</span>
+              <span className="text-lg font-bold text-emerald-400">{aboveAvg}</span>
             </div>
           </div>
+          <p className="text-xs text-zinc-500 mt-3">
+            {zeroBrands + lowBrands > 0 ? `${zeroBrands + lowBrands} brands need GEO optimization` : 'All brands have some AI visibility'}
+          </p>
+        </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-orange-50 to-red-50 px-6 py-4 border-b border-orange-100">
-              <h3 className="text-lg font-bold text-slate-900">Needs Attention</h3>
-              <p className="text-sm text-slate-600 mt-1">
-                {notVisible.length} brand{notVisible.length !== 1 ? 's' : ''} not mentioned by AI
-              </p>
-            </div>
-            <div className="p-6 space-y-3">
-              {lowPerformers.length > 0 && (
-                <div className="mb-2">
-                  <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Low scoring brands</p>
-                  {lowPerformers.map((brand) => (
-                    <Link key={brand.id} href={`/brands/${brand.id}`}>
-                      <div className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                        <span className="text-sm font-medium text-slate-900">{brand.name}</span>
-                        <span className="text-sm font-bold text-amber-600">{brand.score?.composite_score}</span>
-                      </div>
-                    </Link>
-                  ))}
+        {/* Best Intent Coverage */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Target className="w-5 h-5 text-violet-400" />
+            <h3 className="font-bold text-white">Intent Coverage</h3>
+          </div>
+          {bestIntent && worstIntent && (
+            <div className="space-y-2">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-zinc-500">Best: {formatIntent(bestIntent.intent)}</span>
+                  <span className="text-sm font-bold text-emerald-400">{bestIntent.rate}%</span>
                 </div>
-              )}
-              {notVisible.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Not visible (score 0)</p>
-                  <div className="flex flex-wrap gap-2">
-                    {notVisible.slice(0, 8).map((brand) => (
-                      <Link key={brand.id} href={`/brands/${brand.id}`}>
-                        <span className="inline-block px-3 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 cursor-pointer transition-colors">
-                          {brand.name}
-                        </span>
-                      </Link>
-                    ))}
-                    {notVisible.length > 8 && (
-                      <span className="inline-block px-3 py-1 text-xs text-slate-500 font-medium">
-                        +{notVisible.length - 8} more
-                      </span>
-                    )}
+                <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full bg-emerald-500" style={{ width: `${bestIntent.rate}%` }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-zinc-500">Worst: {formatIntent(worstIntent.intent)}</span>
+                  <span className="text-sm font-bold text-red-400">{worstIntent.rate}%</span>
+                </div>
+                <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full bg-red-500" style={{ width: `${worstIntent.rate}%` }} />
+                </div>
+              </div>
+            </div>
+          )}
+          <p className="text-xs text-zinc-500 mt-3">
+            Opportunity: optimize for {worstIntent ? formatIntent(worstIntent.intent) : 'low-performing'} queries
+          </p>
+        </div>
+      </div>
+
+      {/* Section 5: Brand Performance — Top 5 + Bottom 3 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Top Performers */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-zinc-800">
+            <h3 className="font-bold text-white">Top Performers</h3>
+          </div>
+          <div className="p-4 space-y-2">
+            {top5.map((b, i) => {
+              const pct = maxScore > 0 ? (b.composite / maxScore) * 100 : 0;
+              return (
+                <div key={b.name} className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-800/50 transition-colors">
+                  <span className={`text-sm font-bold w-7 text-center ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-zinc-300' : i === 2 ? 'text-amber-600' : 'text-zinc-500'}`}>
+                    {i < 3 ? ['🥇', '🥈', '🥉'][i] : `#${i + 1}`}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-white truncate">{b.name}</span>
+                      <span className={`text-sm font-bold font-mono ml-2 ${scoreTextClass(b.composite)}`}>{b.composite}</span>
+                    </div>
+                    <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: scoreColor(b.composite) }} />
+                    </div>
                   </div>
                 </div>
-              )}
-              {lowPerformers.length === 0 && notVisible.length === 0 && (
-                <p className="text-sm text-slate-500 py-4 text-center">All brands performing well</p>
-              )}
-            </div>
+              );
+            })}
+            {top5.length === 0 && <p className="text-sm text-zinc-500 text-center py-4">No brands with scores yet</p>}
+          </div>
+          <div className="px-5 py-3 border-t border-zinc-800">
+            <Link href="/insights" className="text-sm text-violet-400 hover:text-violet-300 font-medium flex items-center gap-1">
+              View All Brands <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
 
-        {/* Share of Voice + Weekly Trend (Demo) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Mini SOV */}
-          <Card className="border-slate-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <PieChart className="w-5 h-5 text-violet-600" />
-                Share of Voice
-              </CardTitle>
-              <p className="text-sm text-slate-500">品牌在 AI 回答中的市场占有率</p>
-            </CardHeader>
-            <CardContent>
-              {(() => {
-                const sovData = [
-                  { name: "Carter's", pct: 28, color: '#8b5cf6' },
-                  { name: 'Primary.com', pct: 16, color: '#3b82f6' },
-                  { name: 'Hanna Andersson', pct: 14, color: '#10b981' },
-                  { name: 'Tea Collection', pct: 12, color: '#f59e0b' },
-                  { name: 'Janie and Jack', pct: 10, color: '#ec4899' },
-                  { name: 'Others', pct: 20, color: '#94a3b8' },
-                ];
-                let cum = 0;
-                const segs = sovData.map(d => {
-                  const start = cum * 3.6;
-                  cum += d.pct;
-                  return { ...d, start, end: cum * 3.6 };
-                });
-                const slice = (s: number, e: number, c: string, i: number) => {
-                  const r = 70, cx = 85, cy = 85;
-                  const sr = (s - 90) * Math.PI / 180, er = (e - 90) * Math.PI / 180;
-                  const x1 = cx + r * Math.cos(sr), y1 = cy + r * Math.sin(sr);
-                  const x2 = cx + r * Math.cos(er), y2 = cy + r * Math.sin(er);
-                  const la = e - s > 180 ? 1 : 0;
-                  return <path key={i} d={`M${cx} ${cy}L${x1} ${y1}A${r} ${r} 0 ${la} 1 ${x2} ${y2}Z`} fill={c} stroke="white" strokeWidth="2" />;
-                };
-                return (
-                  <div className="flex items-center gap-6">
-                    <svg viewBox="0 0 170 170" className="w-36 h-36 flex-shrink-0">
-                      {segs.map((s, i) => slice(s.start, s.end, s.color, i))}
-                      <circle cx="85" cy="85" r="38" fill="white" />
-                      <text x="85" y="82" textAnchor="middle" className="text-lg font-bold" fill="#1e293b">28%</text>
-                      <text x="85" y="97" textAnchor="middle" className="text-[10px]" fill="#64748b">Top Brand</text>
-                    </svg>
-                    <div className="flex-1 space-y-1.5">
-                      {sovData.map((d, i) => (
-                        <div key={i} className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                            <span className="text-slate-700 truncate">{d.name}</span>
-                          </div>
-                          <span className="font-semibold text-slate-900">{d.pct}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-              <Link href="/compete" className="mt-4 flex items-center gap-1 text-sm text-violet-600 hover:text-violet-700 font-medium">
-                查看竞品详细对标 <ArrowRight className="w-4 h-4" />
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Weekly Trend Sparklines */}
-          <Card className="border-slate-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
-                可见性趋势
-              </CardTitle>
-              <p className="text-sm text-slate-500">近 8 周品牌 AI 可见性变化 (Demo)</p>
-            </CardHeader>
-            <CardContent>
-              {(() => {
-                const trendBrands = [
-                  { name: "Carter's", data: [22, 24, 23, 26, 25, 28, 30, 32], color: '#8b5cf6', change: +4 },
-                  { name: 'Primary.com', data: [12, 14, 15, 16, 18, 17, 19, 21], color: '#3b82f6', change: +5 },
-                  { name: 'Hanna Andersson', data: [18, 17, 16, 15, 16, 15, 14, 14], color: '#10b981', change: -2 },
-                  { name: 'Tea Collection', data: [8, 9, 10, 11, 12, 13, 12, 14], color: '#f59e0b', change: +3 },
-                  { name: 'Janie and Jack', data: [10, 10, 11, 9, 10, 11, 10, 11], color: '#ec4899', change: 0 },
-                ];
-                const weeks = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'];
-                return (
-                  <div className="space-y-3">
-                    {trendBrands.map((brand, bi) => {
-                      const max = Math.max(...brand.data);
-                      const min = Math.min(...brand.data);
-                      const range = max - min || 1;
-                      const points = brand.data.map((v, i) => {
-                        const x = 10 + (i / 7) * 120;
-                        const y = 28 - ((v - min) / range) * 22;
-                        return `${x},${y}`;
-                      }).join(' ');
-                      return (
-                        <div key={bi} className="flex items-center gap-3">
-                          <span className="text-xs font-medium text-slate-600 w-28 truncate">{brand.name}</span>
-                          <svg viewBox="0 0 140 32" className="flex-1 h-8">
-                            <polyline points={points} fill="none" stroke={brand.color} strokeWidth="2" strokeLinejoin="round" />
-                          </svg>
-                          <span className="text-xs font-bold w-8 text-right" style={{ color: brand.change > 0 ? '#10b981' : brand.change < 0 ? '#ef4444' : '#64748b' }}>
-                            {brand.change > 0 ? '+' : ''}{brand.change}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })()}
-              <Link href="/trends" className="mt-4 flex items-center gap-1 text-sm text-violet-600 hover:text-violet-700 font-medium">
-                查看完整趋势分析 <ArrowRight className="w-4 h-4" />
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Access: New Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link href="/prompts">
-            <Card className="border-slate-200 hover:border-violet-300 hover:shadow-md transition-all cursor-pointer group">
-              <CardContent className="p-6">
-                <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-violet-200 transition-colors">
-                  <Search className="w-5 h-5 text-violet-600" />
+        {/* Needs Attention */}
+        <div className="bg-zinc-900 border border-red-900/30 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-zinc-800 bg-red-950/20">
+            <h3 className="font-bold text-white">Needs Attention</h3>
+            <p className="text-xs text-zinc-500 mt-0.5">{zeroBrands} invisible + {lowBrands} low-scoring brands</p>
+          </div>
+          <div className="p-4 space-y-2">
+            {bottom3.map(b => (
+              <div key={b.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800/50 transition-colors">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <span className="text-sm text-zinc-300">{b.name}</span>
+                  {!selectedCategory && <span className="text-xs text-zinc-600">{b.category}</span>}
                 </div>
-                <h3 className="font-semibold text-slate-900 mb-1">Prompt 研究</h3>
-                <p className="text-sm text-slate-500">分析用户在 AI 中的真实提问，发现品牌曝光机会</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/compete">
-            <Card className="border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer group">
-              <CardContent className="p-6">
-                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-indigo-200 transition-colors">
-                  <Users className="w-5 h-5 text-indigo-600" />
-                </div>
-                <h3 className="font-semibold text-slate-900 mb-1">竞品对标</h3>
-                <p className="text-sm text-slate-500">Head-to-head 品牌对比，发现 Citation Gap</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link href="/trends">
-            <Card className="border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group">
-              <CardContent className="p-6">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-colors">
-                  <TrendingUp className="w-5 h-5 text-emerald-600" />
-                </div>
-                <h3 className="font-semibold text-slate-900 mb-1">趋势追踪</h3>
-                <p className="text-sm text-slate-500">追踪品牌可见性变化，季节性趋势和 AI 平台差异</p>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-
-        {/* GEO Methodology */}
-        <Card className="border-slate-200">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Info className="w-5 h-5 text-slate-600" />
-              <CardTitle className="text-lg">How GEO Scoring Works</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  GEO (Generative Engine Optimization) measures how AI models represent your brand
-                  when users ask relevant questions. Each brand is evaluated across 20+ prompts
-                  covering product discovery, comparisons, purchase intent, and more.
-                </p>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Eye className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                    <span className="text-slate-700"><strong>Visibility (35%)</strong> — Is the brand mentioned in AI responses?</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Link2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    <span className="text-slate-700"><strong>Citation (25%)</strong> — Does AI link to or cite the brand?</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <MessageSquare className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                    <span className="text-slate-700"><strong>Framing (25%)</strong> — How positively is the brand described?</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Target className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                    <span className="text-slate-700"><strong>Intent (15%)</strong> — Does AI recommend the brand for the right queries?</span>
-                  </div>
-                </div>
+                <span className={`text-sm font-bold font-mono ${scoreTextClass(b.composite)}`}>{b.composite}</span>
               </div>
-              <div className="space-y-3">
-                <p className="text-sm font-medium text-slate-700">Score interpretation</p>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span className="text-sm text-slate-600"><strong>25+</strong> — Strong AI presence, frequently mentioned and recommended</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                    <span className="text-sm text-slate-600"><strong>10-24</strong> — Moderate presence, mentioned in some contexts</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                    <span className="text-sm text-slate-600"><strong>1-9</strong> — Low visibility, rarely mentioned by AI</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-                    <span className="text-sm text-slate-600"><strong>0</strong> — Not mentioned in any AI responses</span>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  Scores are based on evaluation against Gemini 2.0 Flash. Multi-model support coming soon.
-                </p>
+            ))}
+            {zeroBrands > 0 && (
+              <div className="mt-2 pt-2 border-t border-zinc-800">
+                <p className="text-xs text-zinc-500 mb-2">+ {zeroBrands} brands with zero AI visibility</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            )}
+            {bottom3.length === 0 && zeroBrands === 0 && (
+              <p className="text-sm text-zinc-500 text-center py-4">All brands performing well</p>
+            )}
+          </div>
+          <div className="px-5 py-3 border-t border-zinc-800">
+            <Link href="/insights" className="text-sm text-violet-400 hover:text-violet-300 font-medium flex items-center gap-1">
+              View Full Rankings <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
+}
+
+// ── Stat Card Component ─────────────────────────────────────
+
+function StatCard({ icon, label, value, sub, gauge, highlight }: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub: string;
+  gauge?: number;
+  highlight?: boolean;
+}) {
+  return (
+    <div className={`bg-zinc-900 border rounded-xl p-4 ${highlight ? 'border-yellow-900/50' : 'border-zinc-800'}`}>
+      <div className="flex items-center gap-2 mb-2">
+        {icon}
+        <span className="text-xs text-zinc-500 uppercase tracking-wide font-medium">{label}</span>
+      </div>
+      <div className="flex items-end gap-1">
+        <span className="text-2xl font-bold text-white">{value}</span>
+        {gauge == null && <span className="text-xs text-zinc-500 mb-1">{sub}</span>}
+      </div>
+      {gauge != null && (
+        <div className="mt-2">
+          <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+            <div className="h-full rounded-full transition-all" style={{ width: `${gauge}%`, backgroundColor: scoreColor(gauge) }} />
+          </div>
+          <span className="text-xs text-zinc-500 mt-1">{sub}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Industry Horizontal Bar Chart ───────────────────────────
+
+function IndustryBars({ industries, globalAvg }: { industries: CategoryInfo[]; globalAvg: number }) {
+  const maxVal = Math.max(...industries.map(c => c.avg_composite), 1);
+  const barH = 28;
+  const gap = 6;
+  const labelW = 170;
+  const chartW = 700;
+  const h = industries.length * (barH + gap) + 10;
+  const avgX = labelW + (globalAvg / maxVal) * (chartW - labelW - 80);
+
+  return (
+    <svg width="100%" height={h} viewBox={`0 0 ${chartW} ${h}`} preserveAspectRatio="xMinYMid meet">
+      {/* Global average line */}
+      <line x1={avgX} y1={0} x2={avgX} y2={h} stroke="#8b5cf6" strokeWidth={1.5} strokeDasharray="6 4" opacity={0.6} />
+      <text x={avgX} y={h - 2} textAnchor="middle" fill="#8b5cf6" fontSize={9} opacity={0.8}>avg {globalAvg}</text>
+
+      {industries.map((c, i) => {
+        const y = i * (barH + gap) + 4;
+        const w = (c.avg_composite / maxVal) * (chartW - labelW - 80);
+        const color = scoreColor(c.avg_composite);
+        return (
+          <g key={c.category}>
+            <text x={8} y={y + barH / 2 + 4} fill="#a1a1aa" fontSize={12} fontWeight={500}>
+              #{i + 1}
+            </text>
+            <text x={30} y={y + barH / 2 + 4} fill="#d4d4d8" fontSize={12}>
+              {c.category}
+            </text>
+            <rect x={labelW} y={y} width={Math.max(w, 3)} height={barH} rx={4} fill={color} opacity={0.75} />
+            <text x={labelW + w + 8} y={y + barH / 2 + 4} fill="#e4e4e7" fontSize={12} fontWeight={700}>
+              {c.avg_composite.toFixed(1)}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ── Brand Horizontal Bar Chart (filtered view) ──────────────
+
+function IndustryBrandBars({ brands, maxVal }: { brands: RankingItem[]; maxVal: number }) {
+  const barH = 28;
+  const gap = 6;
+  const labelW = 160;
+  const chartW = 700;
+  const h = brands.length * (barH + gap) + 10;
+
+  return (
+    <svg width="100%" height={h} viewBox={`0 0 ${chartW} ${h}`} preserveAspectRatio="xMinYMid meet">
+      {brands.map((b, i) => {
+        const y = i * (barH + gap) + 4;
+        const w = (b.composite / Math.max(maxVal, 1)) * (chartW - labelW - 80);
+        const color = scoreColor(b.composite);
+        return (
+          <g key={b.name}>
+            <text x={8} y={y + barH / 2 + 4} fill="#a1a1aa" fontSize={12} fontWeight={500}>
+              #{i + 1}
+            </text>
+            <text x={30} y={y + barH / 2 + 4} fill="#d4d4d8" fontSize={12}>
+              {b.name.length > 20 ? b.name.slice(0, 19) + '…' : b.name}
+            </text>
+            <rect x={labelW} y={y} width={Math.max(w, 3)} height={barH} rx={4} fill={color} opacity={0.75} />
+            <text x={labelW + w + 8} y={y + barH / 2 + 4} fill="#e4e4e7" fontSize={12} fontWeight={700}>
+              {b.composite}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function formatIntent(s: string): string {
+  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }

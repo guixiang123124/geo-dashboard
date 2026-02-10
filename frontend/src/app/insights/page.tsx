@@ -385,10 +385,31 @@ function OverviewTab({ category, categories }: { category: string; categories: C
   if (loading) return <Spinner />;
   if (error || !stats) return <ErrorMsg msg={error || 'No data'} />;
 
+  // Find best AIO rate and best scoring category
+  const sortedByAIO = [...categories].filter(c => c.eval_count > 0).sort((a, b) => b.avg_composite - a.avg_composite);
+  const bestCategory = sortedByAIO[0];
+  // For headline: find category with highest mention rate (proxy: highest avg_composite)
+  // and category with highest avg score
+  const sortedCats = [...categories].filter(c => c.avg_composite > 0).sort((a, b) => b.avg_composite - a.avg_composite);
+
   // "All Industries" view
   if (!category) {
     return (
       <div className="space-y-6">
+        {/* Headline Insight */}
+        {bestCategory && (
+          <div className="rounded-xl p-6" style={{ background: 'linear-gradient(135deg, #1e1044 0%, #0f172a 100%)' }}>
+            <p className="text-violet-400 text-sm font-medium mb-1 uppercase tracking-wider">Cross-Industry Insight</p>
+            <h2 className="text-xl md:text-2xl font-bold text-white">
+              <span className="text-emerald-400">{bestCategory.category}</span> brands score highest (avg {bestCategory.avg_composite})
+              {sortedCats.length > 1 && (
+                <span className="text-zinc-400 font-normal text-lg"> — while {sortedCats[sortedCats.length - 1].category} trails at {sortedCats[sortedCats.length - 1].avg_composite}</span>
+              )}
+            </h2>
+            <p className="text-sm text-zinc-500 mt-2">{stats.total_brands} brands · {stats.total_evaluations.toLocaleString()} evaluations · {stats.mention_rate}% overall mention rate</p>
+          </div>
+        )}
+
         {/* Global KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -411,18 +432,35 @@ function OverviewTab({ category, categories }: { category: string; categories: C
           ))}
         </div>
 
-        {/* Cross-Industry Comparison */}
+        {/* Cross-Industry Comparison — wider bars with rank numbers */}
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader><CardTitle className="text-white flex items-center gap-2"><TrendingUp className="h-5 w-5 text-violet-400" /> Cross-Industry Comparison</CardTitle></CardHeader>
           <CardContent>
-            <BarChartSVG
-              data={categories.filter(c => c.avg_composite > 0).map(c => ({
-                label: SHORT_CATEGORY_NAMES[c.category] || c.category,
-                value: c.avg_composite,
-                color: getCatColor(c.category).hex,
-              }))}
-              height={280}
-            />
+            {(() => {
+              const sorted = [...categories].filter(c => c.avg_composite > 0).sort((a, b) => b.avg_composite - a.avg_composite);
+              const maxVal = Math.max(...sorted.map(c => c.avg_composite), 1);
+              const barH = 30;
+              const gap = 8;
+              const labelW = 160;
+              const chartW = 600;
+              const h = sorted.length * (barH + gap) + 10;
+              return (
+                <svg width="100%" height={h} viewBox={`0 0 ${chartW} ${h}`} preserveAspectRatio="xMinYMid meet">
+                  {sorted.map((c, i) => {
+                    const y = i * (barH + gap) + 4;
+                    const w = (c.avg_composite / maxVal) * (chartW - labelW - 80);
+                    return (
+                      <g key={c.category}>
+                        <text x={6} y={y + barH / 2 + 4} fill="#a1a1aa" fontSize={12} fontWeight={600}>#{i + 1}</text>
+                        <text x={30} y={y + barH / 2 + 4} fill="#d4d4d8" fontSize={12}>{c.category}</text>
+                        <rect x={labelW} y={y} width={Math.max(w, 3)} height={barH} rx={5} fill={getCatColor(c.category).hex} opacity={0.8} />
+                        <text x={labelW + w + 8} y={y + barH / 2 + 4} fill="#e4e4e7" fontSize={12} fontWeight={700}>{c.avg_composite.toFixed(1)}</text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              );
+            })()}
           </CardContent>
         </Card>
 
@@ -463,6 +501,13 @@ function OverviewTab({ category, categories }: { category: string; categories: C
   }
 
   // Category-specific view
+  const topPerformer = rankings[0];
+  const catAvg = stats.score_averages.composite;
+  const gapAboveAvg = topPerformer ? Math.round(topPerformer.composite - catAvg) : 0;
+  const sortedIntents = [...stats.intent_breakdown].sort((a, b) => b.rate - a.rate);
+  const bestIntentItem = sortedIntents[0];
+  const worstIntentItem = sortedIntents[sortedIntents.length - 1];
+
   const sentimentData = [
     { label: 'Positive', value: stats.sentiment_distribution['positive'] || 0, color: '#34d399' },
     { label: 'Neutral', value: stats.sentiment_distribution['neutral'] || 0, color: '#a78bfa' },
@@ -472,12 +517,44 @@ function OverviewTab({ category, categories }: { category: string; categories: C
 
   return (
     <div className="space-y-6">
+      {/* Category Header with Gauge */}
+      <div className="rounded-xl p-6" style={{ background: 'linear-gradient(135deg, #1e1044 0%, #0f172a 100%)' }}>
+        <p className="text-violet-400 text-sm font-medium mb-1 uppercase tracking-wider">{category} AI Visibility Report</p>
+        <div className="flex flex-wrap items-end gap-6 mt-2">
+          {/* Large score gauge */}
+          <div className="flex items-center gap-4">
+            <div className="relative w-20 h-20">
+              <svg viewBox="0 0 80 80" className="w-full h-full">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#27272a" strokeWidth="6" />
+                <circle cx="40" cy="40" r="34" fill="none" stroke={scoreHex(catAvg)} strokeWidth="6"
+                  strokeDasharray={`${(catAvg / 100) * 213.6} 213.6`}
+                  strokeLinecap="round" transform="rotate(-90 40 40)" />
+                <text x="40" y="36" textAnchor="middle" fill="#e4e4e7" fontSize="18" fontWeight="700">{catAvg}</text>
+                <text x="40" y="50" textAnchor="middle" fill="#71717a" fontSize="10">/100</text>
+              </svg>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-white">Industry Average: {catAvg}/100</div>
+              {topPerformer && (
+                <p className="text-zinc-400 text-sm mt-1">
+                  Top: <span className="text-emerald-400 font-semibold">{topPerformer.name}</span> at {topPerformer.composite}/100 — <span className="text-emerald-400">{gapAboveAvg} points above avg</span>
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-4 mt-3 text-sm text-zinc-500">
+          <span>{stats.total_brands} brands</span>
+          <span>{stats.total_evaluations.toLocaleString()} evaluations</span>
+          <span>{stats.mention_rate}% mention rate</span>
+        </div>
+      </div>
+
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Total Brands', value: stats.total_brands, icon: <Users className="h-5 w-5 text-blue-400" /> },
           { label: 'Evaluations', value: stats.total_evaluations.toLocaleString(), icon: <Zap className="h-5 w-5 text-violet-400" /> },
-          { label: 'Avg Composite', value: stats.score_averages.composite, icon: <Star className="h-5 w-5 text-yellow-400" /> },
           { label: 'Mention Rate', value: `${stats.mention_rate}%`, icon: <Eye className="h-5 w-5 text-emerald-400" /> },
           { label: 'Top Brand', value: stats.top_brand?.name || '—', icon: <Trophy className="h-5 w-5 text-amber-400" /> },
         ].map(c => (
@@ -510,15 +587,24 @@ function OverviewTab({ category, categories }: { category: string; categories: C
           </CardContent>
         </Card>
 
-        {/* Intent Performance */}
+        {/* Intent Performance — with best/worst callouts */}
         <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader><CardTitle className="text-white text-base">Intent Performance</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-white text-base">Intent Performance</CardTitle>
+            {bestIntentItem && worstIntentItem && (
+              <p className="text-xs text-zinc-500 mt-1">
+                Best: <span className="text-emerald-400 font-medium">{bestIntentItem.intent.replace(/_/g, ' ')}</span> ({bestIntentItem.rate}%)
+                {' · '}
+                Worst: <span className="text-red-400 font-medium">{worstIntentItem.intent.replace(/_/g, ' ')}</span> ({worstIntentItem.rate}%)
+              </p>
+            )}
+          </CardHeader>
           <CardContent>
             <HorizontalBarSVG
-              data={stats.intent_breakdown.slice(0, 10).map(ib => ({
+              data={sortedIntents.slice(0, 10).map(ib => ({
                 label: ib.intent,
                 value: ib.rate,
-                color: ib.rate >= 50 ? '#34d399' : ib.rate >= 25 ? '#fbbf24' : '#f87171',
+                color: ib === bestIntentItem ? '#34d399' : ib === worstIntentItem ? '#f87171' : (ib.rate >= 50 ? '#34d399' : ib.rate >= 25 ? '#fbbf24' : '#f87171'),
               }))}
             />
           </CardContent>
