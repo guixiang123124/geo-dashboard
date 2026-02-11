@@ -18,6 +18,7 @@ const translations: Record<Locale, Record<string, string>> = {
     // Sidebar nav
     'nav.dashboard': 'Dashboard',
     'nav.diagnosis': 'AI Diagnosis',
+    'nav.history': 'Diagnosis History',
     'nav.brands': 'Brands',
     'nav.competitors': 'Competitors',
     'nav.trends': 'Trends',
@@ -304,6 +305,7 @@ const translations: Record<Locale, Record<string, string>> = {
     // Sidebar nav
     'nav.dashboard': '仪表盘',
     'nav.diagnosis': 'AI 诊断',
+    'nav.history': '诊断历史',
     'nav.brands': '品牌管理',
     'nav.competitors': '竞品分析',
     'nav.trends': '趋势追踪',

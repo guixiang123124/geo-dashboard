@@ -16,6 +16,7 @@ import {
   FlaskConical,
   Search,
   Zap,
+  History,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const navigation = [
   { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard },
   { nameKey: 'nav.diagnosis', href: '/audit', icon: Search },
+  { nameKey: 'nav.history', href: '/dashboard/history', icon: History },
   { nameKey: 'nav.brands', href: '/brands', icon: Package },
   { nameKey: 'nav.competitors', href: '/compete', icon: GitCompareArrows },
   { nameKey: 'nav.insights', href: '/insights', icon: Lightbulb },

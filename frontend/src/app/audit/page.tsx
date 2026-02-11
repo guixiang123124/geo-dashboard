@@ -467,6 +467,58 @@ export default function AuditPage() {
           {/* Overall Score Card */}
           <Card className="overflow-hidden">
             <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white">
+              {/* Export Buttons */}
+              <div className="flex justify-end gap-2 mb-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(`${API_URL}/api/v1/diagnosis/${diagnosis.id}/report`);
+                      if (!res.ok) throw new Error('Failed to fetch report');
+                      const data = await res.json();
+                      const markdown = data.report || data.markdown || data.content || JSON.stringify(data, null, 2);
+                      const blob = new Blob([markdown], { type: 'text/markdown' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `luminos-${diagnosis.brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-report.md`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    } catch (err) {
+                      console.error('Export report failed:', err);
+                    }
+                  }}
+                >
+                  <FileText className="w-4 h-4 mr-1.5" />
+                  Export Report
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(`${API_URL}/api/v1/diagnosis/${diagnosis.id}/export`);
+                      if (!res.ok) throw new Error('Failed to fetch data');
+                      const data = await res.json();
+                      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `luminos-${diagnosis.brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-data.json`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    } catch (err) {
+                      console.error('Export data failed:', err);
+                    }
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-1.5" />
+                  Export Raw Data
+                </Button>
+              </div>
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold">{diagnosis.brand.name}</h2>
