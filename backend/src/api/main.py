@@ -15,13 +15,17 @@ async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
     print(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
+
+    # Validate critical config
+    if not settings.SECRET_KEY:
+        raise RuntimeError("SECRET_KEY is not set! Generate one with: openssl rand -hex 32")
+
     print(f"Database URL prefix: {settings.DATABASE_URL[:20]}...")
     try:
         await init_db()
         print("Database initialized")
     except Exception as e:
-        print(f"WARNING: Database init failed: {e}")
-        print("App will start but DB features may not work")
+        raise RuntimeError(f"Database initialization failed: {e}")
 
     yield
 

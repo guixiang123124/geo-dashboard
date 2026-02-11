@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     # API
     API_V1_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: Union[str, list[str]] = "*"  # Can be "*", a single URL, or comma-separated URLs
+    CORS_ORIGINS: Union[str, list[str]] = "https://geo-dashboard-sigma-ashen.vercel.app"  # Set via env var; comma-separated for multiple
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     STRIPE_PRICE_ENTERPRISE: Optional[str] = None  # price_xxx for $299/mo
 
     # Security
-    SECRET_KEY: str = "your-secret-key-here-change-in-production"
+    SECRET_KEY: str = ""  # REQUIRED: set via SECRET_KEY env var (use `openssl rand -hex 32`)
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days
 

@@ -190,7 +190,7 @@ export default function SettingsPage() {
               <div>
                 <p className="font-semibold text-slate-900">Backend API</p>
                 <p className="text-sm text-slate-600">
-                  {loading ? 'Checking...' : apiConnected ? 'Connected at localhost:8000' : 'Not connected'}
+                  {loading ? 'Checking...' : apiConnected ? 'Connected' : 'Not connected'}
                 </p>
               </div>
               <Badge className={`ml-auto ${apiConnected ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200'}`}>

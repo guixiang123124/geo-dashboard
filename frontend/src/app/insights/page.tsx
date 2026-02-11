@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Trophy, Grid3X3, Database, Loader2, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Search, X, TrendingUp, Users, Eye, Star, Zap } from 'lucide-react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 type Tab = 'overview' | 'rankings' | 'matrix' | 'raw';
 
