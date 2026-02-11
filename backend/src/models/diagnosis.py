@@ -37,4 +37,5 @@ class DiagnosisRecord(Base):
     insights: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     recommendations: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     competitors_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    per_model_scores: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

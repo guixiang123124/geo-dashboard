@@ -1013,6 +1013,7 @@ Return only one word: accurate/partially_accurate/inaccurate/insufficient_data""
             insights=insights,
             recommendations=recommendations[:5],
             competitors_json=[c.model_dump() for c in competitors],
+            per_model_scores=per_model_scores if per_model_scores else None,
             created_at=datetime.utcnow(),
         )
         db.add(record)
@@ -1030,13 +1031,23 @@ Return only one word: accurate/partially_accurate/inaccurate/insufficient_data""
 # ---------------------------------------------------------------------------
 
 @router.get("/history")
-async def get_diagnosis_history(db: AsyncSession = Depends(get_db)):
-    """Return the 50 most recent diagnoses."""
-    result = await db.execute(
-        select(DiagnosisRecord)
-        .order_by(DiagnosisRecord.created_at.desc())
-        .limit(50)
-    )
+async def get_diagnosis_history(
+    user_email: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+):
+    """Return the 50 most recent diagnoses, optionally filtered by user_email."""
+    query = select(DiagnosisRecord).order_by(DiagnosisRecord.created_at.desc()).limit(50)
+    if user_email:
+        # Join with users table to filter by email
+        from ...models.user import User
+        query = (
+            select(DiagnosisRecord)
+            .join(User, DiagnosisRecord.user_id == User.id)
+            .where(User.email == user_email)
+            .order_by(DiagnosisRecord.created_at.desc())
+            .limit(50)
+        )
+    result = await db.execute(query)
     records = result.scalars().all()
     return [
         {
@@ -1046,6 +1057,7 @@ async def get_diagnosis_history(db: AsyncSession = Depends(get_db)):
             "category": r.category,
             "composite_score": r.composite_score,
             "models_used": r.models_used,
+            "per_model_scores": r.per_model_scores,
             "created_at": r.created_at.isoformat() if r.created_at else None,
         }
         for r in records
@@ -1054,7 +1066,7 @@ async def get_diagnosis_history(db: AsyncSession = Depends(get_db)):
 
 @router.get("/{diagnosis_id}")
 async def get_diagnosis(diagnosis_id: str, db: AsyncSession = Depends(get_db)):
-    """Retrieve a specific diagnosis by ID."""
+    """Retrieve a specific diagnosis by ID with full details."""
     result = await db.execute(
         select(DiagnosisRecord).where(DiagnosisRecord.id == diagnosis_id)
     )
@@ -1078,5 +1090,161 @@ async def get_diagnosis(diagnosis_id: str, db: AsyncSession = Depends(get_db)):
         "results_json": record.results_json,
         "insights": record.insights,
         "recommendations": record.recommendations,
+        "competitors_json": record.competitors_json,
+        "per_model_scores": record.per_model_scores,
         "created_at": record.created_at.isoformat() if record.created_at else None,
     }
+
+
+@router.get("/{diagnosis_id}/export")
+async def export_diagnosis(diagnosis_id: str, db: AsyncSession = Depends(get_db)):
+    """Export complete diagnosis data as JSON (all raw prompt results included)."""
+    result = await db.execute(
+        select(DiagnosisRecord).where(DiagnosisRecord.id == diagnosis_id)
+    )
+    record = result.scalar_one_or_none()
+    if not record:
+        raise HTTPException(404, "Diagnosis not found")
+
+    return {
+        "id": record.id,
+        "brand_name": record.brand_name,
+        "domain": record.domain,
+        "category": record.category,
+        "scores": {
+            "composite": record.composite_score,
+            "visibility": record.visibility_score,
+            "citation": record.citation_score,
+            "representation": record.representation_score,
+            "intent": record.intent_score,
+        },
+        "per_model_scores": record.per_model_scores,
+        "total_prompts": record.total_prompts,
+        "mentioned_count": record.mentioned_count,
+        "models_used": record.models_used,
+        "results": record.results_json,
+        "insights": record.insights,
+        "recommendations": record.recommendations,
+        "competitors": record.competitors_json,
+        "created_at": record.created_at.isoformat() if record.created_at else None,
+    }
+
+
+@router.get("/{diagnosis_id}/report")
+async def get_diagnosis_report(diagnosis_id: str, db: AsyncSession = Depends(get_db)):
+    """Generate a markdown deep-analysis report for a diagnosis."""
+    result = await db.execute(
+        select(DiagnosisRecord).where(DiagnosisRecord.id == diagnosis_id)
+    )
+    record = result.scalar_one_or_none()
+    if not record:
+        raise HTTPException(404, "Diagnosis not found")
+
+    r = record
+    results = r.results_json or []
+    competitors = r.competitors_json or []
+    insights = r.insights or []
+    recommendations = r.recommendations or []
+    per_model = r.per_model_scores or {}
+    models_used = r.models_used or []
+
+    # Stats
+    total_prompts = r.total_prompts or len(results)
+    mentioned = r.mentioned_count or 0
+    mention_rate = round((mentioned / total_prompts * 100), 1) if total_prompts else 0
+
+    generic_results = [p for p in results if p.get("prompt_type") == "generic"]
+    brand_results = [p for p in results if p.get("prompt_type") == "brand_specific"]
+    generic_mentioned = sum(1 for p in generic_results if p.get("mentioned"))
+    brand_mentioned = sum(1 for p in brand_results if p.get("mentioned"))
+
+    # Build markdown
+    lines = []
+    lines.append(f"# AI Visibility Report: {r.brand_name}")
+    lines.append(f"*Generated {r.created_at.strftime('%Y-%m-%d %H:%M UTC') if r.created_at else 'N/A'}*\n")
+
+    # Executive Summary
+    if r.composite_score is not None and r.composite_score >= 70:
+        grade = "strong"
+    elif r.composite_score is not None and r.composite_score >= 40:
+        grade = "moderate"
+    else:
+        grade = "weak"
+    lines.append("## Executive Summary")
+    lines.append(f"**{r.brand_name}** has **{grade}** AI visibility with a composite score of **{r.composite_score}/100**, "
+                  f"mentioned in {mentioned}/{total_prompts} prompts ({mention_rate}%) across {len(models_used)} AI platform(s).\n")
+
+    # Score Breakdown
+    lines.append("## Score Breakdown")
+    lines.append(f"| Dimension | Score |")
+    lines.append(f"|-----------|-------|")
+    lines.append(f"| **Composite** | {r.composite_score}/100 |")
+    lines.append(f"| Visibility (organic discovery) | {r.visibility_score}/100 |")
+    lines.append(f"| Citation (linked references) | {r.citation_score}/100 |")
+    lines.append(f"| Representation (sentiment quality) | {r.representation_score}/100 |")
+    lines.append(f"| Intent Coverage (query types) | {r.intent_score}/100 |")
+    lines.append("")
+
+    # Platform Comparison
+    if per_model and len(per_model) > 0:
+        lines.append("## Platform Comparison")
+        lines.append("| Platform | Mention Rate |")
+        lines.append("|----------|-------------|")
+        for model, score in sorted(per_model.items(), key=lambda x: x[1], reverse=True):
+            lines.append(f"| {model.capitalize()} | {score}% |")
+        lines.append("")
+
+    # Top Competitors
+    if competitors:
+        lines.append("## Top Competitors")
+        lines.append("These brands dominate AI recommendations in your category:\n")
+        lines.append("| Rank | Brand | Mentions | Avg Position | Sentiment |")
+        lines.append("|------|-------|----------|-------------|-----------|")
+        for i, c in enumerate(competitors[:10], 1):
+            avg_rank = f"#{c.get('avg_rank', 'N/A')}" if c.get('avg_rank') else "N/A"
+            lines.append(f"| {i} | {c.get('name', '?')} | {c.get('mention_count', 0)} | {avg_rank} | {c.get('sentiment', 'neutral')} |")
+        lines.append("")
+
+    # Generic vs Brand-Specific
+    lines.append("## Generic vs Brand-Specific Analysis")
+    lines.append(f"- **Generic prompts** (no brand name): {len(generic_results)} total, "
+                  f"{generic_mentioned} mentioned ({round(generic_mentioned/len(generic_results)*100, 1) if generic_results else 0}%)")
+    lines.append(f"- **Brand-specific prompts** (includes brand name): {len(brand_results)} total, "
+                  f"{brand_mentioned} mentioned ({round(brand_mentioned/len(brand_results)*100, 1) if brand_results else 0}%)")
+    lines.append("")
+    if generic_results and generic_mentioned == 0:
+        lines.append("> ⚠️ AI does not organically recommend your brand in category searches. "
+                      "This is the most critical gap to address.\n")
+    elif generic_results and generic_mentioned / len(generic_results) < 0.3:
+        lines.append("> ⚠️ Low organic discovery rate. Your brand appears in less than 30% of generic category queries.\n")
+
+    # Actionable Recommendations
+    lines.append("## Actionable Recommendations")
+    for i, rec in enumerate(recommendations, 1):
+        lines.append(f"{i}. {rec}")
+    lines.append("")
+
+    # Insights
+    if insights:
+        lines.append("## Key Insights")
+        for ins in insights:
+            lines.append(f"- {ins}")
+        lines.append("")
+
+    # Raw Data Summary
+    lines.append("## Raw Data Summary")
+    lines.append(f"- **Total prompts evaluated**: {total_prompts}")
+    lines.append(f"- **Total mentions**: {mentioned} ({mention_rate}%)")
+    lines.append(f"- **Models used**: {', '.join(models_used)}")
+    lines.append(f"- **Generic prompts**: {len(generic_results)}")
+    lines.append(f"- **Brand-specific prompts**: {len(brand_results)}")
+
+    # Sentiment breakdown
+    pos = sum(1 for p in results if p.get("mentioned") and p.get("sentiment") == "positive")
+    neu = sum(1 for p in results if p.get("mentioned") and p.get("sentiment") == "neutral")
+    neg = sum(1 for p in results if p.get("mentioned") and p.get("sentiment") == "negative")
+    lines.append(f"- **Sentiment**: {pos} positive, {neu} neutral, {neg} negative")
+    lines.append("")
+
+    markdown = "\n".join(lines)
+    return {"diagnosis_id": diagnosis_id, "report_markdown": markdown}

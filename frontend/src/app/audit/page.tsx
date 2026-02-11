@@ -7,7 +7,7 @@ import {
   Search, Eye, Link2, MessageSquare, Target, TrendingUp,
   AlertTriangle, CheckCircle2, XCircle, ArrowRight, Zap, BarChart3,
   Globe, Loader2, ChevronRight, Star, Award, Sparkles, Clock,
-  ThumbsUp, ThumbsDown, Minus, Users, Trophy, Crown
+  ThumbsUp, ThumbsDown, Minus, Users, Trophy, Crown, Download, FileText
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
