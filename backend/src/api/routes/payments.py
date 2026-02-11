@@ -5,6 +5,8 @@ Stripe payment integration — checkout sessions, webhooks, subscription status.
 from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -80,18 +82,105 @@ async def stripe_webhook(request: Request):
     data = event.get("data", {}).get("object", {}) if isinstance(event, dict) else event.data.object
 
     if event_type == "checkout.session.completed":
-        print(f"[Stripe] Checkout completed: customer={getattr(data, 'customer', data.get('customer', 'unknown'))}")
-        # TODO: activate subscription in your database
+        customer_id = getattr(data, 'customer', data.get('customer', ''))
+        customer_email = getattr(data, 'customer_email', data.get('customer_email', ''))
+        print(f"[Stripe] Checkout completed: customer={customer_id}, email={customer_email}")
+        
+        # Link Stripe customer to our user
+        if customer_email:
+            await _update_user_subscription(customer_email, customer_id=customer_id)
+
     elif event_type in (
         "customer.subscription.created",
         "customer.subscription.updated",
         "customer.subscription.deleted",
     ):
-        status = getattr(data, "status", data.get("status", "unknown"))
-        print(f"[Stripe] Subscription {event_type}: status={status}")
-        # TODO: update subscription status in your database
+        sub_status = getattr(data, "status", data.get("status", "unknown"))
+        customer_id = getattr(data, "customer", data.get("customer", ""))
+        
+        # Determine plan from price ID
+        items = getattr(data, "items", data.get("items", {}))
+        plan = _resolve_plan_name(items)
+        
+        print(f"[Stripe] Subscription {event_type}: status={sub_status}, plan={plan}")
+        
+        if customer_id:
+            await _update_user_subscription(
+                None,
+                customer_id=customer_id,
+                status=sub_status if event_type != "customer.subscription.deleted" else "canceled",
+                plan=plan
+            )
+
+    elif event_type == "invoice.payment_failed":
+        customer_id = getattr(data, "customer", data.get("customer", ""))
+        print(f"[Stripe] Payment failed: customer={customer_id}")
+        if customer_id:
+            await _update_user_subscription(None, customer_id=customer_id, status="past_due")
 
     return {"status": "ok"}
+
+
+def _resolve_plan_name(items) -> str:
+    """Resolve Stripe price ID to plan name."""
+    from ...core.config import settings
+    
+    try:
+        if hasattr(items, 'data'):
+            price_id = items.data[0].price.id if items.data else None
+        elif isinstance(items, dict):
+            data_list = items.get("data", [])
+            price_id = data_list[0].get("price", {}).get("id") if data_list else None
+        else:
+            return "unknown"
+        
+        if price_id == settings.STRIPE_PRICE_PRO:
+            return "pro"
+        elif price_id == settings.STRIPE_PRICE_ENTERPRISE:
+            return "enterprise"
+        return "unknown"
+    except Exception:
+        return "unknown"
+
+
+async def _update_user_subscription(
+    email: str = None,
+    customer_id: str = None,
+    status: str = None,
+    plan: str = None,
+):
+    """Update user subscription fields in database."""
+    from src.core.database import _get_session_factory
+    from src.models.user import User
+    
+    try:
+        async with _get_session_factory()() as db:
+            user = None
+            if customer_id:
+                stmt = select(User).where(User.stripe_customer_id == customer_id)
+                result = await db.execute(stmt)
+                user = result.scalar_one_or_none()
+            
+            if not user and email:
+                stmt = select(User).where(User.email == email)
+                result = await db.execute(stmt)
+                user = result.scalar_one_or_none()
+            
+            if not user:
+                print(f"[Stripe] User not found: email={email}, customer={customer_id}")
+                return
+            
+            if customer_id and not user.stripe_customer_id:
+                user.stripe_customer_id = customer_id
+            if status:
+                user.subscription_status = status
+            if plan and plan != "unknown":
+                user.subscription_plan = plan
+            
+            await db.commit()
+            print(f"[Stripe] Updated user {user.email}: status={status}, plan={plan}")
+    except Exception as e:
+        print(f"[Stripe] Error updating user: {e}")
 
 
 @router.get("/subscription-status")

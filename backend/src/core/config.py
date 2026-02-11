@@ -65,8 +65,10 @@ class Settings(BaseSettings):
     # OAuth
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
-    APPLE_CLIENT_ID: str = ""
-    APPLE_CLIENT_SECRET: str = ""
+    APPLE_CLIENT_ID: str = ""  # Service ID (e.g., com.luminos.web)
+    APPLE_TEAM_ID: str = ""  # D7BK236H9B
+    APPLE_KEY_ID: str = ""  # Key ID from Apple Developer
+    APPLE_PRIVATE_KEY: str = ""  # Contents of .p8 file (newlines as \n)
     OAUTH_REDIRECT_BASE: str = ""  # e.g., https://geo-insights-api-production.up.railway.app
     FRONTEND_URL: str = "https://geo-dashboard-sigma-ashen.vercel.app"
 

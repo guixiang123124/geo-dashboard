@@ -9,7 +9,7 @@ from typing import Annotated
 from urllib.parse import urlencode
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -235,11 +235,24 @@ async def oauth_redirect(provider: str) -> RedirectResponse:
             "redirect_uri": f"{settings.OAUTH_REDIRECT_BASE}/api/v1/auth/oauth/apple/callback",
             "scope": "name email",
             "response_type": "code",
-            "response_mode": "query"
+            "response_mode": "form_post"  # Apple requires form_post for scope with name/email
         }
 
     redirect_url = f"{auth_url}?{urlencode(params)}"
     return RedirectResponse(url=redirect_url)
+
+
+@router.post("/oauth/apple/callback")
+async def apple_oauth_callback(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+) -> RedirectResponse:
+    """Handle Apple OAuth callback (form_post)."""
+    form = await request.form()
+    code = form.get("code")
+    if not code:
+        return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth/login?error=no_code")
+    return await _handle_oauth_callback("apple", code, db)
 
 
 @router.get("/oauth/{provider}/callback")
@@ -248,19 +261,24 @@ async def oauth_callback(
     code: str,
     db: AsyncSession = Depends(get_db)
 ) -> RedirectResponse:
-    """Handle OAuth callback, create/login user, redirect to frontend with token."""
-    if provider not in ["google", "apple"]:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unsupported OAuth provider"
-        )
+    """Handle OAuth callback (GET for Google)."""
+    if provider == "apple":
+        # Apple uses form_post, handled by apple_oauth_callback above
+        raise HTTPException(status_code=400, detail="Apple uses POST callback")
+    if provider != "google":
+        raise HTTPException(status_code=400, detail="Unsupported OAuth provider")
+    return await _handle_oauth_callback(provider, code, db)
 
+
+async def _handle_oauth_callback(provider: str, code: str, db: AsyncSession) -> RedirectResponse:
+    """Shared OAuth callback logic."""
     try:
-        # Exchange code for tokens and get user info
         if provider == "google":
             user_info = await _get_google_user_info(code)
         elif provider == "apple":
             user_info = await _get_apple_user_info(code)
+        else:
+            raise ValueError(f"Unsupported provider: {provider}")
         
         email = user_info.get("email")
         name = user_info.get("name")
@@ -278,7 +296,6 @@ async def oauth_callback(
         user = result.scalar_one_or_none()
 
         if not user:
-            # Create new OAuth user with random password
             random_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
             user = User(
                 email=email,
@@ -292,30 +309,25 @@ async def oauth_callback(
             await db.commit()
             await db.refresh(user)
         else:
-            # Update OAuth fields if not set
             if not user.oauth_provider:
                 user.oauth_provider = provider
                 user.oauth_id = oauth_id
                 await db.commit()
 
-        # Update last login
         await update_last_login(db, user)
 
-        # Create access token
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             subject=user.id,
             expires_delta=access_token_expires
         )
 
-        # Redirect to frontend with token
         frontend_url = f"{settings.FRONTEND_URL}/auth/callback?token={access_token}"
         return RedirectResponse(url=frontend_url)
 
     except Exception as e:
         import logging
         logging.error(f"OAuth callback error for {provider}: {type(e).__name__}: {e}")
-        # Redirect to frontend with error
         error_url = f"{settings.FRONTEND_URL}/auth/login?error=oauth_failed&detail={str(e)[:200]}"
         return RedirectResponse(url=error_url)
 
@@ -351,17 +363,52 @@ async def _get_google_user_info(code: str) -> dict:
 
 
 async def _get_apple_user_info(code: str) -> dict:
-    """Exchange Apple OAuth code for user info."""
-    # Note: Apple OAuth is more complex and requires JWT tokens
-    # For now, we'll return a placeholder implementation
-    # Full implementation would require JWT signing with Apple's private key
+    """Exchange Apple OAuth code for user info using JWT client secret."""
+    from jose import jwt as jose_jwt
+    import time
     
-    # This is a simplified version - in production, you'd need to:
-    # 1. Create a JWT client assertion signed with your Apple private key
-    # 2. Exchange the code for tokens
-    # 3. Decode the ID token to get user info
+    # Generate client_secret JWT signed with Apple's private key
+    now = int(time.time())
+    private_key = settings.APPLE_PRIVATE_KEY.replace("\\n", "\n")
     
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Apple OAuth implementation pending"
+    client_secret_payload = {
+        "iss": settings.APPLE_TEAM_ID,
+        "iat": now,
+        "exp": now + 86400 * 180,  # 6 months max
+        "aud": "https://appleid.apple.com",
+        "sub": settings.APPLE_CLIENT_ID,
+    }
+    client_secret = jose_jwt.encode(
+        client_secret_payload,
+        private_key,
+        algorithm="ES256",
+        headers={"kid": settings.APPLE_KEY_ID}
     )
+
+    # Exchange code for tokens
+    token_url = "https://appleid.apple.com/auth/token"
+    token_data = {
+        "client_id": settings.APPLE_CLIENT_ID,
+        "client_secret": client_secret,
+        "code": code,
+        "grant_type": "authorization_code",
+        "redirect_uri": f"{settings.OAUTH_REDIRECT_BASE}/api/v1/auth/oauth/apple/callback"
+    }
+
+    async with httpx.AsyncClient() as client:
+        token_response = await client.post(token_url, data=token_data)
+        token_response.raise_for_status()
+        tokens = token_response.json()
+
+    # Decode ID token (without verification — Apple's token endpoint is trusted)
+    id_token = tokens.get("id_token")
+    if not id_token:
+        raise HTTPException(status_code=400, detail="No id_token from Apple")
+    
+    claims = jose_jwt.get_unverified_claims(id_token)
+    
+    return {
+        "id": claims.get("sub"),
+        "email": claims.get("email"),
+        "name": claims.get("email", "").split("@")[0]  # Apple only sends name on first login
+    }

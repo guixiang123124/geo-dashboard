@@ -31,6 +31,11 @@ class User(Base):
         nullable=True
     )
 
+    # Subscription
+    stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    subscription_status: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # active, canceled, past_due, free
+    subscription_plan: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # pro, enterprise
+
     # Status
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
