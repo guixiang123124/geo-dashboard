@@ -650,10 +650,10 @@ export default function LandingPage() {
           <FadeIn delay={200}>
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { name: 'Free', price: '$0', period: 'forever', features: ['3 brands', '1 AI model (Gemini)', 'Basic GEO Score', 'Monthly reports', 'Community support'], cta: 'Get Started', highlight: false },
-                { name: 'Pro', price: '$49', period: '/month', features: ['20 brands', '3 AI models', 'Full GEO Score + trends', 'Prompt research', 'Competitive benchmark', 'Priority support'], cta: 'Start Pro Trial', highlight: true },
-                { name: 'Business', price: '$299', period: '/month', features: ['Unlimited brands', 'All AI models', 'API access', 'White-label reports', 'Content audit', 'Dedicated manager'], cta: 'Contact Sales', highlight: false },
-              ].map(({ name, price, period, features, cta, highlight }) => (
+                { name: 'Free', price: '$0', period: 'forever', features: ['3 brands', '1 AI model (Gemini)', 'Basic GEO Score', 'Monthly reports', 'Community support'], cta: 'Get Started', highlight: false, href: '/audit' },
+                { name: 'Pro', price: '$49', period: '/month', features: ['20 brands', '3 AI models', 'Full GEO Score + trends', 'Prompt research', 'Competitive benchmark', 'Priority support'], cta: 'Start Pro Trial', highlight: true, href: '/pricing' },
+                { name: 'Business', price: '$299', period: '/month', features: ['Unlimited brands', 'All AI models', 'API access', 'White-label reports', 'Content audit', 'Dedicated manager'], cta: 'Contact Sales', highlight: false, href: '/pricing' },
+              ].map(({ name, price, period, features, cta, highlight, href }) => (
                 <div key={name} className={`rounded-xl p-8 border-2 bg-white ${highlight ? 'border-violet-500 ring-2 ring-violet-100 scale-105' : 'border-slate-200'}`}>
                   {highlight && <div className="text-xs font-semibold text-violet-600 uppercase mb-2">Most Popular</div>}
                   <h3 className="text-xl font-bold text-slate-900">{name}</h3>
@@ -668,7 +668,7 @@ export default function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/audit">
+                  <Link href={href}>
                     <Button className={`w-full ${highlight ? 'bg-violet-600 hover:bg-violet-700' : ''}`} variant={highlight ? 'default' : 'outline'}>
                       {cta}
                     </Button>

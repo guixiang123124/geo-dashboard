@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Search, Eye, Link2, MessageSquare, Target, TrendingUp,
   AlertTriangle, CheckCircle2, XCircle, ArrowRight, Zap, BarChart3,
   Globe, Loader2, ChevronRight, Star, Award, Sparkles, Clock,
-  ThumbsUp, ThumbsDown, Minus, Users, Trophy, Crown, Download, FileText
+  ThumbsUp, ThumbsDown, Minus, Users, Trophy, Crown, Download, FileText,
+  Share2, X, Mail
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -156,6 +158,17 @@ function ModelBadge({ model }: { model: string }) {
   );
 }
 
+function ProBlurOverlay() {
+  return (
+    <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[2px]">
+      <Link href="/pricing" className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-violet-600 text-white font-semibold text-sm hover:bg-violet-700 transition-colors shadow-lg">
+        <Zap className="w-4 h-4" />
+        Upgrade to Pro
+      </Link>
+    </div>
+  );
+}
+
 // ---- Progress animation messages ----
 const PROGRESS_MESSAGES = [
   'Crawling website...',
@@ -176,9 +189,56 @@ export default function AuditPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'prompts' | 'competitors'>('overview');
   const [expandedResults, setExpandedResults] = useState<Set<number>>(new Set());
+  const [isPro, setIsPro] = useState(false);
 
   const [showCustomPrompts, setShowCustomPrompts] = useState(false);
   const [customPromptsText, setCustomPromptsText] = useState('');
+  const [shareToast, setShareToast] = useState(false);
+  const [showEmailBanner, setShowEmailBanner] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Show email banner 5s after diagnosis completes
+  useEffect(() => {
+    if (!diagnosis) return;
+    const alreadySubscribed = localStorage.getItem('luminos_subscribed') === 'true';
+    if (alreadySubscribed) return;
+    const timer = setTimeout(() => setShowEmailBanner(true), 5000);
+    return () => clearTimeout(timer);
+  }, [diagnosis]);
+
+  const handleShare = useCallback(() => {
+    if (!diagnosis) return;
+    const url = `${window.location.origin}/report/${diagnosis.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2000);
+    });
+  }, [diagnosis]);
+
+  const handleSubscribe = useCallback(async () => {
+    if (!emailInput.trim() || !emailInput.includes('@')) return;
+    setEmailSubmitting(true);
+    try {
+      const res = await fetch(`${API_URL}/api/v1/subscribers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.trim() }),
+      });
+      if (res.ok) {
+        setEmailStatus('success');
+        localStorage.setItem('luminos_subscribed', 'true');
+        setTimeout(() => setShowEmailBanner(false), 2000);
+      } else {
+        setEmailStatus('error');
+      }
+    } catch {
+      setEmailStatus('error');
+    } finally {
+      setEmailSubmitting(false);
+    }
+  }, [emailInput]);
 
   // Popular brands for quick access
   const popularBrands = [
@@ -236,6 +296,7 @@ export default function AuditPage() {
 
       const data: DiagnosisResponse = await res.json();
       setDiagnosis(data);
+      setIsPro(data.score.models_used && data.score.models_used.length > 1);
       setActiveTab('overview');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Diagnosis failed';
@@ -467,57 +528,82 @@ export default function AuditPage() {
           {/* Overall Score Card */}
           <Card className="overflow-hidden">
             <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white">
-              {/* Export Buttons */}
+              {/* Export & Share Buttons */}
               <div className="flex justify-end gap-2 mb-4">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
-                  onClick={async () => {
-                    try {
-                      const res = await fetch(`${API_URL}/api/v1/diagnosis/${diagnosis.id}/report`);
-                      if (!res.ok) throw new Error('Failed to fetch report');
-                      const data = await res.json();
-                      const markdown = data.report || data.markdown || data.content || JSON.stringify(data, null, 2);
-                      const blob = new Blob([markdown], { type: 'text/markdown' });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `luminos-${diagnosis.brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-report.md`;
-                      a.click();
-                      URL.revokeObjectURL(url);
-                    } catch (err) {
-                      console.error('Export report failed:', err);
-                    }
-                  }}
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white relative"
+                  onClick={handleShare}
                 >
-                  <FileText className="w-4 h-4 mr-1.5" />
-                  Export Report
+                  <Share2 className="w-4 h-4 mr-1.5" />
+                  {shareToast ? 'Link copied!' : 'Share Results'}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
-                  onClick={async () => {
-                    try {
-                      const res = await fetch(`${API_URL}/api/v1/diagnosis/${diagnosis.id}/export`);
-                      if (!res.ok) throw new Error('Failed to fetch data');
-                      const data = await res.json();
-                      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `luminos-${diagnosis.brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-data.json`;
-                      a.click();
-                      URL.revokeObjectURL(url);
-                    } catch (err) {
-                      console.error('Export data failed:', err);
-                    }
-                  }}
-                >
-                  <Download className="w-4 h-4 mr-1.5" />
-                  Export Raw Data
-                </Button>
+              </div>
+              <div className="flex justify-end gap-2 mb-4">
+                {isPro ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`${API_URL}/api/v1/diagnosis/${diagnosis.id}/report`);
+                          if (!res.ok) throw new Error('Failed to fetch report');
+                          const data = await res.json();
+                          const markdown = data.report || data.markdown || data.content || JSON.stringify(data, null, 2);
+                          const blob = new Blob([markdown], { type: 'text/markdown' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `luminos-${diagnosis.brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-report.md`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        } catch (err) {
+                          console.error('Export report failed:', err);
+                        }
+                      }}
+                    >
+                      <FileText className="w-4 h-4 mr-1.5" />
+                      Export Report
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`${API_URL}/api/v1/diagnosis/${diagnosis.id}/export`);
+                          if (!res.ok) throw new Error('Failed to fetch data');
+                          const data = await res.json();
+                          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `luminos-${diagnosis.brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-data.json`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        } catch (err) {
+                          console.error('Export data failed:', err);
+                        }
+                      }}
+                    >
+                      <Download className="w-4 h-4 mr-1.5" />
+                      Export Raw Data
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-white/5 border-white/20 text-white/50 cursor-not-allowed"
+                    disabled
+                  >
+                    <Download className="w-4 h-4 mr-1.5" />
+                    Export — Pro Only
+                  </Button>
+                )}
               </div>
               <div className="flex items-center justify-between">
                 <div>
@@ -746,11 +832,20 @@ export default function AuditPage() {
                             </div>
                           </div>
                           {isExpanded && r.response_text && (
-                            <div className="px-10 pb-3">
-                              <div className="bg-white rounded border p-3 text-xs text-slate-600 whitespace-pre-wrap max-h-60 overflow-y-auto">
-                                {r.response_text}
+                            isPro ? (
+                              <div className="px-10 pb-3">
+                                <div className="bg-white rounded border p-3 text-xs text-slate-600 whitespace-pre-wrap max-h-60 overflow-y-auto">
+                                  {r.response_text}
+                                </div>
                               </div>
-                            </div>
+                            ) : (
+                              <div className="px-10 pb-3 relative">
+                                <div className="bg-white rounded border p-3 text-xs text-slate-600 whitespace-pre-wrap max-h-20 overflow-hidden select-none" style={{ filter: 'blur(4px)' }}>
+                                  {r.response_text}
+                                </div>
+                                <ProBlurOverlay />
+                              </div>
+                            )
                           )}
                         </div>
                       );
@@ -801,11 +896,20 @@ export default function AuditPage() {
                             </div>
                           </div>
                           {isExpanded && r.response_text && (
-                            <div className="px-10 pb-3">
-                              <div className="bg-white rounded border p-3 text-xs text-slate-600 whitespace-pre-wrap max-h-60 overflow-y-auto">
-                                {r.response_text}
+                            isPro ? (
+                              <div className="px-10 pb-3">
+                                <div className="bg-white rounded border p-3 text-xs text-slate-600 whitespace-pre-wrap max-h-60 overflow-y-auto">
+                                  {r.response_text}
+                                </div>
                               </div>
-                            </div>
+                            ) : (
+                              <div className="px-10 pb-3 relative">
+                                <div className="bg-white rounded border p-3 text-xs text-slate-600 whitespace-pre-wrap max-h-20 overflow-hidden select-none" style={{ filter: 'blur(4px)' }}>
+                                  {r.response_text}
+                                </div>
+                                <ProBlurOverlay />
+                              </div>
+                            )
                           )}
                         </div>
                       );
@@ -831,42 +935,48 @@ export default function AuditPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {diagnosis.competitors.map((comp, i) => (
-                    <div key={i} className="flex items-start gap-4 p-4 rounded-lg border border-slate-200 hover:border-orange-200 transition-colors">
-                      {/* Rank badge */}
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        i === 0 ? 'bg-yellow-100 text-yellow-700' :
-                        i === 1 ? 'bg-slate-100 text-slate-600' :
-                        i === 2 ? 'bg-orange-100 text-orange-700' :
-                        'bg-slate-50 text-slate-500'
-                      }`}>
-                        {i === 0 ? <Crown className="w-4 h-4" /> :
-                         <span className="text-xs font-bold">{i + 1}</span>}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3">
-                          <span className="font-semibold text-slate-900">{comp.name}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                            comp.sentiment === 'positive' ? 'bg-emerald-100 text-emerald-700' :
-                            comp.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
-                            'bg-slate-100 text-slate-600'
+                  {diagnosis.competitors.map((comp, i) => {
+                    const isLocked = !isPro && i >= 3;
+                    return (
+                      <div key={i} className="relative">
+                        <div className={`flex items-start gap-4 p-4 rounded-lg border border-slate-200 hover:border-orange-200 transition-colors ${isLocked ? 'select-none' : ''}`} style={isLocked ? { filter: 'blur(4px)' } : undefined}>
+                          {/* Rank badge */}
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            i === 0 ? 'bg-yellow-100 text-yellow-700' :
+                            i === 1 ? 'bg-slate-100 text-slate-600' :
+                            i === 2 ? 'bg-orange-100 text-orange-700' :
+                            'bg-slate-50 text-slate-500'
                           }`}>
-                            {comp.sentiment || 'neutral'}
-                          </span>
-                        </div>
+                            {i === 0 ? <Crown className="w-4 h-4" /> :
+                             <span className="text-xs font-bold">{i + 1}</span>}
+                          </div>
 
-                        {comp.why_mentioned && (
-                          <p className="text-sm text-slate-600 mt-1">{comp.why_mentioned}</p>
-                        )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3">
+                              <span className="font-semibold text-slate-900">{comp.name}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                comp.sentiment === 'positive' ? 'bg-emerald-100 text-emerald-700' :
+                                comp.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
+                                'bg-slate-100 text-slate-600'
+                              }`}>
+                                {comp.sentiment || 'neutral'}
+                              </span>
+                            </div>
 
-                        <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                          <span>Mentioned {comp.mention_count}x</span>
-                          {comp.avg_rank && <span>Avg rank #{Math.round(comp.avg_rank)}</span>}
+                            {comp.why_mentioned && (
+                              <p className="text-sm text-slate-600 mt-1">{comp.why_mentioned}</p>
+                            )}
+
+                            <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                              <span>Mentioned {comp.mention_count}x</span>
+                              {comp.avg_rank && <span>Avg rank #{Math.round(comp.avg_rank)}</span>}
+                            </div>
+                          </div>
                         </div>
+                        {isLocked && i === 3 && <ProBlurOverlay />}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div className="bg-violet-50 border border-violet-200 rounded-lg p-4 mt-4">
@@ -924,16 +1034,20 @@ export default function AuditPage() {
               {diagnosis.insights.map((text, i) => {
                 const isGood = text.toLowerCase().includes('strong') || text.toLowerCase().includes('excellent');
                 const isBad = text.toLowerCase().includes('low') || text.toLowerCase().includes('zero') || text.toLowerCase().includes('limited');
+                const isLocked = !isPro && i >= 2;
                 return (
-                  <div key={i} className={`flex items-start gap-3 p-3 rounded-lg ${
-                    isGood ? 'bg-emerald-50' : isBad ? 'bg-red-50' : 'bg-yellow-50'
-                  }`}>
-                    {isGood ? <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" /> :
-                     isBad ? <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" /> :
-                     <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />}
-                    <span className={`text-sm ${
-                      isGood ? 'text-emerald-800' : isBad ? 'text-red-800' : 'text-yellow-800'
-                    }`}>{text}</span>
+                  <div key={i} className="relative">
+                    <div className={`flex items-start gap-3 p-3 rounded-lg ${
+                      isGood ? 'bg-emerald-50' : isBad ? 'bg-red-50' : 'bg-yellow-50'
+                    } ${isLocked ? 'select-none' : ''}`} style={isLocked ? { filter: 'blur(4px)' } : undefined}>
+                      {isGood ? <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" /> :
+                       isBad ? <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" /> :
+                       <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />}
+                      <span className={`text-sm ${
+                        isGood ? 'text-emerald-800' : isBad ? 'text-red-800' : 'text-yellow-800'
+                      }`}>{text}</span>
+                    </div>
+                    {isLocked && i === 2 && <ProBlurOverlay />}
                   </div>
                 );
               })}
@@ -950,37 +1064,67 @@ export default function AuditPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {diagnosis.recommendations.map((rec, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-violet-700">{i + 1}</span>
+                {diagnosis.recommendations.map((rec, i) => {
+                  const isLocked = !isPro && i >= 1;
+                  return (
+                    <div key={i} className="relative">
+                      <div className={`flex items-start gap-3 p-3 bg-slate-50 rounded-lg ${isLocked ? 'select-none' : ''}`} style={isLocked ? { filter: 'blur(4px)' } : undefined}>
+                        <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-xs font-bold text-violet-700">{i + 1}</span>
+                        </div>
+                        <span className="text-sm text-slate-700">{rec}</span>
+                      </div>
+                      {isLocked && i === 1 && <ProBlurOverlay />}
                     </div>
-                    <span className="text-sm text-slate-700">{rec}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
 
-          {/* CTA */}
-          <Card className="border-2 border-violet-200 bg-gradient-to-r from-violet-50 to-indigo-50">
-            <CardContent className="p-8 text-center space-y-4">
-              <Award className="w-12 h-12 text-violet-600 mx-auto" />
-              <h3 className="text-xl font-bold text-slate-900">Want to Improve Your Score?</h3>
-              <p className="text-slate-600 max-w-lg mx-auto">
-                Our team can help optimize your brand&apos;s AI visibility across all major platforms.
-                Get a detailed action plan and ongoing monitoring.
-              </p>
-              <div className="flex items-center justify-center gap-4 pt-2">
-                <Button className="bg-violet-600 hover:bg-violet-700 px-6 py-3 h-auto text-base">
-                  Get Full Report <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-                <Button variant="outline" className="px-6 py-3 h-auto text-base border-violet-300 text-violet-700 hover:bg-violet-50">
-                  View Pricing
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Upgrade Banner */}
+          {!isPro && (
+            <Card className="border-2 border-violet-300 bg-gradient-to-r from-violet-50 to-indigo-50 overflow-hidden">
+              <CardContent className="p-8 text-center space-y-4">
+                <div className="text-4xl">🚀</div>
+                <h3 className="text-xl font-bold text-slate-900">Unlock Full AI Visibility Report</h3>
+                <p className="text-slate-600 max-w-lg mx-auto">
+                  Get 3-platform analysis, full competitor data, all insights &amp; recommendations, export reports, and more.
+                </p>
+                <div className="pt-2">
+                  <Link href="/pricing">
+                    <Button className="bg-violet-600 hover:bg-violet-700 px-8 py-3 h-auto text-base font-semibold">
+                      Upgrade to Pro — $49/mo <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* CTA for Pro users */}
+          {isPro && (
+            <Card className="border-2 border-violet-200 bg-gradient-to-r from-violet-50 to-indigo-50">
+              <CardContent className="p-8 text-center space-y-4">
+                <Award className="w-12 h-12 text-violet-600 mx-auto" />
+                <h3 className="text-xl font-bold text-slate-900">Want to Improve Your Score?</h3>
+                <p className="text-slate-600 max-w-lg mx-auto">
+                  Our team can help optimize your brand&apos;s AI visibility across all major platforms.
+                  Get a detailed action plan and ongoing monitoring.
+                </p>
+                <div className="flex items-center justify-center gap-4 pt-2">
+                  <Button className="bg-violet-600 hover:bg-violet-700 px-6 py-3 h-auto text-base">
+                    Get Full Report <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                  <Link href="/pricing">
+                    <Button variant="outline" className="px-6 py-3 h-auto text-base border-violet-300 text-violet-700 hover:bg-violet-50">
+                      View Pricing
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
@@ -1002,6 +1146,50 @@ export default function AuditPage() {
             <h3 className="font-semibold text-slate-900 mb-2">Real-Time Scoring</h3>
             <p className="text-sm text-slate-500">Live evaluation against Gemini AI with visibility, citation, and intent scores</p>
           </Card>
+        </div>
+      )}
+
+      {/* Email Subscribe Banner */}
+      {showEmailBanner && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom duration-500">
+          <div className="max-w-2xl mx-auto px-4 pb-4">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-lg p-4 relative">
+              <button
+                onClick={() => setShowEmailBanner(false)}
+                className="absolute top-3 right-3 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="flex items-start gap-3">
+                <Mail className="w-5 h-5 text-violet-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 space-y-2">
+                  <p className="font-semibold text-slate-900 text-sm">Get weekly AI visibility insights</p>
+                  {emailStatus === 'success' ? (
+                    <p className="text-sm text-emerald-600 font-medium">✓ Subscribed! Check your inbox.</p>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
+                        placeholder="you@company.com"
+                        className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:border-violet-500 focus:ring-1 focus:ring-violet-200 outline-none"
+                      />
+                      <button
+                        onClick={handleSubscribe}
+                        disabled={emailSubmitting}
+                        className="px-4 py-1.5 text-sm font-medium bg-violet-600 text-white rounded-lg hover:bg-violet-700 disabled:opacity-50"
+                      >
+                        {emailSubmitting ? '...' : 'Subscribe'}
+                      </button>
+                    </div>
+                  )}
+                  <p className="text-xs text-slate-400">Join 500+ brands monitoring their AI presence</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
