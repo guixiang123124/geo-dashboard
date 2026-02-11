@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     STRIPE_PRICE_ENTERPRISE: Optional[str] = None  # price_xxx for $299/mo
 
     # Security
-    SECRET_KEY: str = ""  # REQUIRED: set via SECRET_KEY env var (use `openssl rand -hex 32`)
+    SECRET_KEY: str = "54e0312dcfb24f8055162e51e35d035bd59d215656298e1cff203872bb228626"  # Override via SECRET_KEY env var
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days
 

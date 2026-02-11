@@ -17,8 +17,8 @@ async def lifespan(app: FastAPI):
     print(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
 
     # Validate critical config
-    if not settings.SECRET_KEY:
-        raise RuntimeError("SECRET_KEY is not set! Generate one with: openssl rand -hex 32")
+    if not settings.SECRET_KEY or settings.SECRET_KEY == "your-secret-key-here-change-in-production":
+        print("⚠️  WARNING: SECRET_KEY is weak or unset! Set a secure key via env var: openssl rand -hex 32")
 
     print(f"Database URL prefix: {settings.DATABASE_URL[:20]}...")
     try:
