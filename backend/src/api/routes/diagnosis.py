@@ -187,11 +187,15 @@ async def gemini_generate(prompt: str, max_tokens: int = 512) -> str:
 # Request / Response schemas
 # ---------------------------------------------------------------------------
 
+# Admin emails get unlimited Pro access
+ADMIN_EMAILS = os.environ.get("ADMIN_EMAILS", "guixiang123124@gmail.com").split(",")
+
 class DiagnosisRequest(BaseModel):
     domain: Optional[str] = None
     brand_name: Optional[str] = None
     custom_prompts: Optional[list[str]] = None
     pro: bool = False
+    email: Optional[str] = None  # If admin email, auto-upgrade to pro
 
 
 class PromptResult(BaseModel):
@@ -682,8 +686,14 @@ async def diagnose_brand(req: DiagnosisRequest, db: AsyncSession = Depends(get_d
     if not available_models:
         raise HTTPException(500, "No AI API keys configured")
 
+    # Admin auto-upgrade to pro
+    is_admin = req.email and req.email.strip().lower() in [e.strip().lower() for e in ADMIN_EMAILS]
+    is_pro = req.pro or is_admin
+    if is_admin:
+        print(f"[diagnosis] Admin access: {req.email}")
+
     # Model selection based on pro/free tier
-    if req.pro:
+    if is_pro:
         # Pro: use ALL available models
         models_to_use = available_models
         print(f"[diagnosis] Pro tier: using all {len(models_to_use)} models")
