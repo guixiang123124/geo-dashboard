@@ -134,7 +134,7 @@ function markdownToHtml(md: string): string {
     const tag = 'td';
     return '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
   });
-  html = html.replace(/(<tr>.*?<\/tr>)+/gs, (match) => {
+  html = html.replace(new RegExp('(<tr>.*?<\\/tr>)+', 'gs'), (match) => {
     // First row as header
     const firstRow = match.replace(/<tr>(.*?)<\/tr>/, (_, inner) =>
       '<thead><tr>' + inner.replace(/<td>/g, '<th>').replace(/<\/td>/g, '</th>') + '</tr></thead>'
