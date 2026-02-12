@@ -251,7 +251,7 @@ async def apple_oauth_callback(
     form = await request.form()
     code = form.get("code")
     if not code:
-        return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth/login?error=no_code")
+        return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth/login?error=no_code", status_code=302)
     return await _handle_oauth_callback("apple", code, db)
 
 
@@ -323,13 +323,13 @@ async def _handle_oauth_callback(provider: str, code: str, db: AsyncSession) -> 
         )
 
         frontend_url = f"{settings.FRONTEND_URL}/auth/callback?token={access_token}"
-        return RedirectResponse(url=frontend_url)
+        return RedirectResponse(url=frontend_url, status_code=302)
 
     except Exception as e:
         import logging
         logging.error(f"OAuth callback error for {provider}: {type(e).__name__}: {e}")
         error_url = f"{settings.FRONTEND_URL}/auth/login?error=oauth_failed&detail={str(e)[:200]}"
-        return RedirectResponse(url=error_url)
+        return RedirectResponse(url=error_url, status_code=302)
 
 
 async def _get_google_user_info(code: str) -> dict:
