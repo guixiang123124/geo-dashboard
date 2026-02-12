@@ -109,9 +109,7 @@ export function TopBar() {
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
-            <Eye className="w-5 h-5 text-white" />
-          </div>
+          <img src="/luminos-logo.png" alt="Luminos" className="w-8 h-8 rounded-lg" />
           <span className="text-lg font-bold text-slate-900">Luminos</span>
         </Link>
 

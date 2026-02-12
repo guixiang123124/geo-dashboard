@@ -724,9 +724,7 @@ export default function LandingPage() {
       <footer className="py-12 px-6 bg-slate-900 text-slate-400">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-violet-600 rounded flex items-center justify-center">
-              <Eye className="w-4 h-4 text-white" />
-            </div>
+            <img src="/luminos-logo.png" alt="Luminos" className="w-6 h-6 rounded" />
             <span className="text-white font-semibold">Luminos</span>
           </div>
           <div className="flex gap-6 text-sm">
