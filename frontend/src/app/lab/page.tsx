@@ -125,7 +125,7 @@ function markdownToHtml(md: string): string {
     .replace(/\n/g, '<br/>');
 
   // Wrap list items
-  html = html.replace(/(<li>.*?<\/li>)+/gs, (match) => `<ul>${match}</ul>`);
+  html = html.replace(new RegExp('(<li>.*?<\\/li>)+', 'gs'), (match) => `<ul>${match}</ul>`);
 
   // Tables (basic)
   html = html.replace(/\|(.+)\|/g, (match) => {
